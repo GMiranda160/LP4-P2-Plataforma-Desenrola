@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Floral delicado">
+  <rect width="240" height="240" fill="#f5ede2"/>
+  <g fill="none" stroke="#6b1f2e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M120 200 C 118 150 122 110 120 40"/>
+    <path d="M120 120 C 96 110 84 88 82 62 C 108 66 120 88 120 112"/>
+    <path d="M120 140 C 146 130 158 108 160 82 C 134 86 122 110 120 134"/>
+    <circle cx="120" cy="34" r="10"/>
+    <circle cx="80" cy="54" r="8"/>
+    <circle cx="162" cy="74" r="8"/>
+  </g>
+  <circle cx="120" cy="34" r="3.5" fill="#d9a7a0"/>
+  <circle cx="80" cy="54" r="3" fill="#d9a7a0"/>
+  <circle cx="162" cy="74" r="3" fill="#d9a7a0"/>
+</svg>

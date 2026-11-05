@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Coração afetivo">
+  <rect width="240" height="240" fill="#f5ede2"/>
+  <path d="M120 190 C 60 148 44 100 66 74 C 88 48 116 58 120 84 C 124 58 152 48 174 74 C 196 100 180 148 120 190 Z"
+        fill="none" stroke="#6b1f2e" stroke-width="5" stroke-linejoin="round" stroke-dasharray="10 8"/>
+  <path d="M120 160 C 88 132 78 102 92 86 C 104 72 118 78 120 96 C 122 78 136 72 148 86 C 162 102 152 132 120 160 Z"
+        fill="#d9a7a0" fill-opacity="0.45" stroke="#8c3a48" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

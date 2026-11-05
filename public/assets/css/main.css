@@ -1,0 +1,12 @@
+/*
+ * Arquivo: main.css
+ * Dono: Guilherme. Só Guilherme altera este arquivo.
+ * Responsabilidade: ponto único de entrada dos estilos.
+ *
+ * TODO(Guilherme):
+ * 1. Importar nesta ordem: base, componentes, páginas e responsive.css.
+ * 2. Base: reset, variables, typography, utilities, animations.
+ * 3. Componentes: buttons, header, footer, category-item, product-card, showcase, forms, tables, feedback, admin.
+ * 4. Páginas: home, painel, montador, cadastros, catalog, produto, auth, hub.
+ * Veja INSTRUCOES_GUILHERME.md, seção 9.
+ */

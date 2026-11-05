@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Monograma clássico">
+  <rect width="240" height="240" fill="#f5ede2"/>
+  <circle cx="120" cy="120" r="78" fill="none" stroke="#6b1f2e" stroke-width="4" stroke-dasharray="7 9"/>
+  <circle cx="120" cy="120" r="58" fill="none" stroke="#8c3a48" stroke-width="2.5"/>
+  <text x="120" y="146" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="600" fill="#6b1f2e">M</text>
+</svg>

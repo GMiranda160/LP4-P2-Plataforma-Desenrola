@@ -1,0 +1,10 @@
+--
+-- Arquivo: backup.sql
+-- Dono: Guilherme. Só Guilherme altera este arquivo.
+-- Responsabilidade: backup entregue ao professor no Teams.
+--
+-- TODO(Guilherme):
+-- 1. Gerar este arquivo com pg_dump, pelo Session pooler, antes da entrega.
+-- 2. Restaurar em um banco vazio para provar que o backup funciona.
+-- Veja INSTRUCOES_GUILHERME.md, seção 12.
+--

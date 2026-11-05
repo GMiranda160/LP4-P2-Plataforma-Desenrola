@@ -1,0 +1,11 @@
+/*
+ * Arquivo: hub.css
+ * Dono: Eduardo. Só Eduardo altera este arquivo.
+ * Responsabilidade: estilos do Hub.
+ *
+ * TODO(Eduardo):
+ * 1. Criar os estilos de feed, detalhe e comentários, com o prefixo hub-.
+ * 2. Dar ao botão de curtir um estado para [aria-pressed="true"].
+ * 3. Usar white-space: pre-line no texto dos comentários.
+ * Veja INSTRUCOES_EDUARDO.md, seção 8.
+ */

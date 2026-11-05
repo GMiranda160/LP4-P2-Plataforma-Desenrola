@@ -1,0 +1,11 @@
+/*
+ * Arquivo: montador.css
+ * Dono: Guilherme. Só Guilherme altera este arquivo.
+ * Responsabilidade: estilos do conversor e do montador.
+ *
+ * TODO(Guilherme):
+ * 1. Trazer de produto.css o que for do fluxo em etapas, como .stepper, .matrix-grid e .swatch.
+ * 2. Criar .peca, .peca__mockup e .peca__matriz, se não ficarem em um componente.
+ * 3. Usar touch-action: none na área de arraste.
+ * Veja INSTRUCOES_GUILHERME.md, seção 7.
+ */

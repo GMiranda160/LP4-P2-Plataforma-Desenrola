@@ -1,0 +1,11 @@
+--
+-- Arquivo: seed.sql
+-- Dono: Guilherme. Só Guilherme altera este arquivo.
+-- Responsabilidade: dados mínimos para o sistema iniciar.
+--
+-- TODO(Guilherme):
+-- 1. Inserir as categorias: Toalhas, Bolsas, Aventais e Personalizados, com seus mockups.
+-- 2. Inserir a conta de gerente, com hash gerado localmente. Não salvar senha em texto.
+-- Os demais dados entram depois, por importação de arquivos ou pelo próprio site.
+-- Veja INSTRUCOES_GUILHERME.md, seção 5.
+--

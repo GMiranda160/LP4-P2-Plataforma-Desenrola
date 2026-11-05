@@ -1,0 +1,6 @@
+# Arquivos que não entram na imagem Docker
+.git
+.env
+*.md
+Modelo.png
+database/backup.sql

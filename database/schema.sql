@@ -1,0 +1,12 @@
+--
+-- Arquivo: schema.sql
+-- Dono: Guilherme. Só Guilherme altera este arquivo.
+-- Responsabilidade: criar as tabelas no SQL Editor do Supabase.
+--
+-- TODO(Guilherme):
+-- 1. Criar: usuarios, sessoes, clientes, insumos, categorias, matrizes, bordados, produtos, curtidas e comentarios.
+-- 2. Criar os índices do feed, das curtidas, dos comentários e da expiração de sessão.
+-- 3. Ativar RLS em todas as tabelas, sem políticas, para fechar a API pública do Supabase.
+-- 4. Copiar o SQL completo do documento de instruções.
+-- Veja INSTRUCOES_GUILHERME.md, seção 5.
+--

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ramo de folhas">
+  <rect width="240" height="240" fill="#f5ede2"/>
+  <g fill="none" stroke="#6b1f2e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M60 200 C 90 140 140 90 196 40"/>
+    <path d="M88 158 C 78 138 62 130 42 132 C 48 154 62 162 88 158 Z"/>
+    <path d="M118 128 C 108 106 90 98 70 102 C 78 126 94 134 118 128 Z"/>
+    <path d="M146 98 C 136 76 118 68 98 72 C 106 96 122 104 146 98 Z"/>
+    <path d="M112 160 C 126 148 146 148 158 160 C 142 170 124 170 112 160 Z"/>
+    <path d="M150 116 C 164 104 184 104 196 116 C 180 126 162 126 150 116 Z"/>
+  </g>
+  <circle cx="196" cy="40" r="5" fill="#d9a7a0"/>
+</svg>
