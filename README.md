@@ -63,7 +63,7 @@ O Render executa PHP por Docker. Por isso, o projeto tem um `Dockerfile` na raiz
 | Exigência | Como atendemos |
 |---|---|
 | Front-end em HTML, CSS e JS | Telas PHP geram o HTML, com o CSS e o JS atuais reaproveitados |
-| Back-end em PHP | PHP 8.4 com arquitetura MVC2 |
+| Back-end em PHP | PHP 8.5 com arquitetura MVC2 |
 | Método POST | Todo formulário e toda ação que altera dados usa POST |
 | Variáveis de sessão | `$_SESSION` guarda login, perfil e mensagens, com armazenamento no banco |
 | Banco de dados | PostgreSQL no Supabase, autorizado pelo professor |
@@ -84,7 +84,7 @@ on-line, envio de e-mail e upload de arquivos para o servidor.
 | Camada | Tecnologia |
 |---|---|
 | Interface | HTML gerado por PHP, CSS puro, JavaScript com ES Modules |
-| Servidor | PHP 8.4 com FrankenPHP em Docker |
+| Servidor | PHP 8.5 com FrankenPHP em Docker |
 | Banco | PostgreSQL no Supabase, acessado por PDO |
 | Hospedagem | Render, com deploy pelo GitHub |
 | IA | API do Gemini, chamada por cURL no PHP |
@@ -402,11 +402,11 @@ funcionar em celular, porque a turma vai usar o sistema pelo telefone.
 
 **Regra principal: duas pessoas nunca alteram o mesmo arquivo.**
 
-| Pessoa | Nível | Telas | Lógica em PHP | Documento |
-|---|---|---|---|---|
-| **Arthur** | Fácil | Insumos, Clientes, Produtos, Matrizes, Catálogo | Cadastro e listagem de Insumos e Clientes | [INSTRUCOES_ARTHUR.md](INSTRUCOES_ARTHUR.md) |
-| **Eduardo** | Médio | Contas, Usuários, Hub, comentários, curtidas no JS | Autenticação, recuperação de senha, usuários e comentários | [INSTRUCOES_EDUARDO.md](INSTRUCOES_EDUARDO.md) |
-| **Guilherme** | Difícil | Home, painel, montador, header e footer | Base, banco, deploy, Matrizes, Produtos, Hub, curtidas, conversor, Gemini e integração | [INSTRUCOES_GUILHERME.md](INSTRUCOES_GUILHERME.md) |
+| Pessoa | Telas | Lógica em PHP | Documento |
+|---|---|---|---|
+| **Arthur** | Insumos, Clientes, Produtos, Matrizes, Catálogo | Cadastro e listagem de Insumos e Clientes | [INSTRUCOES_ARTHUR.md](INSTRUCOES_ARTHUR.md) |
+| **Eduardo** | Contas, Usuários, Hub, comentários, curtidas no JS | Autenticação, recuperação de senha, usuários e comentários | [INSTRUCOES_EDUARDO.md](INSTRUCOES_EDUARDO.md) |
+| **Guilherme** | Home, painel, montador, header e footer | Base, banco, deploy, Matrizes, Produtos, Hub, curtidas, conversor, Gemini e integração | [INSTRUCOES_GUILHERME.md](INSTRUCOES_GUILHERME.md) |
 
 Como o trabalho começa:
 
@@ -510,10 +510,6 @@ Se aparecer conflito durante o rebase, abra o arquivo, escolha o trecho correto,
 git add <arquivo-resolvido>
 ```
 
-```bash
-git rebase --continue
-```
-
 Em caso de dúvida, pare e chame Guilherme antes de tentar comandos destrutivos.
 
 Se você usa IA para programar, os commits continuam com você, e ela deve avisar antes de qualquer commit. Revise o código, teste e faça o commit
@@ -531,10 +527,6 @@ servidor, por isso a conexão usa `PDO::ATTR_EMULATE_PREPARES`.
 **Deploy:** Guilherme cria um **Web Service** no [Render](https://render.com/), liga o repositório
 do GitHub e escolhe o ambiente Docker. O Render publica a imagem a cada push na `main`.
 
-**Plano gratuito:** o serviço dorme após 15 minutos parado e leva cerca de 1 minuto para acordar.
-Cada conta tem 750 horas gratuitas por mês. Uma instância atende todo o tráfego, e por isso o teste
-com vários celulares é obrigatório antes da apresentação.
-
 **Plano B para a apresentação:** se o Render falhar ou ficar lento, rode o projeto em um notebook e use o mesmo
 banco do Supabase. Todos entram pelo IP do notebook na mesma rede:
 
@@ -542,40 +534,7 @@ banco do Supabase. Todos entram pelo IP do notebook na mesma rede:
 php -S 0.0.0.0:8000 -t public public/index.php
 ```
 
-## 16. Cronograma
-
-| Data | Meta | Responsável |
-|---|---|---|
-| 05 a 07/11 | Repositório, teste no Render, base comentada, banco e primeiro deploy | Guilherme |
-| 07/11 | Arthur e Eduardo rodam o projeto localmente | Todos |
-| 08 a 10/11 | Insumos e Clientes; autenticação; conversor | Todos |
-| 11 a 13/11 | Telas de Produtos, Matrizes e Catálogo; Hub e comentários; montador e Gemini | Todos |
-| 14 e 15/11 | Integração, correções e CSS final | Guilherme, com apoio de todos |
-| 16/11 | **Congelamento:** só correções a partir daqui | Todos |
-| 16 e 17/11 | Teste com vários celulares ao mesmo tempo, backup do banco | Todos |
-| 18/11 | Ensaio da apresentação e montagem do ZIP | Todos |
-| 19/11 | Entrega no Teams antes da aula e apresentação | Todos |
-
-## 17. Roteiro da demonstração
-
-**Na véspera**
-
-- Abra o site publicado e o painel do Supabase, e confira a hospedagem em uso. Projetos gratuitos podem ser pausados por
-  inatividade.
-- Deixe matrizes padrão, produtos e bordados de exemplo cadastrados.
-- Gere com antecedência o tutorial dos bordados de exemplo.
-
-**Em sala**
-
-1. Abra o site 5 minutos antes, para o Render já estar acordado.
-2. Mostre o QR Code do Hub no telão.
-3. Cada pessoa cria uma conta e monta um bordado no celular.
-4. Projete o feed enquanto os bordados, as curtidas e os comentários aparecem.
-5. Gere o tutorial de um bordado da turma com o Gemini.
-6. Entre como gerente e mostre cadastros, painel e moderação.
-7. Mostre a arquitetura e os commits de cada integrante.
-
-## 18. Checklist da entrega
+## 16. Checklist da entrega
 
 - [ ] Registro das autorizações do professor guardado
 - [ ] Login, cadastro e recuperação de senha funcionando
