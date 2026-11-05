@@ -40,9 +40,7 @@ Valem para todas as pessoas do grupo e para qualquer IA usada no projeto:
 13. [Como rodar no seu computador](#13-como-rodar-no-seu-computador)
 14. [Como usar o Git na main](#14-como-usar-o-git-na-main)
 15. [Publicação](#15-publicação)
-16. [Cronograma](#16-cronograma)
-17. [Roteiro da demonstração](#17-roteiro-da-demonstração)
-18. [Checklist da entrega](#18-checklist-da-entrega)
+16. [Checklist da entrega](#16-checklist-da-entrega)
 
 ## 1. Decisões do projeto
 
