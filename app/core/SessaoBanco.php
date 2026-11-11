@@ -1,44 +1,65 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Camada: Core. Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: guardar as sessões na tabela sessoes, pois o disco do Render não é persistente.
- * Veja INSTRUCOES_GUILHERME.md, seção 4.
+ * Responsabilidade: handler de sessão do PHP que grava na tabela sessoes.
+ *
+ * Por que existe: o disco do servidor não é durável. No Railway e no Render,
+ * a cada deploy ou reinício os arquivos de sessão somem e o visitante é
+ * deslogado. A tabela sessoes no Supabase resolve isso.
+ *
+ * A coluna dados é text, nunca jsonb: a serialização da sessão tem caracteres
+ * que quebrariam em JSON.
  */
 class SessaoBanco implements SessionHandlerInterface
 {
-    /** TODO(Guilherme): devolver true. */
-    public function open(string $path, string $name): bool
+    public function open(string $caminho, string $nome): bool
     {
-        throw new RuntimeException('Não implementado: SessaoBanco::open');
+        // A conexão é criada sob demanda por Conexao::pdo(), nada a preparar.
+        return true;
     }
 
-    /** TODO(Guilherme): devolver true. */
     public function close(): bool
     {
-        throw new RuntimeException('Não implementado: SessaoBanco::close');
+        // A conexão fica viva para o resto da requisição, nada a fechar aqui.
+        return true;
     }
 
-    /** TODO(Guilherme): buscar os dados da sessão ainda válida, ou devolver texto vazio. */
+    /** Lê os dados da sessão pela id. Devolve string vazia se não existir ou expirou. */
     public function read(string $id): string|false
     {
-        throw new RuntimeException('Não implementado: SessaoBanco::read');
+        $consulta = Conexao::pdo()->prepare(
+            'SELECT dados FROM sessoes WHERE id = :id AND expira_em > now()'
+        );
+        $consulta->execute(['id' => $id]);
+
+        return (string) $consulta->fetchColumn();
     }
 
-    /** TODO(Guilherme): gravar com INSERT ... ON CONFLICT e expiração de 1 dia. */
-    public function write(string $id, string $data): bool
+    /** Grava ou atualiza a sessão, com expiração de 1 dia a cada escrita. */
+    public function write(string $id, string $dados): bool
     {
-        throw new RuntimeException('Não implementado: SessaoBanco::write');
+        $consulta = Conexao::pdo()->prepare(
+            "INSERT INTO sessoes (id, dados, expira_em)
+             VALUES (:id, :dados, now() + interval '1 day')
+             ON CONFLICT (id) DO UPDATE
+             SET dados = EXCLUDED.dados, expira_em = EXCLUDED.expira_em"
+        );
+
+        return $consulta->execute(['id' => $id, 'dados' => $dados]);
     }
 
-    /** TODO(Guilherme): apagar a sessão. */
+    /** Apaga a sessão (usado no logout). */
     public function destroy(string $id): bool
     {
-        throw new RuntimeException('Não implementado: SessaoBanco::destroy');
+        return Conexao::pdo()->prepare('DELETE FROM sessoes WHERE id = :id')->execute(['id' => $id]);
     }
 
-    /** TODO(Guilherme): apagar as sessões expiradas. */
-    public function gc(int $max_lifetime): int|false
+    /** Remove sessões expiradas. Chamado pelo PHP em session_gc_probability. */
+    public function gc(int $duracao): int|false
     {
-        throw new RuntimeException('Não implementado: SessaoBanco::gc');
+        return Conexao::pdo()->exec('DELETE FROM sessoes WHERE expira_em < now()');
     }
 }
