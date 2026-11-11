@@ -10,6 +10,7 @@ class AuthControlador
     public function loginForm(): void
     {
         Visao::render('auth/login', [
+            
             'titulo' => 'Entrar',
             'velhos' => Sessao::tirarVelhos(),
         ]);
