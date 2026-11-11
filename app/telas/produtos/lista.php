@@ -1,16 +1,8 @@
 <?php
-/**
- * Tela: lista de produtos
- * Dono: Arthur. Só Arthur altera este arquivo.
- * Rota: GET /gerente/produtos
- * Recebe: $titulo, $produtos
- * Campos de $produtos: id, nome, categoria, preco_base, destaque, ativo
- *
- * 1. Mostrar tabela com situação e botão Novo produto.
- * 2. Adicionar editar e excluir por POST em /gerente/produtos/excluir.
- * 3. Adicionar Ativar/Desativar por POST em /gerente/produtos/ativar.
-*/
-
+/*
+ * produtos/lista.php
+ * Tela de listagem de produtos.
+ */
 ?>
 <div class="page-head">
   <h1><?= e($titulo) ?></h1>

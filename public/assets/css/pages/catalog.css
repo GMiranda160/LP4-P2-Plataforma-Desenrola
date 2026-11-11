@@ -1,11 +1,6 @@
-/*
- * Arquivo: catalog.css
- * Dono: Arthur. Só Arthur altera este arquivo.
- * Responsabilidade: estilos do catálogo público.
- *
- * 1. Guilherme migra a base de Apenas Mostruario/css/pages/catalog.css.
- * 2. Ajustar filtros e grade de produtos. Usar variáveis, sem cores fixas.
-*/
+/* catalog.css
+ * Estilos da página pública do catálogo.
+ */
 
 .catalog-filters {
   display: flex;

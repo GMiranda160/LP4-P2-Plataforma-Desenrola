@@ -1,32 +1,58 @@
 <?php
-/**
- * Camada: Controlador. Dono: Arthur. Só Arthur altera este arquivo.
- * Responsabilidade: receber os pedidos de insumos, chamar InsumoServico e escolher a tela.
- * Veja INSTRUCOES_ARTHUR.md, seção 6.
+/*
+ * InsumoControlador.php
+ * Controlador dos insumos.
  */
+
 class InsumoControlador
 {
-    /** TODO(Arthur): ler a busca de $_GET e mostrar insumos/lista com o layout gerente. */
+    public function __construct(private InsumoServico $servico = new InsumoServico()) {}
+
     public function listar(): void
     {
-        throw new RuntimeException('Não implementado: InsumoControlador::listar');
+        $busca = trim($_GET['busca'] ?? '');
+        Visao::render('insumos/lista', [
+            'titulo' => 'Insumos',
+            'busca' => $busca,
+            'insumos' => $this->servico->listar($busca),
+        ], 'gerente');
     }
 
-    /** TODO(Arthur): carregar o registro por id, se houver, recuperar velhos e mostrar insumos/form. */
     public function form(): void
     {
-        throw new RuntimeException('Não implementado: InsumoControlador::form');
+        $id = (int) ($_GET['id'] ?? 0);
+        $insumo = $id ? $this->servico->buscar($id) : [];
+
+        if ($id && !$insumo) {
+            Sessao::flash('erro', 'Insumo não encontrado.');
+            Resposta::redirecionar('/gerente/insumos');
+        }
+
+        Visao::render('insumos/form', [
+            'titulo' => $id ? 'Editar insumo' : 'Novo insumo',
+            'insumo' => Sessao::tirarVelhos() ?: $insumo,
+        ], 'gerente');
     }
 
-    /** TODO(Arthur): chamar o serviço. Com erro, usar flash e guardarVelhos e voltar ao formulário. Sem erro, usar flash e ir para /gerente/insumos. */
     public function salvar(): void
     {
-        throw new RuntimeException('Não implementado: InsumoControlador::salvar');
+        $id = (int) ($_POST['id'] ?? 0);
+        $erros = $this->servico->salvar($id, $_POST);
+
+        if ($erros) {
+            Sessao::flash('erro', implode(' ', $erros));
+            Sessao::guardarVelhos($_POST);
+            Resposta::redirecionar('/gerente/insumos/form' . ($id ? "?id={$id}" : ''));
+        }
+
+        Sessao::flash('sucesso', $id ? 'Insumo atualizado com sucesso!' : 'Insumo cadastrado com sucesso!');
+        Resposta::redirecionar('/gerente/insumos');
     }
 
-    /** TODO(Arthur): excluir pelo id do $_POST, usar flash e ir para /gerente/insumos. */
     public function excluir(): void
     {
-        throw new RuntimeException('Não implementado: InsumoControlador::excluir');
+        $this->servico->excluir((int) ($_POST['id'] ?? 0));
+        Sessao::flash('sucesso', 'Insumo excluído com sucesso!');
+        Resposta::redirecionar('/gerente/insumos');
     }
 }

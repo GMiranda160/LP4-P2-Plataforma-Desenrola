@@ -1,17 +1,60 @@
 <?php
-/**
- * Tela: lista de insumos
- * Dono: Arthur. Só Arthur altera este arquivo.
- * Rota: GET /gerente/insumos
- * Recebe: $titulo, $busca, $insumos
- * Campos de $insumos: id, tipo, nome, cor_hex, quantidade, unidade, custo_unitario,
- *                     fornecedor, estoque_minimo
- *
- * TODO(Arthur):
- * 1. Mostrar busca, tabela e botão Novo insumo.
- * 2. Adicionar editar e excluir por POST em /gerente/insumos/excluir.
- * 3. Mostrar o selo Estoque baixo quando quantidade <= estoque_minimo.
- * Veja INSTRUCOES_ARTHUR.md, seções 4 e 5.
+/*
+ * insumos/lista.php
+ * Tela de listagem de insumos.
  */
 ?>
-<p class="empty-state">Tela em construção.</p>
+<div class="page-head">
+  <h1><?= e($titulo) ?></h1>
+  <a class="btn btn--primary btn--sm" href="/gerente/insumos/form">Novo insumo</a>
+</div>
+
+<form method="get" class="form">
+  <label class="visually-hidden" for="busca">Buscar</label>
+  <input class="text-field" id="busca" name="busca" value="<?= e($busca) ?>" placeholder="Buscar por nome">
+</form>
+
+<?php if (!$insumos): ?>
+  <p class="empty-state">Nenhum insumo encontrado.</p>
+<?php else: ?>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Nome</th>
+          <th>Quantidade</th>
+          <th>Custo</th>
+          <th>Situação</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($insumos as $i): ?>
+          <tr>
+            <td><?= e($i['tipo']) ?></td>
+            <td><?= e($i['nome']) ?></td>
+            <td><?= e($i['quantidade']) ?> <?= e($i['unidade']) ?></td>
+            <td><?= moeda($i['custo_unitario']) ?></td>
+            <td>
+              <?php if ((float) $i['quantidade'] <= (float) $i['estoque_minimo']): ?>
+                <span class="badge badge--alerta">Estoque baixo</span>
+              <?php else: ?>
+                <span class="badge badge--ok">Ok</span>
+              <?php endif; ?>
+            </td>
+            <td class="table__actions">
+              <a class="btn btn--ghost btn--sm" href="/gerente/insumos/form?id=<?= (int) $i['id'] ?>">Editar</a>
+              <form method="post" action="/gerente/insumos/excluir"
+                    onsubmit="return confirm('Tem certeza que deseja excluir este insumo?')">
+                <?= Csrf::campo() ?>
+                <input type="hidden" name="id" value="<?= (int) $i['id'] ?>">
+                <button class="btn btn--ghost btn--sm" type="submit">Excluir</button>
+              </form>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+<?php endif; ?>

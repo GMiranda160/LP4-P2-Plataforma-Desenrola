@@ -1,50 +1,68 @@
 <?php
-/**
- * Camada: Dados. Dono: Arthur. Só Arthur altera este arquivo.
- * Responsabilidade: SQL da tabela clientes. Sem validação e sem HTML. Todo valor vai em parâmetro.
- * Veja INSTRUCOES_ARTHUR.md, seção 6.
+/*
+ * ClienteDados.php
+ * Camada de dados dos clientes.
  */
+
 class ClienteDados
 {
-    /** TODO(Arthur): buscar por nome ou CPF/CNPJ com ILIKE, ordenado por nome. */
     public function listar(string $busca = ''): array
     {
-        throw new RuntimeException('Não implementado: ClienteDados::listar');
+        $busca = trim($busca);
+        $digitos = preg_replace('/\D/', '', $busca);
+
+        $sql = 'SELECT * FROM clientes WHERE nome ILIKE :busca';
+        $parametros = ['busca' => "%{$busca}%"];
+
+        if ($digitos !== '') {
+            $sql .= ' OR cpf_cnpj ILIKE :cpf';
+            $parametros['cpf'] = "%{$digitos}%";
+        }
+
+        $sql .= ' ORDER BY nome';
+
+        $consulta = Conexao::pdo()->prepare($sql);
+        $consulta->execute($parametros);
+        return $consulta->fetchAll();
     }
 
-    /** TODO(Arthur): devolver o registro, ou null. */
     public function buscar(int $id): ?array
     {
-        throw new RuntimeException('Não implementado: ClienteDados::buscar');
+        $consulta = Conexao::pdo()->prepare('SELECT * FROM clientes WHERE id = :id');
+        $consulta->execute(['id' => $id]);
+        return $consulta->fetch() ?: null;
     }
 
-    /** TODO(Arthur): informar se o documento já existe, ignorando o próprio id. */
-    public function existeDocumento(string $cpfCnpj, int $ignorarId = 0): bool
+    public function existeCpfCnpj(string $cpfCnpj, int $ignorarId = 0): bool
     {
-        throw new RuntimeException('Não implementado: ClienteDados::existeDocumento');
+        $sql = 'SELECT 1 FROM clientes WHERE cpf_cnpj = :cpf_cnpj AND id <> :id';
+        $consulta = Conexao::pdo()->prepare($sql);
+        $consulta->execute(['cpf_cnpj' => $cpfCnpj, 'id' => $ignorarId]);
+        return (bool) $consulta->fetchColumn();
     }
 
-    /** TODO(Arthur): executar o INSERT. */
     public function inserir(array $d): void
     {
-        throw new RuntimeException('Não implementado: ClienteDados::inserir');
+        $sql = 'INSERT INTO clientes (nome, cpf_cnpj, email, telefone, endereco, cep)
+                VALUES (:nome, :cpf_cnpj, :email, :telefone, :endereco, :cep)';
+        Conexao::pdo()->prepare($sql)->execute($d);
     }
 
-    /** TODO(Arthur): executar o UPDATE. */
     public function atualizar(int $id, array $d): void
     {
-        throw new RuntimeException('Não implementado: ClienteDados::atualizar');
+        $sql = 'UPDATE clientes SET nome = :nome, cpf_cnpj = :cpf_cnpj, email = :email,
+                telefone = :telefone, endereco = :endereco, cep = :cep
+                WHERE id = :id';
+        Conexao::pdo()->prepare($sql)->execute($d + ['id' => $id]);
     }
 
-    /** TODO(Arthur): executar o DELETE. */
     public function excluir(int $id): void
     {
-        throw new RuntimeException('Não implementado: ClienteDados::excluir');
+        Conexao::pdo()->prepare('DELETE FROM clientes WHERE id = :id')->execute(['id' => $id]);
     }
 
-    /** TODO(Arthur): devolver o total, usado no painel. */
     public function contar(): int
     {
-        throw new RuntimeException('Não implementado: ClienteDados::contar');
+        return (int) Conexao::pdo()->query('SELECT count(*) FROM clientes')->fetchColumn();
     }
 }

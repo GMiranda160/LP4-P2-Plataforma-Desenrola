@@ -1,32 +1,66 @@
 <?php
-/**
- * Camada: Processamento. Dono: Arthur. Só Arthur altera este arquivo.
- * Responsabilidade: validar clientes e chamar ClienteDados. Sem $_POST, sem $_SESSION e sem HTML.
- * Veja INSTRUCOES_ARTHUR.md, seção 6.
+/*
+ * ClienteServico.php
+ * Camada de processamento dos clientes.
  */
+
 class ClienteServico
 {
-    /** TODO(Arthur): devolver clientes pela busca. */
+    public function __construct(private ClienteDados $dados = new ClienteDados()) {}
+
     public function listar(string $busca = ''): array
     {
-        throw new RuntimeException('Não implementado: ClienteServico::listar');
+        return $this->dados->listar($busca);
     }
 
-    /** TODO(Arthur): devolver um cliente, ou null. */
     public function buscar(int $id): ?array
     {
-        throw new RuntimeException('Não implementado: ClienteServico::buscar');
+        return $this->dados->buscar($id);
     }
 
-    /** TODO(Arthur): validar nome, CPF com 11 ou CNPJ com 14 dígitos, e-mail, telefone e documento único. Gravar só os números. Devolver a lista de erros. */
-    public function salvar(int $id, array $campos): array
+    /** Devolve a lista de erros. Lista vazia significa que salvou. */
+    public function salvar(int $id, array $c): array
     {
-        throw new RuntimeException('Não implementado: ClienteServico::salvar');
+        $d = [
+            'nome' => trim($c['nome'] ?? ''),
+            'cpf_cnpj' => preg_replace('/\D/', '', $c['cpf_cnpj'] ?? ''),
+            'email' => trim($c['email'] ?? ''),
+            'telefone' => trim($c['telefone'] ?? ''),
+            'endereco' => trim($c['endereco'] ?? ''),
+            'cep' => preg_replace('/\D/', '', $c['cep'] ?? ''),
+        ];
+
+        $erros = [];
+        if ($d['nome'] === '') $erros[] = 'Informe o nome.';
+
+        $tamanhoCpf = strlen($d['cpf_cnpj']);
+        if ($tamanhoCpf === 0) {
+            $erros[] = 'Informe o CPF ou CNPJ.';
+        } elseif ($tamanhoCpf !== 11 && $tamanhoCpf !== 14) {
+            $erros[] = 'CPF deve ter 11 dígitos e CNPJ deve ter 14.';
+        }
+
+        if ($d['email'] === '') {
+            $erros[] = 'Informe o e-mail.';
+        } elseif (!filter_var($d['email'], FILTER_VALIDATE_EMAIL)) {
+            $erros[] = 'E-mail inválido.';
+        }
+
+        if ($d['telefone'] === '') $erros[] = 'Informe o telefone.';
+
+        if (($tamanhoCpf === 11 || $tamanhoCpf === 14)
+            && $this->dados->existeCpfCnpj($d['cpf_cnpj'], $id)) {
+            $erros[] = 'Já existe um cliente com este CPF/CNPJ.';
+        }
+
+        if ($erros) return $erros;
+
+        $id ? $this->dados->atualizar($id, $d) : $this->dados->inserir($d);
+        return [];
     }
 
-    /** TODO(Arthur): excluir o cliente. */
     public function excluir(int $id): void
     {
-        throw new RuntimeException('Não implementado: ClienteServico::excluir');
+        $this->dados->excluir($id);
     }
 }

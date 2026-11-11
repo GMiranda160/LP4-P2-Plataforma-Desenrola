@@ -1,16 +1,8 @@
 <?php
-/**
- * Tela: formulário de matriz
- * Dono: Arthur. Só Arthur altera este arquivo.
- * Rota: GET /gerente/matrizes/form
- * Recebe: $titulo, $matriz
- * Envia POST para /gerente/matrizes/salvar.
- * Campos: id, nome, descricao, categoria, tempo_medio_min
- *
- * 1. Criar o formulário com Csrf::campo() e o id oculto.
- * 2. Mostrar a miniatura da matriz em img.
-*/
-
+/*
+ * matrizes/form.php
+ * Tela de cadastro e edição de matrizes.
+ */
 ?>
 <div class="page-head"><h1><?= e($titulo) ?></h1></div>
 

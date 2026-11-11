@@ -1,11 +1,6 @@
-/*
- * Arquivo: produto.css
- * Dono: Arthur. Só Arthur altera este arquivo.
- * Responsabilidade: estilos da página do produto.
- *
- * 1. Guilherme migra de Apenas Mostruario/css/pages/produto.css só o que a página usa.
- * 2. Ajustar peça, preço e botão de orçamento. Usar variáveis, sem cores fixas.
-*/
+/* produto.css
+ * Estilos da página pública de um produto.
+ */
 
 .product-detail {
   display: grid;

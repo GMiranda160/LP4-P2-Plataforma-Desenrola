@@ -1,50 +1,59 @@
 <?php
-/**
- * Camada: Dados. Dono: Arthur. Só Arthur altera este arquivo.
- * Responsabilidade: SQL da tabela insumos. Sem validação e sem HTML. Todo valor vai em parâmetro.
- * Veja INSTRUCOES_ARTHUR.md, seção 6.
+/*
+ * InsumoDados.php
+ * Camada de dados dos insumos.
  */
+
 class InsumoDados
 {
-    /** TODO(Arthur): buscar por nome com ILIKE, ordenado por tipo e nome. */
     public function listar(string $busca = ''): array
     {
-        throw new RuntimeException('Não implementado: InsumoDados::listar');
+        $sql = 'SELECT * FROM insumos WHERE nome ILIKE :busca ORDER BY tipo, nome';
+        $consulta = Conexao::pdo()->prepare($sql);
+        $consulta->execute(['busca' => "%{$busca}%"]);
+        return $consulta->fetchAll();
     }
 
-    /** TODO(Arthur): devolver o registro, ou null. */
     public function buscar(int $id): ?array
     {
-        throw new RuntimeException('Não implementado: InsumoDados::buscar');
+        $consulta = Conexao::pdo()->prepare('SELECT * FROM insumos WHERE id = :id');
+        $consulta->execute(['id' => $id]);
+        return $consulta->fetch() ?: null;
     }
 
-    /** TODO(Arthur): informar se já existe o nome neste tipo, ignorando o próprio id. */
     public function existeNome(string $tipo, string $nome, int $ignorarId = 0): bool
     {
-        throw new RuntimeException('Não implementado: InsumoDados::existeNome');
+        $sql = 'SELECT 1 FROM insumos WHERE tipo = :tipo AND lower(nome) = lower(:nome) AND id <> :id';
+        $consulta = Conexao::pdo()->prepare($sql);
+        $consulta->execute(['tipo' => $tipo, 'nome' => $nome, 'id' => $ignorarId]);
+        return (bool) $consulta->fetchColumn();
     }
 
-    /** TODO(Arthur): executar o INSERT. */
     public function inserir(array $d): void
     {
-        throw new RuntimeException('Não implementado: InsumoDados::inserir');
+        $sql = 'INSERT INTO insumos
+                (tipo, nome, cor_hex, quantidade, unidade, custo_unitario, fornecedor, estoque_minimo)
+                VALUES
+                (:tipo, :nome, :cor_hex, :quantidade, :unidade, :custo_unitario, :fornecedor, :estoque_minimo)';
+        Conexao::pdo()->prepare($sql)->execute($d);
     }
 
-    /** TODO(Arthur): executar o UPDATE. */
     public function atualizar(int $id, array $d): void
     {
-        throw new RuntimeException('Não implementado: InsumoDados::atualizar');
+        $sql = 'UPDATE insumos SET tipo = :tipo, nome = :nome, cor_hex = :cor_hex,
+                quantidade = :quantidade, unidade = :unidade, custo_unitario = :custo_unitario,
+                fornecedor = :fornecedor, estoque_minimo = :estoque_minimo
+                WHERE id = :id';
+        Conexao::pdo()->prepare($sql)->execute($d + ['id' => $id]);
     }
 
-    /** TODO(Arthur): executar o DELETE. */
     public function excluir(int $id): void
     {
-        throw new RuntimeException('Não implementado: InsumoDados::excluir');
+        Conexao::pdo()->prepare('DELETE FROM insumos WHERE id = :id')->execute(['id' => $id]);
     }
 
-    /** TODO(Arthur): devolver o total, usado no painel. */
     public function contar(): int
     {
-        throw new RuntimeException('Não implementado: InsumoDados::contar');
+        return (int) Conexao::pdo()->query('SELECT count(*) FROM insumos')->fetchColumn();
     }
 }

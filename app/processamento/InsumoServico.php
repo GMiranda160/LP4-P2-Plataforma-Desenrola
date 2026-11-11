@@ -1,32 +1,61 @@
 <?php
-/**
- * Camada: Processamento. Dono: Arthur. Só Arthur altera este arquivo.
- * Responsabilidade: validar insumos e chamar InsumoDados. Sem $_POST, sem $_SESSION e sem HTML.
- * Veja INSTRUCOES_ARTHUR.md, seção 6.
+/*
+ * InsumoServico.php
+ * Camada de processamento dos insumos.
  */
+
 class InsumoServico
 {
-    /** TODO(Arthur): devolver insumos pela busca. */
+    private const TIPOS = ['tecido', 'linha', 'aviamento'];
+    private const UNIDADES = ['metro', 'carretel', 'peca'];
+
+    public function __construct(private InsumoDados $dados = new InsumoDados()) {}
+
     public function listar(string $busca = ''): array
     {
-        throw new RuntimeException('Não implementado: InsumoServico::listar');
+        return $this->dados->listar($busca);
     }
 
-    /** TODO(Arthur): devolver um insumo, ou null. */
     public function buscar(int $id): ?array
     {
-        throw new RuntimeException('Não implementado: InsumoServico::buscar');
+        return $this->dados->buscar($id);
     }
 
-    /** TODO(Arthur): validar tipo, nome, unidade, quantidade >= 0, custo > 0, cor e nome único por tipo. Devolver a lista de erros; lista vazia significa que salvou. */
-    public function salvar(int $id, array $campos): array
+    /** Devolve a lista de erros. Lista vazia significa que salvou. */
+    public function salvar(int $id, array $c): array
     {
-        throw new RuntimeException('Não implementado: InsumoServico::salvar');
+        $d = [
+            'tipo' => trim($c['tipo'] ?? ''),
+            'nome' => trim($c['nome'] ?? ''),
+            'cor_hex' => trim($c['cor_hex'] ?? ''),
+            'quantidade' => (float) str_replace(',', '.', $c['quantidade'] ?? '0'),
+            'unidade' => trim($c['unidade'] ?? ''),
+            'custo_unitario' => (float) str_replace(',', '.', $c['custo_unitario'] ?? '0'),
+            'fornecedor' => trim($c['fornecedor'] ?? ''),
+            'estoque_minimo' => (float) str_replace(',', '.', $c['estoque_minimo'] ?? '0'),
+        ];
+
+        $erros = [];
+        if (!in_array($d['tipo'], self::TIPOS, true)) $erros[] = 'Selecione o tipo.';
+        if ($d['nome'] === '') $erros[] = 'Informe o nome.';
+        if (!in_array($d['unidade'], self::UNIDADES, true)) $erros[] = 'Selecione a unidade.';
+        if ($d['quantidade'] < 0) $erros[] = 'A quantidade não pode ser negativa.';
+        if ($d['custo_unitario'] <= 0) $erros[] = 'O custo deve ser maior que zero.';
+        if ($d['cor_hex'] !== '' && !preg_match('/^#[0-9a-f]{6}$/i', $d['cor_hex'])) {
+            $erros[] = 'Cor inválida.';
+        }
+        if ($this->dados->existeNome($d['tipo'], $d['nome'], $id)) {
+            $erros[] = 'Já existe um insumo com este nome neste tipo.';
+        }
+
+        if ($erros) return $erros;
+
+        $id ? $this->dados->atualizar($id, $d) : $this->dados->inserir($d);
+        return [];
     }
 
-    /** TODO(Arthur): excluir o insumo. */
     public function excluir(int $id): void
     {
-        throw new RuntimeException('Não implementado: InsumoServico::excluir');
+        $this->dados->excluir($id);
     }
 }

@@ -1,32 +1,58 @@
 <?php
-/**
- * Camada: Controlador. Dono: Arthur. Só Arthur altera este arquivo.
- * Responsabilidade: receber os pedidos de clientes, chamar ClienteServico e escolher a tela.
- * Veja INSTRUCOES_ARTHUR.md, seção 6.
+/*
+ * ClienteControlador.php
+ * Controlador dos clientes.
  */
+
 class ClienteControlador
 {
-    /** TODO(Arthur): ler a busca de $_GET e mostrar clientes/lista com o layout gerente. */
+    public function __construct(private ClienteServico $servico = new ClienteServico()) {}
+
     public function listar(): void
     {
-        throw new RuntimeException('Não implementado: ClienteControlador::listar');
+        $busca = trim($_GET['busca'] ?? '');
+        Visao::render('clientes/lista', [
+            'titulo' => 'Clientes',
+            'busca' => $busca,
+            'clientes' => $this->servico->listar($busca),
+        ], 'gerente');
     }
 
-    /** TODO(Arthur): carregar o registro por id, se houver, recuperar velhos e mostrar clientes/form. */
     public function form(): void
     {
-        throw new RuntimeException('Não implementado: ClienteControlador::form');
+        $id = (int) ($_GET['id'] ?? 0);
+        $cliente = $id ? $this->servico->buscar($id) : [];
+
+        if ($id && !$cliente) {
+            Sessao::flash('erro', 'Cliente não encontrado.');
+            Resposta::redirecionar('/gerente/clientes');
+        }
+
+        Visao::render('clientes/form', [
+            'titulo' => $id ? 'Editar cliente' : 'Novo cliente',
+            'cliente' => Sessao::tirarVelhos() ?: $cliente,
+        ], 'gerente');
     }
 
-    /** TODO(Arthur): chamar o serviço. Com erro, usar flash e guardarVelhos e voltar ao formulário. Sem erro, usar flash e ir para /gerente/clientes. */
     public function salvar(): void
     {
-        throw new RuntimeException('Não implementado: ClienteControlador::salvar');
+        $id = (int) ($_POST['id'] ?? 0);
+        $erros = $this->servico->salvar($id, $_POST);
+
+        if ($erros) {
+            Sessao::flash('erro', implode(' ', $erros));
+            Sessao::guardarVelhos($_POST);
+            Resposta::redirecionar('/gerente/clientes/form' . ($id ? "?id={$id}" : ''));
+        }
+
+        Sessao::flash('sucesso', $id ? 'Cliente atualizado com sucesso!' : 'Cliente cadastrado com sucesso!');
+        Resposta::redirecionar('/gerente/clientes');
     }
 
-    /** TODO(Arthur): excluir pelo id do $_POST, usar flash e ir para /gerente/clientes. */
     public function excluir(): void
     {
-        throw new RuntimeException('Não implementado: ClienteControlador::excluir');
+        $this->servico->excluir((int) ($_POST['id'] ?? 0));
+        Sessao::flash('sucesso', 'Cliente excluído com sucesso!');
+        Resposta::redirecionar('/gerente/clientes');
     }
 }
