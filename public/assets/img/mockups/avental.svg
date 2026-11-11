@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Avental">
+  <!-- Mockup de avental: bib com alça no pescoço, corpo e bolso. -->
+  <g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Alça do pescoço -->
+    <path d="M160 60 H240"/>
+    <!-- Bib e corpo -->
+    <path d="M150 60 V170 H250 V60"/>
+    <path d="M150 170 L90 420 H310 L250 170"/>
+    <!-- Bolso -->
+    <rect x="155" y="280" width="90" height="70" rx="8"/>
+    <path d="M155 315 h90" stroke-width="5"/>
+  </g>
+</svg>

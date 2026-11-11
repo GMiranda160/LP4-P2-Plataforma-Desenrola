@@ -1,11 +1,59 @@
-/*
- * Arquivo: variables.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: cores, fontes, espaços, sombras e medidas.
- *
- * TODO(Guilherme):
- * 1. Migrar o conteúdo de Apenas Mostruario/css/base/variables.css.
- * 2. Trocar --color-wine-700 para #691818 e rever --color-wine-900 e --color-wine-500.
- * 3. Trocar --color-sand-50 para #fbf7f4.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Variáveis globais - identidade visual da plataforma
+   Centralizar aqui evita cores e medidas espalhadas pelo CSS.
+   Paleta alinhada com o Modelo.png (vinho #691818, fundo #fbf7f4).
+   ========================================================================== */
+
+:root {
+  /* Cores da marca */
+  --color-wine-900: #4d1013;
+  --color-wine-700: #691818;
+  --color-wine-500: #8c3a3a;
+  --color-rose-300: #d9a7a0;
+  --color-rose-100: #f3ded9;
+  --color-sand-50: #fbf7f4;
+  --color-sand-100: #f5ede2;
+  --color-sand-200: #eaddcb;
+  --color-white: #ffffff;
+  --color-ink: #2e2321;
+  --color-ink-soft: #6a5b57;
+  --color-focus: #8c3a3a;
+  --color-border: #d6bfbd;
+  --color-wine-accent: #8c0d1c;
+
+  /* Tipografia */
+  --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+  --font-body: "Jost", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* Espaçamentos */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --section-y: clamp(3rem, 6vw, 5.5rem);
+
+  /* Layout */
+  --container: 1180px;
+  --container-pad: clamp(1.25rem, 4vw, 2.5rem);
+
+  /* Bordas, sombras e movimento */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 2px 10px -6px rgba(77, 16, 19, 0.28);
+  --shadow-md: 0 18px 40px -28px rgba(77, 16, 19, 0.55);
+  --shadow-lg: 0 34px 70px -44px rgba(77, 16, 19, 0.65);
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --transition: 280ms var(--ease-soft);
+  --transition-slow: 560ms var(--ease-soft);
+  --z-header: 50;
+
+  /* Cards de produto */
+  --product-card-width: 300px;
+  --product-card-width-max: 360px;
+}

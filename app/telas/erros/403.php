@@ -1,11 +1,18 @@
 <?php
 /**
- * Tela: acesso negado
+ * Tela: erro 403
  * Dono: Guilherme. Só Guilherme altera este arquivo.
- *
- * TODO(Guilherme):
- * 1. Mostrar a mensagem de acesso negado e um link para /.
- * Veja INSTRUCOES_GUILHERME.md, seção 4.
+ * Rota: acesso indevido (POST sem CSRF válido, ou área da gerente sem perfil).
+ * Recebe: $titulo (definido na tela), $conteudo (montado no layout).
  */
+
+$titulo = 'Acesso negado | Desenrola';
 ?>
-<p class="empty-state">Tela em construção.</p>
+<section class="section">
+  <div class="container section__head">
+    <p class="eyebrow">Erro 403</p>
+    <h1>Você não tem permissão</h1>
+    <p class="lead">Esta área é restrita ou a operação não pôde ser validada.</p>
+    <p><a class="btn btn--primary" href="/">Voltar para o início</a></p>
+  </div>
+</section>

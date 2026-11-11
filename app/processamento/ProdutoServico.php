@@ -1,68 +1,48 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Camada: Processamento. Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: regras de produtos e catálogo.
- * Veja INSTRUCOES_GUILHERME.md, seção 14.
+ * Responsabilidade: regras dos produtos do mostruário. Sem SQL e sem HTML.
  */
 class ProdutoServico
 {
-    /** TODO(Guilherme): devolver todos os produtos para a gerente. */
-    public function listar(): array
+    /** Todos os produtos para a gerente. */
+    public function todos(): array
     {
-        throw new RuntimeException('Não implementado: ProdutoServico::listar');
+        return (new ProdutoDados())->listar();
     }
 
-    /** TODO(Guilherme): devolver os produtos ativos, com os dados da peça. */
-    public function listarAtivos(?string $categoriaSlug = null): array
+    /** Produtos ativos para o catálogo. Passe o slug da categoria para filtrar. */
+    public function catalogo(?string $categoria = null): array
     {
-        throw new RuntimeException('Não implementado: ProdutoServico::listarAtivos');
+        if ($categoria !== null) {
+            $categoria = strtolower(trim($categoria));
+
+            if (!preg_match('/^[a-z0-9-]{1,80}$/', $categoria)) {
+                $categoria = null;
+            }
+        }
+
+        return (new ProdutoDados())->listar($categoria);
     }
 
-    /** TODO(Guilherme): devolver os produtos em destaque. */
+    /** Produtos em destaque, para a home. */
     public function destaques(int $limite = 6): array
     {
-        throw new RuntimeException('Não implementado: ProdutoServico::destaques');
+        return (new ProdutoDados())->destaques($limite);
     }
 
-    /** TODO(Guilherme): devolver um produto para edição. */
-    public function buscar(int $id): ?array
+    /** Um produto ativo para a página pública, ou null. */
+    public function mostrar(int $id): ?array
     {
-        throw new RuntimeException('Não implementado: ProdutoServico::buscar');
+        return (new ProdutoDados())->buscarAtivo($id);
     }
 
-    /** TODO(Guilherme): devolver um produto ativo, com os dados da peça. */
-    public function buscarAtivo(int $id): ?array
+    /** Categorias para navegação e filtros. */
+    public function categorias(): array
     {
-        throw new RuntimeException('Não implementado: ProdutoServico::buscarAtivo');
-    }
-
-    /** TODO(Guilherme): devolver as categorias. */
-    public function listarCategorias(): array
-    {
-        throw new RuntimeException('Não implementado: ProdutoServico::listarCategorias');
-    }
-
-    /** TODO(Guilherme): devolver os bordados do tipo produto. */
-    public function listarCombinacoes(): array
-    {
-        throw new RuntimeException('Não implementado: ProdutoServico::listarCombinacoes');
-    }
-
-    /** TODO(Guilherme): validar preço > 0 e combinação única. Enviar booleanos como t ou f. Devolver a lista de erros. */
-    public function salvar(int $id, array $campos): array
-    {
-        throw new RuntimeException('Não implementado: ProdutoServico::salvar');
-    }
-
-    /** TODO(Guilherme): excluir o produto. */
-    public function excluir(int $id): void
-    {
-        throw new RuntimeException('Não implementado: ProdutoServico::excluir');
-    }
-
-    /** TODO(Guilherme): inverter o campo ativo. */
-    public function alternarAtivo(int $id): void
-    {
-        throw new RuntimeException('Não implementado: ProdutoServico::alternarAtivo');
+        return (new ProdutoDados())->categorias();
     }
 }

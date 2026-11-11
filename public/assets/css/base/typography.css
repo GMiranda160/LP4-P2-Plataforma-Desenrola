@@ -1,9 +1,51 @@
-/*
- * Arquivo: typography.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: papéis e escala de texto.
- *
- * TODO(Guilherme):
- * 1. Migrar o conteúdo de Apenas Mostruario/css/base/typography.css.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Tipografia - escala e papéis de texto
+   ========================================================================== */
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-ink);
+  background-color: var(--color-sand-50);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  color: var(--color-wine-900);
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(2.4rem, 1.35rem + 3.8vw, 4rem);
+}
+
+h2 {
+  font-size: clamp(1.9rem, 1.35rem + 2.2vw, 2.9rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+}
+
+p {
+  color: var(--color-ink-soft);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-wine-500);
+}
+
+.lead {
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  color: var(--color-ink-soft);
+  line-height: 1.7;
+}

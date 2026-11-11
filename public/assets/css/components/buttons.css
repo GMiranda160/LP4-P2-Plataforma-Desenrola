@@ -1,10 +1,76 @@
-/*
- * Arquivo: buttons.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: botões e links de ação.
- *
- * TODO(Guilherme):
- * 1. Migrar o conteúdo de Apenas Mostruario/css/components/buttons.css.
- * 2. Decidir com o Modelo.png entre cantos arredondados e o formato em pílula.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Botões
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.7rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  transition:
+    background-color var(--transition),
+    color var(--transition),
+    border-color var(--transition),
+    transform var(--transition),
+    box-shadow var(--transition);
+}
+
+.btn--primary {
+  background-color: var(--color-wine-700);
+  color: var(--color-sand-50);
+  box-shadow: 0 12px 26px -16px rgba(77, 16, 19, 0.7);
+}
+
+.btn--primary:hover {
+  background-color: var(--color-wine-900);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px -16px rgba(77, 16, 19, 0.75);
+}
+
+.btn--ghost {
+  background-color: transparent;
+  border-color: rgba(105, 24, 24, 0.28);
+  color: var(--color-wine-700);
+}
+
+.btn--ghost:hover {
+  border-color: var(--color-wine-700);
+  background-color: rgba(105, 24, 24, 0.06);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--sm {
+  padding: 0.65rem 1.15rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-wine-700);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  transition: color var(--transition);
+}
+
+.link-button:hover {
+  color: var(--color-wine-900);
+}

@@ -1,10 +1,53 @@
-/*
- * Arquivo: feedback.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: avisos e selos.
- *
- * TODO(Guilherme):
- * 1. Criar .alert, .alert--sucesso e .alert--erro.
- * 2. Criar .badge, .badge--ok e .badge--alerta.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Avisos, alertas e selos
+   ========================================================================== */
+
+.flash {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--container-pad) 0;
+}
+
+.alert {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+}
+
+.alert--sucesso {
+  background-color: #eef6ee;
+  border-color: #bcd8c0;
+  color: #26532a;
+}
+
+.alert--erro {
+  background-color: #faecec;
+  border-color: #e5b8b8;
+  color: #7a2222;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background-color: var(--color-sand-100);
+  color: var(--color-ink-soft);
+}
+
+.badge--ok {
+  background-color: #eef6ee;
+  color: #26532a;
+}
+
+.badge--alerta {
+  background-color: #faecec;
+  color: #7a2222;
+}

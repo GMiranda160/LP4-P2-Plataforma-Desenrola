@@ -1,12 +1,30 @@
 <?php
 /**
- * Tela: mensagens de sucesso e erro
+ * Parcial: mensagens flash (sucesso, erro e aviso).
  * Dono: Guilherme. Só Guilherme altera este arquivo.
  *
- * TODO(Guilherme):
- * 1. Mostrar as mensagens de flash com .alert, .alert--sucesso e .alert--erro.
- * 2. Limpar as mensagens depois de exibir.
- * Veja INSTRUCOES_GUILHERME.md, seção 4.
+ * Lê as mensagens da sessão e as exibe uma única vez.
+ * Tipos conhecidos: sucesso (verde), erro (vermelho) e aviso (neutro).
  */
+
+$mensagens = Sessao::tirarFlash();
+
+if ($mensagens === []) {
+    return;
+}
+
+$classes = [
+    'sucesso' => 'alert--sucesso',
+    'erro' => 'alert--erro',
+    'aviso' => 'alert--sucesso',
+];
 ?>
-<p class="empty-state">Tela em construção.</p>
+<div class="flash" role="status" aria-live="polite">
+  <?php foreach ($mensagens as $mensagem): ?>
+    <?php
+    $tipo = (string) ($mensagem['tipo'] ?? 'aviso');
+    $classe = $classes[$tipo] ?? 'alert--sucesso';
+    ?>
+    <p class="alert <?= e($classe) ?>"><?= e((string) ($mensagem['mensagem'] ?? '')) ?></p>
+  <?php endforeach; ?>
+</div>

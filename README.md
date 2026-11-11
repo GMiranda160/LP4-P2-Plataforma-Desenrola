@@ -52,6 +52,7 @@ Valem para todas as pessoas do grupo e para qualquer IA usada no projeto:
 | **Sessão PHP** | Fica no banco, na tabela `sessoes`, porque arquivos do container não são duráveis |
 | **Arquivos** | Sem upload. Matrizes ficam no banco como grade de pontos e SVG gerado no servidor |
 | **IA** | Gemini, com cada tutorial salvo no banco e um texto reserva para falhas |
+| **Contas** | Todo e-mail do sistema usa `@example.com`; a pessoa digita só o prefixo no formulário |
 | **Divisão** | Cada arquivo tem um único dono, e Guilherme entrega os arquivos comentados |
 
 O Render executa PHP por Docker. Por isso, o projeto tem um `Dockerfile` na raiz.

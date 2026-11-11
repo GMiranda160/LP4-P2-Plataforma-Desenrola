@@ -94,23 +94,35 @@ base? Peça a Guilherme.
 
 ## 4. Contrato das telas de conta
 
+**Convenção de e-mail do projeto:** no Desenrola, todo e-mail de conta usa o domínio
+`@example.com`. A pessoa digita só o que vem antes do @; o sistema monta `usuario@example.com`.
+Não existe envio de e-mail no projeto, então não faz diferença para a entrega. Nas telas, mostre
+um campo `usuario` com o sufixo fixo `@example.com` (somente leitura), por exemplo com a classe
+`.input-group`. No servidor, o e-mail é montado pelo controlador e pelo serviço.
+
+**Exemplo de referência:** `auth/cadastro.php` foi montada por Guilherme como exemplo de tela
+para o Eduardo. O arquivo continua sendo dele; use como modelo para `login.php`, `recuperar.php`
+e `redefinir.php`.
+
 **`auth/login.php`**: rota `/login`
 
 - Recebe `$titulo`, `$velhos`.
-- Envia POST para `/login`, com `email` e `senha`.
+- Envia POST para `/login`, com `usuario` e `senha`. O e-mail completo é montado no servidor como `usuario@example.com`.
 - Tem links para `/cadastro` e `/recuperar-senha`.
 
 **`auth/cadastro.php`**: rota `/cadastro`
 
 - Recebe `$titulo`, `$perguntas`, `$velhos`.
 - Envia POST para `/cadastro`.
-- Campos: `nome`, `email`, `senha`, `confirmar_senha`, `pergunta_seguranca`, `resposta`.
+- Campos: `nome`, `usuario`, `senha`, `confirmar_senha`, `pergunta_seguranca`, `resposta`.
+- `usuario` é o que vem antes do @; o servidor monta `usuario@example.com`.
+- Mostre o sufixo `@example.com` ao lado do campo `usuario` (classe `.input-group`).
 - `pergunta_seguranca` é um `<select>` com os valores de `$perguntas`.
 
 **`auth/recuperar.php`**: rota `/recuperar-senha`
 
 - Recebe `$titulo`.
-- Envia POST para `/recuperar-senha`, com `email`.
+- Envia POST para `/recuperar-senha`, com `usuario`. O servidor monta `usuario@example.com`.
 
 **`auth/redefinir.php`**: aparece depois de informar o e-mail
 
@@ -302,7 +314,9 @@ contar(): int
 
 ### Cadastro
 
-- E-mail válido e único, salvo com `mb_strtolower(trim($email))`.
+- O formulário envia `usuario`, não e-mail completo. O serviço monta `usuario@example.com`.
+- `usuario` aceita letras minúsculas, números, ponto, hífen e sublinhado, de 3 a 30 caracteres.
+- E-mail válido e único, composto em minúsculas, salvo com `mb_strtolower(trim($email))`.
 - Senha com no mínimo 6 caracteres e confirmação igual.
 - Senha: `password_hash($senha, PASSWORD_DEFAULT)`.
 - Resposta: `password_hash(mb_strtolower(trim($resposta)), PASSWORD_DEFAULT)`.
@@ -311,7 +325,7 @@ contar(): int
 
 Perguntas fixas: nome do primeiro animal de estimação, cidade onde nasceu, nome da primeira escola.
 
-Mensagens: `Este e-mail já está cadastrado.`, `A senha deve ter no mínimo 6 caracteres.` e
+Mensagens: `Este usuário já está cadastrado.`, `A senha deve ter no mínimo 6 caracteres.` e
 `As senhas não coincidem.`
 
 ### Login e saída

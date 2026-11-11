@@ -1,10 +1,184 @@
-/*
- * Arquivo: header.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: cabeçalho e menu móvel.
- *
- * TODO(Guilherme):
- * 1. Migrar o conteúdo de Apenas Mostruario/css/components/header.css.
- * 2. Adaptar para a marca Desenrola e para o menu de conta do usuário.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Header - faixa superior, marca e navegação
+   ========================================================================== */
+
+.topbar {
+  background-color: var(--color-wine-900);
+  color: var(--color-rose-100);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: 0.55rem;
+}
+
+.topbar p {
+  color: inherit;
+}
+
+.topbar a {
+  color: var(--color-rose-300);
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.topbar a:hover {
+  color: var(--color-white);
+  border-color: currentColor;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background-color: rgba(251, 247, 244, 0.94);
+  border-bottom: 1px solid var(--color-sand-200);
+  backdrop-filter: blur(10px);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding-block: 0.85rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.brand__mark {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: var(--color-wine-700);
+  color: var(--color-sand-50);
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-wine-900);
+}
+
+.brand__text small {
+  margin-top: 0.4rem;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.nav__list {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.nav__list a {
+  position: relative;
+  display: inline-block;
+  padding-block: 0.35rem;
+}
+
+.nav__list a::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition);
+}
+
+.nav__list a:hover::after,
+.nav__list a[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.header-actions form {
+  display: inline-flex;
+}
+
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(105, 24, 24, 0.25);
+  border-radius: var(--radius-pill);
+  color: var(--color-wine-700);
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.nav-toggle:hover {
+  border-color: var(--color-wine-700);
+  background-color: rgba(105, 24, 24, 0.06);
+}
+
+.nav-toggle__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 18px;
+}
+
+.nav-toggle__bars span {
+  display: block;
+  height: 1.5px;
+  background-color: currentColor;
+  transition: transform var(--transition), opacity var(--transition);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}

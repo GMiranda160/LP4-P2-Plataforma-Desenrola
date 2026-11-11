@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Toalha de prato">
+  <!-- Mockup de toalha: retângulo com franjas e ponto de costura. -->
+  <g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="70" y="80" width="260" height="340" rx="10"/>
+    <!-- Franjas da parte de baixo -->
+    <path d="M95 420 v34"/>
+    <path d="M135 420 v34"/>
+    <path d="M175 420 v34"/>
+    <path d="M215 420 v34"/>
+    <path d="M255 420 v34"/>
+    <path d="M295 420 v34"/>
+    <!-- Ponto de costura -->
+    <path d="M100 385 h200" stroke-width="5" stroke-dasharray="14 12"/>
+    <path d="M100 115 h200" stroke-width="5" stroke-dasharray="14 12"/>
+  </g>
+</svg>

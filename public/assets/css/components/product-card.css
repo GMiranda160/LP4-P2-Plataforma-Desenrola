@@ -1,9 +1,137 @@
-/*
- * Arquivo: product-card.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: grade e cards de produto, reaproveitados no Hub.
- *
- * TODO(Guilherme):
- * 1. Migrar o conteúdo de Apenas Mostruario/css/components/product-card.css.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Card de produto
+   ========================================================================== */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--product-card-width)), 1fr));
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.product-card__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background-color: var(--color-sand-100);
+}
+
+.product-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.product-card:hover .product-card__media img {
+  transform: scale(1.04);
+}
+
+.product-card__badge {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background-color: rgba(251, 247, 244, 0.92);
+  color: var(--color-wine-700);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.product-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.3rem 1.4rem 1.5rem;
+}
+
+.product-card__category {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-wine-500);
+  min-height: 1.6em;
+}
+
+.product-card__name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--color-wine-900);
+  /* Reserva duas linhas para o nome não deslocar preço e botão. */
+  min-height: 2.4em;
+}
+
+.product-card__name a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-card__name a:hover {
+  color: var(--color-wine-700);
+}
+
+.product-card__description {
+  font-size: 0.88rem;
+  color: var(--color-ink-soft);
+  min-height: 3.2em;
+}
+
+.product-card__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+
+.product-card__price-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.product-card__price strong {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--color-wine-900);
+}
+
+.product-card__actions {
+  margin-top: auto;
+  padding-top: 1.1rem;
+}
+
+/* O card inteiro já sobe no hover; o botão só muda de tom. */
+.product-card__actions .btn--primary:hover {
+  transform: none;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+}

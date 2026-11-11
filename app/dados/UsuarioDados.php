@@ -100,7 +100,7 @@ class UsuarioDados
                 (
                     SELECT COUNT(*)
                     FROM bordados b
-                    WHERE b.usuario_id = u.id
+                    WHERE b.autor_id = u.id
                 ) AS total_bordados
             FROM usuarios u
         ';

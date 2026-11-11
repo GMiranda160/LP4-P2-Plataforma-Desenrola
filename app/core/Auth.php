@@ -1,38 +1,66 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Camada: Core. Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: guardar e consultar o usuário logado.
- * Veja INSTRUCOES_GUILHERME.md, seção 4.
+ * Responsabilidade: login e estado do usuário na sessão.
+ *
+ * Na sessão fica apenas o necessário para a interface: id, nome, e-mail e
+ * perfil. Senha e hash nunca entram na sessão nem chegam às telas.
  */
 class Auth
 {
-    /** TODO(Guilherme): gravar id, nome e perfil na sessão, nunca hashes, e usar session_regenerate_id(true). */
+    /**
+     * Registra o usuário na sessão e regenera o id da sessão.
+     * A regeneração impede o ataque de fixation (id da sessão roubado antes do login).
+     */
     public static function entrar(array $usuario): void
     {
-        throw new RuntimeException('Não implementado: Auth::entrar');
+        session_regenerate_id(true);
+
+        Sessao::definir('usuario', [
+            'id' => (int) $usuario['id'],
+            'nome' => (string) $usuario['nome'],
+            'email' => (string) $usuario['email'],
+            'perfil' => (string) ($usuario['perfil'] ?? 'usuario'),
+        ]);
     }
 
-    /** TODO(Guilherme): encerrar a sessão. */
+    /** Encerra a sessão do usuário e descarta os cookies de sessão. */
     public static function sair(): void
     {
-        throw new RuntimeException('Não implementado: Auth::sair');
+        $_SESSION = [];
+
+        if (ini_get('session.use_cookies')) {
+            $parametros = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $parametros['path'], $parametros['domain'], $parametros['secure'], $parametros['httponly']);
+        }
+
+        session_destroy();
     }
 
-    /** TODO(Guilherme): devolver o usuário logado ou null. */
+    /** Devolve o usuário logado (id, nome, email, perfil), ou null para visitante. */
     public static function usuario(): ?array
     {
-        throw new RuntimeException('Não implementado: Auth::usuario');
+        $usuario = Sessao::obter('usuario');
+
+        return is_array($usuario) ? $usuario : null;
     }
 
-    /** TODO(Guilherme): devolver o id do usuário logado ou null. */
+    /** Devolve o id do usuário logado, ou null. */
     public static function id(): ?int
     {
-        throw new RuntimeException('Não implementado: Auth::id');
+        $usuario = self::usuario();
+
+        return $usuario !== null ? (int) $usuario['id'] : null;
     }
 
-    /** TODO(Guilherme): informar se o perfil é gerente. */
+    /** Diz se o usuário logado é gerente. */
     public static function eGerente(): bool
     {
-        throw new RuntimeException('Não implementado: Auth::eGerente');
+        $usuario = self::usuario();
+
+        return $usuario !== null && ($usuario['perfil'] ?? '') === 'gerente';
     }
 }

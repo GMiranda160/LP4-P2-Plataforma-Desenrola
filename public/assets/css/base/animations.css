@@ -1,9 +1,36 @@
-/*
- * Arquivo: animations.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: animações compartilhadas.
- *
- * TODO(Guilherme):
- * 1. Migrar o conteúdo de Apenas Mostruario/css/base/animations.css.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Animações de entrada - reveladas conforme a rolagem
+   ========================================================================== */
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Sem JavaScript, os elementos permanecem visíveis (progressive enhancement). */
+.js [data-reveal] {
+  opacity: 0;
+}
+
+.js [data-reveal].is-visible {
+  opacity: 1;
+  animation: reveal-up 700ms cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+  }
+
+  .js [data-reveal].is-visible {
+    animation: none;
+  }
+}

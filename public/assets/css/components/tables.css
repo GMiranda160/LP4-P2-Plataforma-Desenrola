@@ -1,9 +1,49 @@
-/*
- * Arquivo: tables.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: tabelas das telas de gestão.
- *
- * TODO(Guilherme):
- * 1. Criar .table-wrap, com rolagem no celular, .table e .table__actions.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Tabelas de listagem (área da gerente)
+   ========================================================================== */
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table thead th {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  border-bottom: 2px solid var(--color-sand-200);
+}
+
+.table tbody tr + tr td {
+  border-top: 1px solid var(--color-sand-200);
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-sand-50);
+}
+
+.table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.table__actions form {
+  display: inline-flex;
+}

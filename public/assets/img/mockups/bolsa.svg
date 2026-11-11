@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Bolsa de linho">
+  <!-- Mockup de bolsa: corpo trapezoidal com duas alças. -->
+  <g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M95 190 L75 430 H325 L305 190 Z"/>
+    <!-- Alças -->
+    <path d="M150 190 C150 125 250 125 250 190"/>
+    <!-- Ponto de costura do contorno -->
+    <path d="M112 230 L97 415 H303 L288 230" stroke-width="5" stroke-dasharray="14 12"/>
+  </g>
+</svg>

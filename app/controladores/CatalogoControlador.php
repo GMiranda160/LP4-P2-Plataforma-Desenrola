@@ -1,21 +1,59 @@
 <?php
+
+declare(strict_types=1);
+
 /**
- * Camada: Controlador. Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: catálogo público. As telas são de Arthur.
- * Enquanto a lógica não estiver pronta, enviar dados de exemplo no formato do contrato da tela.
- * Veja INSTRUCOES_GUILHERME.md, seção 14.
+ * Camada: Controladores. Dono: Guilherme. Só Guilherme altera este arquivo.
+ * Responsabilidade: catálogo público e página do produto.
+ *
+ * Sem produtos cadastrados, as telas renderizam com estado vazio bonito.
+ * Erros de banco vão para o log, nunca para a tela do visitante.
  */
 class CatalogoControlador
 {
-    /** TODO(Guilherme): mostrar catalogo/lista com $titulo, $categorias, $categoriaAtual e $produtos. */
     public function listar(): void
     {
-        throw new RuntimeException('Não implementado: CatalogoControlador::listar');
+        $categoria = isset($_GET['categoria']) ? (string) $_GET['categoria'] : '';
+        $produtos = [];
+        $categorias = [];
+
+        try {
+            $produtos = (new ProdutoServico())->catalogo($categoria === '' ? null : $categoria);
+            $categorias = (new ProdutoServico())->categorias();
+        } catch (Throwable $erro) {
+            error_log('Catálogo: banco indisponível ou vazio (' . $erro->getMessage() . ').');
+        }
+
+        Visao::render('catalogo/lista', [
+            'titulo' => 'Catálogo | Desenrola',
+            'produtos' => $produtos,
+            'categorias' => $categorias,
+            'categoriaAtual' => $categoria,
+        ]);
     }
 
-    /** TODO(Guilherme): mostrar catalogo/produto. Produto inexistente ou inativo volta para /catalogo com mensagem. */
     public function produto(): void
     {
-        throw new RuntimeException('Não implementado: CatalogoControlador::produto');
+        $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        $produto = null;
+
+        if ($id > 0) {
+            try {
+                $produto = (new ProdutoServico())->mostrar($id);
+            } catch (Throwable $erro) {
+                error_log('Produto ' . $id . ': banco indisponível (' . $erro->getMessage() . ').');
+            }
+        }
+
+        if ($produto === null) {
+            http_response_code(404);
+            Visao::render('erros/404');
+            return;
+        }
+
+        Visao::render('catalogo/produto', [
+            'titulo' => $produto['nome'] . ' | Desenrola',
+            'produto' => $produto,
+        ]);
     }
 }

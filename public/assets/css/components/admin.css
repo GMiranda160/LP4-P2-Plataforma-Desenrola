@@ -1,9 +1,55 @@
-/*
- * Arquivo: admin.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: estrutura da área da gerente.
- *
- * TODO(Guilherme):
- * 1. Criar .admin-layout, .admin-nav e .page-head.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Área da gerente - layout, navegação lateral e título de página
+   ========================================================================== */
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  list-style: none;
+}
+
+.admin-nav a {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--color-ink);
+}
+
+.admin-nav a:hover {
+  background-color: var(--color-sand-100);
+  color: var(--color-wine-700);
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.page-head h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
+}
+
+@media (max-width: 900px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+}

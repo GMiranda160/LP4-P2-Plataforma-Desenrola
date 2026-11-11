@@ -1,9 +1,194 @@
-/*
- * Arquivo: showcase.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: vitrine em loop.
- *
- * TODO(Guilherme):
- * 1. Migrar o conteúdo de Apenas Mostruario/css/components/showcase.css.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Vitrine em loop da home
+   ========================================================================== */
+
+.showcase {
+  position: relative;
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.showcase__viewport {
+  overflow: hidden;
+  padding-block: 0.75rem;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 5%,
+    #000 95%,
+    transparent 100%
+  );
+}
+
+.showcase__edge {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(105, 24, 24, 0.24);
+  border-radius: var(--radius-pill);
+  background-color: rgba(251, 247, 244, 0.92);
+  color: var(--color-wine-700);
+  font-size: 1.35rem;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--transition),
+    background-color var(--transition),
+    border-color var(--transition);
+}
+
+.showcase:hover .showcase__edge,
+.showcase:focus-within .showcase__edge {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.showcase__edge:hover {
+  border-color: var(--color-wine-700);
+  background-color: var(--color-sand-50);
+}
+
+.showcase__edge--left {
+  left: 0.5rem;
+}
+
+.showcase__edge--right {
+  right: 0.5rem;
+}
+
+/* Movimento controlado via JS (rAF) em js/components/showcase.js.
+   Não usar animation-duration/direction aqui. */
+.showcase__track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.showcase__group {
+  display: flex;
+  flex: none;
+  gap: var(--showcase-gap, 1.5rem);
+  padding-right: var(--showcase-gap, 1.5rem);
+}
+
+.showcase__item {
+  flex: 0 0 clamp(var(--product-card-width), 24vw, var(--product-card-width-max));
+  display: flex;
+  scroll-snap-align: start;
+}
+
+.showcase__item > .product-card {
+  width: 100%;
+}
+
+.showcase__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.showcase__meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.showcase__hint {
+  display: none;
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-ink-soft);
+}
+
+.showcase__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.1rem;
+  border: 1px solid rgba(105, 24, 24, 0.28);
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-wine-700);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.showcase__toggle:hover {
+  border-color: var(--color-wine-700);
+  background-color: rgba(105, 24, 24, 0.06);
+}
+
+.showcase__toggle-icon {
+  position: relative;
+  width: 10px;
+  height: 12px;
+}
+
+.showcase__toggle-icon::before,
+.showcase__toggle-icon::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 12px;
+  border-radius: 1px;
+  background-color: currentColor;
+}
+
+.showcase__toggle-icon::before {
+  left: 0;
+}
+
+.showcase__toggle-icon::after {
+  right: 0;
+}
+
+.showcase__toggle[aria-pressed='true'] .showcase__toggle-icon::before {
+  left: 0;
+  top: 1px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid currentColor;
+  background-color: transparent;
+}
+
+.showcase__toggle[aria-pressed='true'] .showcase__toggle-icon::after {
+  display: none;
+}
+
+.showcase__action {
+  min-width: 220px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase__viewport {
+    overflow-x: auto;
+    mask-image: none;
+  }
+
+  .showcase__group[aria-hidden='true'] {
+    display: none;
+  }
+
+  .showcase__toggle {
+    display: none;
+  }
+
+  .showcase__edge {
+    display: none;
+  }
+}

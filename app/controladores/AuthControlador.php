@@ -19,7 +19,8 @@ class AuthControlador
     /** TODO(Eduardo): chamar AuthServico::autenticar. Com sucesso, usar Auth::entrar; gerente vai para /gerente e usuário vai para /hub. Com erro: Usuário ou senha inválidos. */
     public function login(): void
     {
-        $email = is_string($_POST['email'] ?? null) ? $_POST['email'] : '';
+        $usuario = mb_strtolower(trim((string) ($_POST['usuario'] ?? '')));
+        $email = $usuario === '' ? '' : $usuario . '@example.com';
         $senha = is_string($_POST['senha'] ?? null) ? $_POST['senha'] : '';
 
         $usuario = (new AuthServico())->autenticar($email, $senha);
@@ -87,7 +88,8 @@ class AuthControlador
     /** TODO(Eduardo): buscar o usuário, gravar recuperar_id na Sessao e mostrar auth/redefinir com a pergunta. E-mail desconhecido recebe mensagem genérica. */
     public function recuperar(): void
     {
-        $email = is_string($_POST['email'] ?? null) ? $_POST['email'] : '';
+        $usuario = mb_strtolower(trim((string) ($_POST['usuario'] ?? '')));
+        $email = $usuario === '' ? '' : $usuario . '@example.com';
         $dados = (new AuthServico())->perguntaDe($email);
 
         if ($dados === null) {

@@ -1,10 +1,252 @@
-/*
- * Arquivo: responsive.css
- * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: ajustes por largura de tela.
- *
- * TODO(Guilherme):
- * 1. Migrar o conteúdo de Apenas Mostruario/css/responsive.css.
- * 2. Incluir ajustes das telas novas. Testar em 320px, 375px, 768px, 1280px e 1920px.
- * Veja INSTRUCOES_GUILHERME.md, seção 9.
- */
+/* ==========================================================================
+   Responsivo - ajustes por largura de tela
+   Ordem: do maior para o menor breakpoint.
+   ========================================================================== */
+
+/* Telas muito grandes ------------------------------------------------------ */
+@media (min-width: 1341px) {
+  :root {
+    --container: min(88vw, 1760px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .hero__grid {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+
+  .hero__media {
+    max-width: 640px;
+    margin-inline-start: auto;
+  }
+}
+
+/* Tablets grandes --------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .footer__grid {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 2.5rem;
+  }
+
+  .footer__brand {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Navegação compacta e hero em coluna ------------------------------------- */
+@media (max-width: 1100px) {
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    padding: 0.5rem var(--container-pad) 1.5rem;
+    background-color: var(--color-sand-50);
+    border-bottom: 1px solid var(--color-sand-200);
+    box-shadow: var(--shadow-md);
+  }
+
+  .nav.is-open {
+    display: block;
+  }
+
+  .nav__list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .nav__list li + li {
+    border-top: 1px solid var(--color-sand-200);
+  }
+
+  .nav__list a {
+    display: block;
+    padding-block: 0.9rem;
+  }
+
+  .nav__list a::after {
+    display: none;
+  }
+
+  .header-actions .btn {
+    display: none;
+  }
+
+  .hero__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__media {
+    max-width: 440px;
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  .hero__content .lead {
+    max-width: 60ch;
+  }
+
+  .category-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Celulares -------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .topbar__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  .footer__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__seal {
+    width: 92px;
+    height: 92px;
+    bottom: 0.85rem;
+    left: 0.5rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.15em;
+  }
+
+  .hero__actions .btn {
+    flex: 1 1 100%;
+  }
+
+  .hero__points {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cta-band__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .product-card__body {
+    padding: 1.1rem 1.15rem 1.3rem;
+  }
+
+  /* Catálogo no mobile: filtros em rolagem horizontal */
+  .catalog-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+  }
+
+  .catalog-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-card__name,
+  .product-card__description {
+    min-height: 0;
+  }
+}
+
+/* Telas muito estreitas -------------------------------------------------- */
+@media (max-width: 420px) {
+  .category-list {
+    grid-template-columns: 1fr;
+  }
+
+  .category-card {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* Vitrine em loop (home) -------------------------------------------------- */
+@media (max-width: 900px) {
+  .showcase__viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    mask-image: none;
+    scrollbar-width: none;
+  }
+
+  .showcase__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .showcase__track {
+    transform: none;
+  }
+
+  .showcase__group[aria-hidden='true'] {
+    display: none;
+  }
+
+  .showcase__group {
+    padding-right: 0;
+  }
+
+  .showcase__toggle {
+    display: none;
+  }
+
+  .showcase__edge {
+    display: none;
+  }
+
+  .showcase__hint {
+    display: block;
+  }
+
+  .showcase__footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .showcase__action {
+    width: 100%;
+  }
+}
+
+/* Marcas d'água decorativas no mobile ------------------------------------ */
+@media (max-width: 640px) {
+  .hero::before {
+    width: 170px;
+    height: 170px;
+    opacity: 0.16;
+  }
+
+  .hero::after {
+    height: 90px;
+    opacity: 0.18;
+  }
+
+  .section#categorias::before,
+  .section#produtos::before {
+    width: 120px;
+    height: 130px;
+    opacity: 0.12;
+  }
+
+  .section#sobre::before {
+    width: 120px;
+    height: 160px;
+    opacity: 0.14;
+  }
+
+  .site-footer::before {
+    width: min(300px, 90%);
+    height: 80px;
+    opacity: 0.1;
+  }
+}

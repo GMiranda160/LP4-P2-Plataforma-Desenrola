@@ -1,11 +1,14 @@
 /**
- * Arquivo: main.js
+ * Entrada principal dos scripts da plataforma.
  * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: inicialização dos scripts comuns.
- *
- * TODO(Guilherme):
- * 1. Ligar o menu móvel do header.
- * 2. Iniciar scroll-reveal.js.
- * 3. Chamar a inicialização da página atual, usando data-page do body.
- * Veja INSTRUCOES_GUILHERME.md, seção 3.
+ * Inicializa o menu móvel, as animações de rolagem e a vitrine da home.
  */
+
+import { queryAll } from './utils/dom.js';
+import { initHeader } from './components/header.js';
+import { initScrollReveal } from './utils/scroll-reveal.js';
+import { initShowcase } from './components/showcase.js';
+
+initHeader();
+initScrollReveal();
+queryAll('[data-showcase]').forEach(initShowcase);

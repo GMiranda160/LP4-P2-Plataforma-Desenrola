@@ -12,7 +12,8 @@ class AuthServico
         $erros = [];
 
         $nome = trim($campos['nome'] ?? '');
-        $email = mb_strtolower(trim($campos['email'] ?? ''));
+        $usuario = mb_strtolower(trim($campos['usuario'] ?? ''));
+        $email = $usuario . '@example.com';
         $senha = $campos['senha'] ?? '';
         $confirmarSenha = $campos['confirmar_senha'] ?? '';
         $pergunta = $campos['pergunta_seguranca'] ?? '';
@@ -28,10 +29,16 @@ class AuthServico
             $erros[] = 'Informe seu nome.';
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $erros[] = 'Informe um e-mail válido.';
-        } elseif ((new UsuarioDados())->buscarPorEmail($email) !== null) {
-            $erros[] = 'Este e-mail já está cadastrado.';
+        if (!preg_match('/^[a-z0-9._-]{3,30}$/', $usuario)) {
+            $erros[] = 'Informe um usuário válido: de 3 a 30 caracteres com letras, números, ponto, hífen ou sublinhado.';
+        } else {
+            $emailMontado = $usuario . '@example.com';
+
+            if (!filter_var($emailMontado, FILTER_VALIDATE_EMAIL)) {
+                $erros[] = 'Não foi possível montar um e-mail válido.';
+            } elseif ((new UsuarioDados())->buscarPorEmail($emailMontado) !== null) {
+                $erros[] = 'Este usuário já está cadastrado.';
+            }
         }
 
         if (mb_strlen($senha) < 6) {
