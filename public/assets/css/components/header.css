@@ -46,9 +46,9 @@
 }
 
 .site-header__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-5);
   padding-block: 0.85rem;
 }
@@ -58,6 +58,7 @@
   align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
+  justify-self: start;
 }
 
 .brand__mark {
@@ -131,6 +132,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  justify-self: end;
 }
 
 .header-actions form {
