@@ -1,8 +1,15 @@
 <?php
-/*
- * catalogo/produto.php
- * Tela pública de um produto.
- */
+/**
+ * Tela: página do produto
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /produto?id=
+ * Recebe: $titulo, $produto
+ * Campos de $produto: id, nome, descricao, preco_base, categoria e dados da peça
+ *
+ * 1. Mostrar peça, nome, descrição e preço.
+ * 2. Criar o botão Solicitar orçamento com link_whatsapp.
+*/
+
 ?>
 <div class="page-head">
   <h1><?= e($titulo) ?></h1>

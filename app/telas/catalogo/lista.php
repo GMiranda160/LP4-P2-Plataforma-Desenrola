@@ -1,8 +1,17 @@
 <?php
-/*
- * catalogo/lista.php
- * Tela pública do catálogo.
- */
+/**
+ * Tela: catálogo público
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /catalogo
+ * Recebe: $titulo, $categorias, $categoriaAtual, $produtos
+ * Campos de $categorias: nome, slug
+ *
+ * 1. Basear a estrutura em Apenas Mostruario/catalogo.html.
+ * 2. Mostrar filtros com link ?categoria=slug.
+ * 3. Mostrar a grade com .product-grid e Visao::parcial('peca_bordada').
+ * 4. Sem produtos, mostrar .empty-state.
+*/
+
 ?>
 <div class="page-head">
   <h1><?= e($titulo) ?></h1>
