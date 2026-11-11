@@ -1,5 +1,8 @@
 # Segredos e configuração local
 .env
+password
+password.txt
+password.*
 cacert.pem
 
 # Logs e arquivos do sistema

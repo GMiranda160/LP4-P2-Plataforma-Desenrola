@@ -1,12 +1,12 @@
 #
 # Arquivo: Caddyfile
 # Dono: Guilherme. Só Guilherme altera este arquivo.
-# Responsabilidade: servidor web do container.
+# Responsabilidade: servidor web do container (escuta na porta do serviço).
 #
-# TODO(Guilherme):
-# 1. Escutar na porta da variável PORT, com 80 como padrão.
-# 2. Usar /app/public como raiz do site.
-# 3. Ativar compressão zstd e gzip.
-# 4. Usar php_server para servir arquivos estáticos e enviar o resto ao index.php.
-# Veja INSTRUCOES_GUILHERME.md, seção 2.1.
+# O Railway informa a porta em $PORT; localmente, fica 80.
 #
+:{$PORT:80} {
+    root * /app/public
+    encode zstd gzip
+    php_server
+}
