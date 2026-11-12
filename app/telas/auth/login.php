@@ -13,8 +13,6 @@
  * Veja INSTRUCOES_EDUARDO.md, seção 4.
  */
 ?>
-<p class="empty-state">Tela em construção.</p>
-
 <div class="auth-container">
     <h1 class="auth-title"><?= e($titulo) ?></h1>
 

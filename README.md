@@ -436,9 +436,10 @@ cp .env.example .env
 
 4. No Windows, dê dois cliques em `rodar-local.bat`.
 
-O `rodar-local.bat` confere o PHP, liga `pdo_pgsql`, `pgsql`, `curl`, `mbstring` e `openssl` só
-durante a execução, avisa se faltar algo e abre <http://localhost:8000>. Ele não instala nada. Se o
-PHP não existir, mostra o comando para instalar.
+O `rodar-local.bat` procura o PHP mais novo instalado, inclusive o do winget, mesmo que um PHP
+antigo como o do XAMPP venha antes no PATH. Ele liga `pdo_pgsql`, `pgsql`, `curl`, `mbstring` e
+`openssl` só durante a execução, avisa se faltar algo e abre <http://localhost:8000>. Ele não instala
+nada. Se nenhum PHP 8.4 ou mais novo existir, mostra o comando para instalar.
 
 Instale o PHP no Windows com:
 
