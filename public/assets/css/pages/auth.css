@@ -8,3 +8,122 @@
  * 2. Priorizar o celular, com área de toque de pelo menos 44px.
  * Veja INSTRUCOES_EDUARDO.md, seção 8.
  */
+
+ .auth-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+  
+  .auth-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--color-wine-900);
+    margin-bottom: var(--space-4);
+    text-align: center;
+  }
+  
+  .auth-container .form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  
+  .auth-container .form__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  
+  .auth-container .text-field,
+  .auth-container input[type="text"],
+  .auth-container input[type="password"] {
+    height: 48px;
+    padding: 0 var(--space-3);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-ink);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-sand-200);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  
+  .auth-container input:focus {
+    border-color: var(--color-wine-700);
+  }
+  
+  .auth-container .input-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .auth-container .input-group input {
+    flex: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  
+  .auth-container .input-group__suffix {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-3);
+    background-color: var(--color-sand-100);
+    color: var(--color-ink-soft);
+    border: 1px solid var(--color-sand-200);
+    border-left: none;
+    border-top-right-radius: var(--radius-sm);
+    border-bottom-right-radius: var(--radius-sm);
+    font-size: 0.95rem;
+  }
+  
+  .auth-container .form__actions {
+    margin-top: var(--space-2);
+  }
+  
+  .auth-container .btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-weight: 500;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    padding: 0 var(--space-4);
+  }
+  
+  .auth-container .btn--primary {
+    background-color: var(--color-wine-700);
+    color: var(--color-white);
+    border: none;
+  }
+  
+  .auth-container .btn--primary:hover {
+    background-color: var(--color-wine-900);
+  }
+  
+  .auth-container .btn--block {
+    width: 100%;
+  }
+  
+  .auth-links {
+    margin-top: var(--space-5);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  
+  .auth-links a {
+    color: var(--color-wine-700);
+    text-decoration: underline;
+    font-size: 0.95rem;
+    padding: var(--space-1);
+  }
+  
+  .auth-links a:hover {
+    color: var(--color-wine-900);
+  }
