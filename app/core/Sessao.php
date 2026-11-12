@@ -13,6 +13,16 @@ declare(strict_types=1);
  *   rodar no seu computador antes de o .env existir.
  * - Sem banco em produção: exceção, o site sobe vazio de sessão é pior
  *   que um erro 500 explícito nos logs do Railway.
+ *
+ * Vida da sessão (só no modo banco, decidida por SessaoBanco conforme o perfil):
+ * visitante 1 dia, usuário 1 semana, gerente 30 dias. A expiração é deslizante:
+ * cada requisição renova o prazo. O cookie acompanha o tempo restante da
+ * sessão no banco, para o navegador não descartar a sessão cedo demais.
+ *
+ * Limpeza das expiradas: a cada requisição há 1 chance em 50 de apagar as
+ * sessões vencidas (independente do tráfego médio, ao contrário do GC do PHP,
+ * que por padrão roda em 1 a cada 1000). Para garantia total, dá para somar
+ * um pg_cron no Supabase com o mesmo DELETE.
  */
 class Sessao
 {
@@ -25,8 +35,29 @@ class Sessao
 
         $bancoConfigurado = getenv('DB_HOST') && getenv('DB_USER') && getenv('DB_PASS') !== false;
 
+        $manejador = null;
+        $vidaCookie = 0;
+        $idObsoleto = false;
+
         if ($bancoConfigurado) {
-            session_set_save_handler(new SessaoBanco(), true);
+            $manejador = new SessaoBanco();
+            session_set_save_handler($manejador, true);
+
+            // O cookie dura o que a sessão no banco durar; assim o usuário não
+            // é deslogado no meio de uma semana/ano só porque fechou o navegador.
+            $idEnviado = $_COOKIE[session_name()] ?? null;
+
+            if (is_string($idEnviado) && $idEnviado !== '') {
+                try {
+                    $restante = $manejador->restante($idEnviado);
+                    $vidaCookie = $restante ?? 86400; // id morto: recomeça com 1 dia
+                    $idObsoleto = $restante === null;
+                } catch (Throwable) {
+                    $vidaCookie = 0; // banco falhou: o read() vai lançar e virar 500 mesmo
+                }
+            } else {
+                $vidaCookie = 86400; // visitante novo: 1 dia
+            }
         } elseif ((getenv('APP_ENV') ?: 'production') === 'local') {
             // Sessão em arquivo, só para desenvolvimento local sem .env do banco.
             error_log('Sessao: banco não configurado, usando sessão em arquivo local (APP_ENV=local).');
@@ -41,7 +72,7 @@ class Sessao
             || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
 
         session_set_cookie_params([
-            'lifetime' => 0,
+            'lifetime' => $vidaCookie,
             'path' => '/',
             'secure' => $https,
             'httponly' => true,
@@ -49,6 +80,22 @@ class Sessao
         ]);
 
         session_start();
+
+        if ($idObsoleto) {
+            // O id enviado pelo navegador não existe mais no banco: troca por
+            // um novo, para não reaproveitar um id morto.
+            session_regenerate_id(true);
+        }
+
+        // Limpeza probabilística das expiradas: 1 em 50 requisições.
+        // Falha de limpeza nunca derruba a requisição, só vai para o log.
+        if ($manejador !== null && random_int(1, 50) === 1) {
+            try {
+                $manejador->gc(0);
+            } catch (Throwable $erro) {
+                error_log('Sessao: limpeza de sessões expiradas falhou: ' . $erro->getMessage());
+            }
+        }
     }
 
     /** Grava um valor na sessão. */
