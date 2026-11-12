@@ -51,6 +51,24 @@ function data_br(?string $data): string
 }
 
 /**
+ * Formata CPF ou CNPJ para exibição.
+ * Aceita a entrada com ou sem pontuação; devolve a original se não tiver 11 ou 14 dígitos.
+ */
+function cpf_cnpj(?string $valor): string
+{
+    $digitos = preg_replace('/\D/', '', (string) $valor);
+
+    if (strlen($digitos) === 11) {
+        return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $digitos);
+    }
+    if (strlen($digitos) === 14) {
+        return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/', '$1.$2.$3/$4-$5', $digitos);
+    }
+
+    return $digitos;
+}
+
+/**
  * Monta o link do WhatsApp do ateliê com a mensagem codificada na URL.
  * Sem argumento, usa a mensagem padrão definida em bootstrap.php.
  */

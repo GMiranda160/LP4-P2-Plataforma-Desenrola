@@ -21,6 +21,14 @@
   --color-border: #d6bfbd;
   --color-wine-accent: #8c0d1c;
 
+  /* Estados (sucesso e alerta) */
+  --color-ok-bg: #eef6ee;
+  --color-ok-border: #bcd8c0;
+  --color-ok-ink: #26532a;
+  --color-alerta-bg: #faecec;
+  --color-alerta-border: #e5b8b8;
+  --color-alerta-ink: #7a2222;
+
   /* Tipografia */
   --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
   --font-body: "Jost", "Segoe UI", system-ui, -apple-system, sans-serif;

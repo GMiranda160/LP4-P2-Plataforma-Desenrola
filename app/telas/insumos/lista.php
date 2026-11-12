@@ -3,6 +3,9 @@
  * insumos/lista.php
  * Tela de listagem de insumos.
  */
+
+/** Quantidade em pt-BR, sem zeros à direita ("10", "2,5", "1,75"). */
+$quantidade = static fn ($valor): string => rtrim(rtrim(number_format((float) $valor, 2, ',', '.'), '0'), ',');
 ?>
 <div class="page-head">
   <h1><?= e($titulo) ?></h1>
@@ -34,7 +37,7 @@
           <tr>
             <td><?= e($i['tipo']) ?></td>
             <td><?= e($i['nome']) ?></td>
-            <td><?= e($i['quantidade']) ?> <?= e($i['unidade']) ?></td>
+            <td><?= e($quantidade($i['quantidade'])) ?> <?= e($i['unidade']) ?></td>
             <td><?= moeda($i['custo_unitario']) ?></td>
             <td>
               <?php if ((float) $i['quantidade'] <= (float) $i['estoque_minimo']): ?>

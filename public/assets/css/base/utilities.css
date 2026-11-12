@@ -52,3 +52,18 @@
   text-align: center;
   color: var(--color-ink-soft);
 }
+
+/* Cabeçalho de página: título e ação à direita, usado no público e no painel. */
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.page-head h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
+}

@@ -4,6 +4,8 @@
  * Tela pública de um produto.
  */
 ?>
+<section class="section">
+<div class="container">
 <div class="page-head">
   <h1><?= e($pagina ?? $produto['nome']) ?></h1>
 </div>
@@ -24,3 +26,5 @@
     </a>
   </div>
 </article>
+</div>
+</section>

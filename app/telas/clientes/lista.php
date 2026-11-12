@@ -34,7 +34,7 @@
         <?php foreach ($clientes as $c): ?>
           <tr>
             <td><?= e($c['nome']) ?></td>
-            <td><?= e($c['cpf_cnpj']) ?></td>
+            <td><?= e(cpf_cnpj($c['cpf_cnpj'])) ?></td>
             <td><?= e($c['email']) ?></td>
             <td><?= e($c['telefone']) ?></td>
             <td><?= e(data_br($c['criado_em'])) ?></td>

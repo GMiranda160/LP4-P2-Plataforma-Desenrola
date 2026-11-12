@@ -4,6 +4,8 @@
  * Tela pública do catálogo.
  */
 ?>
+<section class="section">
+<div class="container">
 <div class="page-head">
   <h1><?= e($pagina ?? $titulo) ?></h1>
 </div>
@@ -39,3 +41,5 @@
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
+</div>
+</section>

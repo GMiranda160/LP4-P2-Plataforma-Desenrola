@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Área da gerente - layout, navegação lateral e título de página
+   Área da gerente - layout e navegação lateral
    ========================================================================== */
 
 .admin-layout {
@@ -32,20 +32,6 @@
 .admin-nav a:hover {
   background-color: var(--color-sand-100);
   color: var(--color-wine-700);
-}
-
-.page-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-5);
-}
-
-.page-head h1 {
-  margin: 0;
-  font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
 }
 
 @media (max-width: 900px) {

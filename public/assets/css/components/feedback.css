@@ -18,15 +18,15 @@
 }
 
 .alert--sucesso {
-  background-color: #eef6ee;
-  border-color: #bcd8c0;
-  color: #26532a;
+  background-color: var(--color-ok-bg);
+  border-color: var(--color-ok-border);
+  color: var(--color-ok-ink);
 }
 
 .alert--erro {
-  background-color: #faecec;
-  border-color: #e5b8b8;
-  color: #7a2222;
+  background-color: var(--color-alerta-bg);
+  border-color: var(--color-alerta-border);
+  color: var(--color-alerta-ink);
 }
 
 .badge {
@@ -43,11 +43,11 @@
 }
 
 .badge--ok {
-  background-color: #eef6ee;
-  color: #26532a;
+  background-color: var(--color-ok-bg);
+  color: var(--color-ok-ink);
 }
 
 .badge--alerta {
-  background-color: #faecec;
-  color: #7a2222;
+  background-color: var(--color-alerta-bg);
+  color: var(--color-alerta-ink);
 }
