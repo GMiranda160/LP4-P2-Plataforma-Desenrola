@@ -1,7 +1,8 @@
 <?php
-/*
- * InsumoServico.php
- * Camada de processamento dos insumos.
+/**
+ * Camada: Processamento. Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: validar insumos (tipo e unidade fixos, quantidade >= 0, custo > 0, unicidade de nome por tipo) e chamar InsumoDados.
+ * Sem $_POST, sem sessão e sem HTML.
  */
 
 class InsumoServico

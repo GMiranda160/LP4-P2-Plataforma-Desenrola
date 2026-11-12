@@ -1,7 +1,7 @@
 <?php
-/*
- * ClienteControlador.php
- * Controlador dos clientes.
+/**
+ * Camada: Controlador. Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: receber os pedidos de clientes, chamar ClienteServico e escolher a tela do painel (layout gerente).
  */
 
 class ClienteControlador

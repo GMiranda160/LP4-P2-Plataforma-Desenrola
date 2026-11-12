@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Desenrola por dentro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: palco 16:9 centralizado, um slide por vez; texto à esquerda, diagrama à direita.
+   No celular, os slides viram uma página contínua. Cores da marca Desenrola (vinho, rosa, areia). */
+:root {
+  --bg: #f4ece8;
+  --surface: #fffaf7;
+  --surface-2: #f3e6e1;
+  --fg: #2e2321;
+  --muted: #6a5b57;
+  --line: #8a6f69;
+  --border: #e3d0ca;
+  --accent: #691818;
+  --accent-soft: #f3d9d3;
+  --rose: #c98b81;
+  --on-accent: #fffaf7;
+  --rose-soft: #f8e7e2;
+  --rose-mid: #efcfc7;
+  --rose-ink: #8f4a40;
+  --fabric-dot: rgba(255, 250, 247, .16);
+  --hoop: #691818;
+  --on-hoop: #fdf3ef;
+  --ok: #2f6b52;
+  --no: #a3332b;
+  --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --font-body: "Jost", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171012; --surface: #221719; --surface-2: #2f2125; --fg: #f3e6e2; --muted: #b9a5a0;
+    --line: #a78c86; --border: #46323a; --accent: #e3a59b; --accent-soft: #4a2329; --rose: #c98b81;
+    --on-accent: #171012; --rose-soft: #2c1d20; --rose-mid: #46292d; --rose-ink: #e9b3aa;
+    --fabric-dot: rgba(255, 236, 230, .12); --hoop: #7c2731; --on-hoop: #fbece7; --ok: #86c9a6; --no: #f0938a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171012; --surface: #221719; --surface-2: #2f2125; --fg: #f3e6e2; --muted: #b9a5a0;
+  --line: #a78c86; --border: #46323a; --accent: #e3a59b; --accent-soft: #4a2329; --rose: #c98b81;
+  --on-accent: #171012; --rose-soft: #2c1d20; --rose-mid: #46292d; --rose-ink: #e9b3aa;
+  --fabric-dot: rgba(255, 236, 230, .12); --hoop: #7c2731; --on-hoop: #fbece7; --ok: #86c9a6; --no: #f0938a; color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg); color: var(--fg); font-family: var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0; box-sizing: border-box;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.app { height: 100%; overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; }
+
+@media (min-width: 761px) {
+  /* Modo slideshow: a moldura nunca produz rolagem. */
+  html, body { overflow: hidden; }
+  body { display: flex; flex-direction: column; }
+  .app { flex: 1 1 auto; min-height: 0; }
+}
+
+/* Barra superior */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px 10px; }
+.brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.brand b { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--accent); letter-spacing: .01em; }
+.brand span { font-size: .8rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); background: var(--surface);
+  padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: .9rem;
+}
+.btn:hover { border-color: var(--line); }
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* Palco */
+.stage { min-height: 0; display: grid; place-items: center; }
+.deck { width: 100%; container-type: inline-size; }
+.slide {
+  width: 100%; aspect-ratio: 16 / 9; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 3cqw 3.4cqw 2.6cqw; display: grid; grid-template-rows: auto 1fr; gap: 1.8cqw;
+  overflow: hidden; position: relative;
+}
+.deck:not(.stacked) .slide:not(.is-active) { display: none; }
+.deck:not(.stacked) .slide.is-active { animation: entra .35s ease both; }
+@keyframes entra { from { opacity: .4; transform: translateX(1.2cqw); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .deck:not(.stacked) .slide.is-active { animation: none; } }
+
+.eyebrow { font-size: .95cqw; text-transform: uppercase; letter-spacing: .16em; color: var(--accent); font-weight: 600; display: flex; gap: .8cqw; align-items: center; }
+.eyebrow .num { font-family: var(--font-mono); letter-spacing: 0; color: var(--muted); font-weight: 400; }
+.slide h2 { font-family: var(--font-display); font-weight: 600; font-size: 3.1cqw; line-height: 1.05; margin-top: .5cqw; }
+
+.body { display: grid; grid-template-columns: 26fr 74fr; gap: 2.6cqw; min-height: 0; }
+.slide--wide .body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 1.6cqw; }
+.copy { display: flex; flex-direction: column; gap: 1.3cqw; min-width: 0; }
+.slide--wide .copy { flex-direction: row; gap: 3cqw; align-items: flex-start; }
+.slide--wide .copy > p { flex: 1.1; }
+.slide--wide .copy > .facts { flex: 1; }
+.copy p { font-size: 1.3cqw; line-height: 1.5; color: var(--fg); max-width: 62ch; }
+.facts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .8cqw; }
+.facts li { font-size: 1.08cqw; line-height: 1.45; color: var(--muted); padding-left: 1.3cqw; position: relative; }
+.facts li::before { content: ""; position: absolute; left: 0; top: .62em; width: .55cqw; height: .55cqw; border: 1.5px solid var(--accent); transform: rotate(45deg); }
+.facts b { color: var(--fg); font-weight: 600; }
+code, .mono { font-family: var(--font-mono); font-size: .92em; }
+.copy code { background: var(--surface-2); padding: .05em .35em; border-radius: 4px; }
+
+.fig { margin: 0; min-height: 0; min-width: 0; display: flex; flex-direction: column; gap: .8cqw; }
+.mmd { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.mmd svg { width: 100%; height: 100%; max-width: 100% !important; }
+.mmd .wait, .mmd .err { font-size: 1.1cqw; color: var(--muted); text-align: center; max-width: 40ch; }
+.mmd .err { color: var(--accent); font-family: var(--font-mono); font-size: .9cqw; white-space: pre-wrap; text-align: left; }
+
+.legend { display: flex; flex-wrap: wrap; gap: .5cqw 1.6cqw; font-size: .95cqw; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: .5cqw; }
+.sw { width: 1.6cqw; height: .95cqw; border-radius: 3px; display: inline-block; }
+.sw.ok { background: var(--accent-soft); border: 2px solid var(--accent); }
+.sw.par { background: var(--surface); border: 2px dashed var(--accent); }
+.sw.esq { background: var(--surface); border: 2px dotted var(--muted); }
+
+/* Capa */
+.cover { grid-template-rows: 1fr; }
+.cover .inner { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3cqw; align-items: center; }
+.cover h1 { font-family: var(--font-display); font-size: 6.4cqw; font-weight: 700; line-height: .95; color: var(--accent); }
+.cover .lead { font-size: 1.55cqw; line-height: 1.5; margin-top: 1.6cqw; max-width: 40ch; }
+.cover .toc { margin-top: 2.4cqw; display: grid; grid-template-columns: 1fr 1fr; gap: .7cqw 2cqw; font-size: 1.1cqw; color: var(--muted); }
+.cover .toc b { color: var(--fg); font-weight: 600; }
+.hoop { display: flex; flex-direction: column; align-items: center; gap: 1.4cqw; }
+.hoop .ring { width: 26cqw; aspect-ratio: 1; border-radius: 50%; border: .9cqw solid var(--rose); background: var(--surface-2); display: grid; place-items: center; box-shadow: inset 0 0 0 .35cqw var(--surface); }
+.hoop svg { width: 68%; height: auto; }
+.hoop .hole { fill: var(--border); }
+.hoop .x0 { stroke: var(--accent); }
+.hoop .x1 { stroke: var(--rose); }
+.hoop pre { margin: 0; font-family: var(--font-mono); font-size: .82cqw; line-height: 1.5; color: var(--muted); background: var(--surface-2); border-radius: 8px; padding: .9cqw 1.2cqw; max-width: 100%; overflow: hidden; }
+.hoop pre b { color: var(--accent); font-weight: 500; }
+
+/* Camadas (HTML) */
+.layers { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: auto 1fr auto; gap: 1.1cqw 1.8cqw; height: 100%; }
+.tier { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 1cqw 1.1cqw; display: flex; flex-direction: column; gap: .6cqw; position: relative; min-width: 0; }
+.tier h3 { font-family: var(--font-body); font-size: 1.15cqw; font-weight: 600; }
+.tier .k { font-size: .78cqw; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.tier .cls { display: flex; flex-wrap: wrap; gap: .35cqw; }
+.tier .cls span { font-family: var(--font-mono); font-size: .74cqw; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: .1cqw .4cqw; }
+.tier .rule { font-size: .86cqw; line-height: 1.4; color: var(--muted); }
+.tier .rule b { color: var(--fg); font-weight: 600; }
+.tier.main { grid-row: 2; }
+.tier.main:not(:last-of-type)::after {
+  content: "→"; position: absolute; right: -1.55cqw; top: 50%; transform: translateY(-50%);
+  font-size: 1.5cqw; color: var(--accent); font-weight: 600;
+}
+.tier.db { background: var(--accent-soft); border-color: var(--accent); }
+.tier.views { grid-row: 1; grid-column: 2 / 3; border-style: dashed; }
+.tier.views::after { content: "↑ Visao::render"; position: absolute; left: 50%; bottom: -1.3cqw; transform: translateX(-50%); font-family: var(--font-mono); font-size: .72cqw; color: var(--accent); background: var(--surface); padding: 0 .4cqw; }
+.tier.ai { grid-row: 1; grid-column: 3 / 4; border-style: dashed; }
+.tier.ai::after { content: "↓ só GeminiServico"; position: absolute; left: 50%; bottom: -1.3cqw; transform: translateX(-50%); font-family: var(--font-mono); font-size: .72cqw; color: var(--accent); background: var(--surface); padding: 0 .4cqw; }
+.tier.core { grid-row: 3; grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 1.4cqw; flex-wrap: wrap; }
+.tier.core h3 { white-space: nowrap; }
+
+/* Slide 08: o que existe, contado por camada; nos de costura por status */
+.chip { font-family: var(--font-mono); font-size: .76cqw; padding: .25cqw .55cqw; border-radius: 5px; }
+.chip.ok { background: var(--accent-soft); border: 1.5px solid var(--accent); }
+.chip.par { background: var(--surface); border: 1.5px dashed var(--accent); }
+.chip.esq { background: var(--surface); border: 1.5px dotted var(--muted); color: var(--muted); }
+.st8 { display: grid; grid-template-rows: 1fr auto; row-gap: 1.5cqw; min-height: 0; }
+.scols { display: grid; grid-template-columns: 33fr 31fr 26fr; column-gap: 4.2cqw; align-content: center; min-height: 0; }
+.scol { display: flex; flex-direction: column; gap: 1.1cqw; justify-content: flex-start; min-width: 0; }
+.frac { display: flex; align-items: baseline; gap: .9cqw; }
+.frac b { font-family: var(--font-display); font-size: 3.4cqw; font-weight: 700; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.frac span { font-size: .95cqw; color: var(--muted); }
+.scol .role { font-size: .9cqw; line-height: 1.4; color: var(--muted); }
+.cbar { position: relative; display: flex; justify-content: space-between; align-items: center; }
+.cbar::before { content: ""; position: absolute; left: .75cqw; right: .75cqw; top: 50%; border-top: 2.5px dashed var(--line); }
+.knot8 { position: relative; flex: none; width: 1.5cqw; height: 1.5cqw; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 .3cqw var(--surface); }
+.knot8.half { background: linear-gradient(90deg, var(--accent) 50%, var(--surface) 50%); border: 1.5px solid var(--accent); }
+.knot8.esq { background: var(--surface); border: 2px dashed var(--muted); }
+.gcap { font-size: .78cqw; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 600; }
+.chips8 { display: flex; flex-wrap: wrap; gap: .4cqw; align-items: center; }
+.sfe { display: flex; align-items: center; gap: 1.2cqw; padding: .9cqw 1.2cqw; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); }
+.sfe .ic { flex: none; width: 2.6cqw; height: 2.6cqw; border-radius: 10px; display: grid; place-items: center; background: var(--surface); color: var(--rose-ink); border: 1px solid var(--rose-mid); }
+.sfe .ic svg { width: 55%; height: 55%; }
+.sfe .sfe-t { min-width: 0; }
+.sfe h4 { font-size: 1.15cqw; font-weight: 600; }
+.sfe .sfe-t p { font-size: .88cqw; line-height: 1.35; color: var(--muted); }
+.sfe .chips8 { margin-left: auto; }
+
+/* Rotas */
+.routes { display: grid; grid-template-columns: 1fr 1fr 1.15fr; gap: 1.4cqw; height: 100%; min-height: 0; }
+.rcol { border: 1px solid var(--border); border-radius: 10px; padding: 1cqw 1.2cqw; display: flex; flex-direction: column; gap: .45cqw; min-width: 0; background: var(--surface); }
+.rcol h3 { font-size: 1.15cqw; font-family: var(--font-body); font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; padding-bottom: .4cqw; border-bottom: 1px solid var(--border); margin-bottom: .2cqw; }
+.rcol h3 small { font-weight: 400; color: var(--muted); font-size: .85cqw; }
+.r { display: grid; grid-template-columns: 3.6cqw 1fr; gap: .4cqw; font-family: var(--font-mono); font-size: .76cqw; line-height: 1.35; }
+.r em { font-style: normal; color: var(--accent); font-weight: 500; }
+.r span small { display: block; color: var(--muted); font-size: .92em; }
+.rcol.pub { border-top: 4px solid var(--rose); }
+.rcol.log { border-top: 4px solid var(--line); }
+.rcol.ger { border-top: 4px solid var(--accent); }
+
+/* Segurança */
+.shield { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.4cqw; height: 100%; align-content: stretch; }
+.st { border: 1px solid var(--border); border-radius: 10px; padding: 1.1cqw; background: var(--surface-2); display: flex; flex-direction: column; gap: .7cqw; position: relative; min-width: 0; }
+.st:not(:last-child)::after { content: "→"; position: absolute; right: -1.2cqw; top: 2.2cqw; color: var(--accent); font-size: 1.2cqw; font-weight: 600; }
+.st .n { font-family: var(--font-display); font-size: 2.6cqw; line-height: 1; color: var(--accent); font-weight: 700; }
+.st h3 { font-size: 1.12cqw; font-family: var(--font-body); font-weight: 600; }
+.st .where { font-family: var(--font-mono); font-size: .74cqw; color: var(--accent); }
+.st ul { margin: 0; padding-left: 1em; display: flex; flex-direction: column; gap: .4cqw; }
+.st li { font-size: .86cqw; line-height: 1.4; color: var(--muted); }
+
+/* Identidade: pessoas em rosa, plataforma em vinho (bastidor), serviços externos em neutro.
+   Ligações desenhadas por JS como linha de costura: ponto corrido = integração, alinhavo = só um link. */
+.slide--draw { grid-template-rows: auto 1fr auto; gap: 1.4cqw; }
+.lede { font-size: 1.35cqw; color: var(--muted); margin-top: .7cqw; max-width: 70ch; }
+.lede b { color: var(--fg); font-weight: 600; }
+.colcap { font-size: .82cqw; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); font-weight: 600; margin-bottom: 1cqw; display: flex; align-items: center; gap: .6cqw; }
+.colcap::before { content: ""; width: 1.4cqw; height: 2px; background: currentColor; opacity: .5; }
+
+.ctx { position: relative; display: grid; grid-template-columns: 29fr 23fr 28fr; column-gap: 10cqw; align-items: center; min-height: 0; }
+.ctx > .col { position: relative; z-index: 1; min-width: 0; }
+/* Colunas com título no topo, todos na mesma linha, e conteúdo centralizado abaixo */
+.ctx, .dep { align-items: stretch; }
+.ctx > .col, .dep > .col { display: grid; grid-template-rows: auto 1fr; }
+.ctx > .col > :nth-child(2), .dep > .col > :nth-child(2) { align-self: center; }
+
+.stairs { display: flex; flex-direction: column; gap: 1cqw; }
+.step { display: flex; align-items: center; gap: 1cqw; padding: 1cqw 1.2cqw; border-radius: 12px; background: var(--rose-soft); border: 1px solid var(--rose-mid); }
+.step.s2 { margin-left: 2.6cqw; background: var(--rose-mid); }
+.step.s3 { margin-left: 5.2cqw; background: var(--rose-mid); border-color: var(--rose); }
+.step .ic { flex: none; width: 2.6cqw; height: 2.6cqw; border-radius: 50%; display: grid; place-items: center; background: var(--surface); color: var(--rose-ink); border: 1px solid var(--rose-mid); }
+.step .ic svg, .ext .ic svg, .mods svg, .note svg { width: 55%; height: 55%; }
+.step h4, .ext h4 { margin: 0; font-size: 1.2cqw; font-weight: 600; }
+.step p, .ext p { margin: .15cqw 0 0; font-size: .95cqw; line-height: 1.35; color: var(--muted); }
+.step p b { color: var(--rose-ink); font-weight: 600; }
+
+.bastidor { position: relative; width: 100%; max-width: 23cqw; aspect-ratio: 1; justify-self: center; border-radius: 50%;
+  border: .9cqw solid var(--rose); box-shadow: 0 0 0 .3cqw var(--surface), 0 0 0 .5cqw var(--rose-mid);
+  background: radial-gradient(circle, var(--fabric-dot) 18%, transparent 22%) 0 0 / .85cqw .85cqw, var(--hoop);
+  color: var(--on-hoop); display: grid; place-items: center; text-align: center; }
+.bastidor::before { content: ""; position: absolute; top: -1.9cqw; left: 50%; transform: translateX(-50%); width: 2.2cqw; height: 1.4cqw; border-radius: 4px 4px 2px 2px; background: var(--rose); border: 2px solid var(--surface); }
+.bastidor .in { display: flex; flex-direction: column; align-items: center; gap: .5cqw; padding: 2cqw; }
+.bastidor b { font-family: var(--font-display); font-size: 2.6cqw; font-weight: 700; line-height: 1; }
+.bastidor small { font-size: .82cqw; letter-spacing: .12em; text-transform: uppercase; opacity: .85; }
+.mods { display: grid; grid-template-columns: 1fr 1fr; gap: .45cqw; margin-top: .9cqw; }
+.mods span { display: flex; align-items: center; gap: .35cqw; font-size: .88cqw; font-weight: 500; padding: .35cqw .6cqw; border-radius: 6px; background: color-mix(in srgb, var(--on-hoop) 14%, transparent); border: 1px dashed color-mix(in srgb, var(--on-hoop) 45%, transparent); }
+.mods svg { width: 1cqw; height: 1cqw; }
+
+.ext { display: flex; flex-direction: column; gap: 1.3cqw; }
+.ext .card { display: flex; align-items: center; gap: 1cqw; padding: 1cqw 1.2cqw; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.ext .card.loose { background: var(--surface); border-style: dashed; }
+.ext .ic { flex: none; width: 2.6cqw; height: 2.6cqw; border-radius: 10px; display: grid; place-items: center; background: var(--surface); color: var(--fg); border: 1px solid var(--border); }
+
+.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+.wires path { fill: none; stroke-linecap: round; }
+.wires .thread { stroke: var(--accent); stroke-width: 2.4; stroke-dasharray: 9 6; animation: costura 1.6s linear infinite; }
+.wires .people { stroke: var(--rose); stroke-width: 2.2; stroke-dasharray: 9 6; }
+.wires .loose { stroke: var(--line); stroke-width: 2; stroke-dasharray: 1 8; }
+.wires .knot { stroke: var(--surface); stroke-width: 2; }
+.wires .k-thread { fill: var(--accent); }
+.wires .k-people { fill: var(--rose); }
+.wires .k-loose { fill: var(--line); }
+@keyframes costura { to { stroke-dashoffset: -30; } }
+@media (prefers-reduced-motion: reduce) { .wires .thread { animation: none; } }
+.wlabel { position: absolute; z-index: 2; transform: translate(-50%, -50%); font-size: .82cqw; font-weight: 500; white-space: nowrap; padding: .2cqw .6cqw; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--fg); }
+.wlabel.loose { color: var(--muted); border-style: dashed; }
+
+/* Slide 03: três lugares onde o sistema roda */
+.dep { position: relative; display: grid; grid-template-columns: 23fr 40fr 25fr; column-gap: 7cqw; align-items: stretch; min-height: 0; }
+.dep > .col { position: relative; z-index: 1; min-width: 0; }
+.place { border-radius: 14px; padding: 1.2cqw 1.3cqw; display: flex; flex-direction: column; gap: .8cqw; }
+.place-h { display: flex; align-items: center; gap: .8cqw; }
+.place-h .ic { flex: none; width: 2.6cqw; height: 2.6cqw; border-radius: 10px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--border); }
+.place-h .ic svg { width: 55%; height: 55%; }
+.place-h h4 { margin: 0; font-size: 1.2cqw; font-weight: 600; }
+.place-h p { margin: .1cqw 0 0; font-size: .9cqw; color: var(--muted); }
+.place.device { background: var(--rose-soft); border: 1px solid var(--rose-mid); }
+.place.device .place-h .ic { color: var(--rose-ink); border-color: var(--rose-mid); }
+.lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .45cqw; }
+.lines li { display: flex; align-items: center; gap: .6cqw; font-size: .95cqw; line-height: 1.35; padding: .5cqw .7cqw; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); }
+.lines li svg { width: 1.1cqw; height: 1.1cqw; flex: none; color: var(--muted); }
+.lines li.hl { border-color: var(--rose); color: var(--fg); }
+.lines li.hl svg { color: var(--rose-ink); }
+.lines li code { font-size: .9em; }
+
+.gh { align-self: center; display: flex; align-items: center; gap: .8cqw; padding: .7cqw 1.1cqw; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); margin-bottom: 4.2cqw; }
+.gh svg { width: 1.4cqw; height: 1.4cqw; }
+.gh b { font-size: 1.05cqw; font-weight: 600; }
+.gh span { font-size: .9cqw; color: var(--muted); }
+.box { position: relative; border: 2px dashed var(--accent); border-radius: 16px; padding: 2.2cqw 1.4cqw 1.3cqw; background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface)); display: flex; flex-direction: column; gap: 1.1cqw; }
+.box .tag { position: absolute; top: -1.05cqw; left: 1.4cqw; display: inline-flex; align-items: center; gap: .5cqw; padding: .3cqw .9cqw; border-radius: 6px; background: var(--hoop); color: var(--on-hoop); font-size: .85cqw; font-weight: 600; letter-spacing: .04em; }
+.box .tag svg { width: 1cqw; height: 1cqw; }
+.flow { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2cqw; }
+.stop { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: .9cqw 1cqw; display: flex; flex-direction: column; gap: .35cqw; }
+.stop:not(:last-child)::after { content: ""; position: absolute; right: -1.55cqw; top: 50%; width: 1.1cqw; border-top: 2.5px dashed var(--accent); }
+.stop:not(:last-child)::before { content: ""; position: absolute; right: -1.65cqw; top: calc(50% - .4cqw); border-left: .55cqw solid var(--accent); border-top: .4cqw solid transparent; border-bottom: .4cqw solid transparent; transform: translateY(.12cqw); }
+.stop b { font-size: 1.08cqw; font-weight: 600; }
+.stop code { font-size: .78cqw; color: var(--accent); background: none; padding: 0; }
+.stop span { font-size: .86cqw; line-height: 1.35; color: var(--muted); }
+.stop.main { border-color: var(--accent); }
+.aside-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1cqw; }
+.pill { display: flex; align-items: center; gap: .6cqw; font-size: .88cqw; line-height: 1.35; padding: .55cqw .8cqw; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); }
+.pill svg { width: 1.15cqw; height: 1.15cqw; flex: none; }
+.pill b { color: var(--fg); font-weight: 600; }
+.pill.gone { border-style: dashed; }
+
+.svc { display: flex; flex-direction: column; gap: 1.6cqw; }
+.place.cloud { background: var(--surface-2); border: 1px solid var(--border); }
+.subs { display: flex; flex-wrap: wrap; gap: .4cqw; }
+.subs span { font-size: .82cqw; padding: .25cqw .6cqw; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
+.subs span.hl { border-color: var(--accent); color: var(--accent); font-weight: 500; }
+
+/* Slide 04: camadas, com a cor escurecendo conforme o pedido desce até o banco */
+.mvc { position: relative; display: grid; grid-template-columns: 18fr 20fr 21fr 18fr 13fr; grid-template-rows: auto 1fr auto; column-gap: 6.2cqw; row-gap: 3.2cqw; min-height: 0; }
+.mvc > .lay, .mvc > .core { position: relative; z-index: 1; min-width: 0; }
+.lay { border-radius: 12px; padding: 1cqw 1.1cqw; display: flex; flex-direction: column; gap: .55cqw; border: 1px solid var(--border); background: var(--surface); }
+.lay .k { font-family: var(--font-mono); font-size: .74cqw; color: var(--muted); }
+.lay h4 { margin: 0; font-size: 1.25cqw; font-weight: 600; display: flex; align-items: center; gap: .5cqw; }
+.lay h4 svg { width: 1.3cqw; height: 1.3cqw; }
+.lay .verb { margin: 0; font-size: .92cqw; line-height: 1.35; color: var(--fg); }
+.rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35cqw; }
+.rules li { display: flex; gap: .45cqw; align-items: flex-start; font-size: .84cqw; line-height: 1.35; color: var(--muted); }
+.rules li svg { width: 1cqw; height: 1cqw; flex: none; margin-top: .12cqw; }
+.rules .yes svg { color: var(--ok); }
+.rules .no svg { color: var(--no); }
+.rules .go svg { color: var(--accent); }
+.lay .count { margin-top: auto; padding-top: .5cqw; border-top: 1px dashed var(--border); font-size: .8cqw; color: var(--muted); }
+.lay .count b { font-family: var(--font-display); font-size: 1.5cqw; color: var(--accent); font-weight: 700; margin-right: .3cqw; }
+.lay.l0 { background: var(--surface-2); }
+.lay.l1 { background: var(--rose-soft); border-color: var(--rose-mid); }
+.lay.l2 { background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface)); border-color: var(--rose-mid); }
+.lay.l3 { background: var(--rose-mid); border-color: var(--rose); }
+.lay.l4 { background: radial-gradient(circle, var(--fabric-dot) 18%, transparent 22%) 0 0 / .85cqw .85cqw, var(--hoop); color: var(--on-hoop); border-color: var(--hoop); justify-content: center; }
+.lay.l4 .k, .lay.l4 .rules li { color: color-mix(in srgb, var(--on-hoop) 80%, transparent); }
+.lay.l4 .verb { color: var(--on-hoop); }
+.lay.side { border-style: dashed; background: var(--surface); padding: .8cqw 1.1cqw; }
+#l-in { grid-column: 1; grid-row: 2; }
+#l-ctl { grid-column: 2; grid-row: 2; }
+#l-proc { grid-column: 3; grid-row: 2; }
+#l-dad { grid-column: 4; grid-row: 2; }
+#l-db { grid-column: 5; grid-row: 2; }
+.mvc .t-tel { grid-column: 2; grid-row: 1; }
+.mvc .t-ai { grid-column: 3; grid-row: 1; }
+.mvc .core { grid-column: 1 / -1; grid-row: 3; display: flex; align-items: center; gap: 1.4cqw; flex-wrap: wrap; padding: .9cqw 1.2cqw; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); }
+.core h4 { margin: 0; font-size: 1.05cqw; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: .5cqw; }
+.core h4 svg { width: 1.2cqw; height: 1.2cqw; color: var(--accent); }
+.core .chips { display: flex; flex-wrap: wrap; gap: .35cqw; flex: 1; }
+.core .chips span { font-family: var(--font-mono); font-size: .76cqw; padding: .2cqw .55cqw; border-radius: 5px; background: var(--surface); border: 1px solid var(--border); }
+.core p { margin: 0; font-size: .85cqw; color: var(--muted); max-width: 30ch; }
+.wlabel.code { font-family: var(--font-mono); font-size: .76cqw; }
+
+/* Slide 05: linha do tempo de um pedido, com portões e saídas antecipadas */
+.trip { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); grid-template-rows: auto auto auto; column-gap: .9cqw; row-gap: 1.8cqw; align-content: center; min-height: 0; }
+.zone { grid-row: 1; border-top: 3px solid; padding-top: .6cqw; font-size: .82cqw; text-transform: uppercase; letter-spacing: .12em; font-weight: 600; }
+.zone small { display: block; margin-top: .2cqw; text-transform: none; letter-spacing: 0; font-weight: 400; font-family: var(--font-mono); font-size: .74cqw; color: var(--muted); }
+.z-in { grid-column: 1 / 4; border-color: var(--line); color: var(--muted); }
+.z-gate { grid-column: 4 / 7; border-color: var(--no); color: var(--no); }
+.z-work { grid-column: 7 / 10; border-color: var(--accent); color: var(--accent); }
+.z-out { grid-column: 10 / 12; border-color: var(--rose); color: var(--rose-ink); }
+.stations { grid-row: 2; grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; position: relative; }
+.stations::before { content: ""; position: absolute; left: 4%; right: 4%; top: 1.6cqw; border-top: 2.5px dashed var(--accent); }
+.sta { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: .7cqw; min-width: 0; }
+.knot { width: 3.2cqw; height: 3.2cqw; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 2px solid var(--line); font-family: var(--font-display); font-weight: 700; font-size: 1.35cqw; color: var(--muted); }
+.sta.gate .knot { width: 2.5cqw; height: 2.5cqw; margin: .35cqw 0; border-radius: 5px; transform: rotate(45deg); border-color: var(--no); color: var(--no); background: var(--surface); }
+.sta.gate .knot span { transform: rotate(-45deg); }
+.sta.work .knot { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.sta.out .knot { border-color: var(--rose); background: var(--rose-soft); color: var(--rose-ink); }
+.sta b { font-size: .95cqw; font-weight: 600; line-height: 1.25; }
+.sta code { font-size: .72cqw; color: var(--muted); background: none; padding: 0; word-break: break-word; }
+.exit { grid-row: 3; position: relative; display: flex; flex-direction: column; gap: .35cqw; padding: .7cqw .7cqw; border-radius: 10px; border: 1.5px dashed var(--no); background: color-mix(in srgb, var(--no) 7%, var(--surface)); font-size: .8cqw; line-height: 1.35; color: var(--fg); }
+.exit::before { content: ""; position: absolute; left: 50%; top: -1.8cqw; height: 1.8cqw; border-left: 2px dashed var(--no); }
+.exit b { display: flex; align-items: center; gap: .35cqw; color: var(--no); font-size: .9cqw; }
+.exit svg { width: 1cqw; height: 1cqw; }
+.exit.e4 { grid-column: 4; } .exit.e5 { grid-column: 5; } .exit.e6 { grid-column: 6; } .exit.e8 { grid-column: 8; }
+.exit.e500 { grid-column: 10 / 12; border-color: var(--line); background: var(--surface-2); }
+.exit.e500::before { display: none; }
+.exit.e500 b { color: var(--fg); }
+.keys .kd { width: 1cqw; height: 1cqw; border: 2px solid var(--no); border-radius: 2px; transform: rotate(45deg); }
+.keys .kc { width: 1.1cqw; height: 1.1cqw; border: 2px solid var(--accent); border-radius: 50%; }
+.keys .ke { width: 1.6cqw; height: 1cqw; border: 1.5px dashed var(--no); border-radius: 3px; }
+
+
+/* Slide 06: o pedido atravessa o núcleo; portões em losango; memória no banco embaixo */
+.nuc { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: auto auto auto auto; column-gap: 6cqw; align-content: center; min-height: 0; }
+.nuc > .colcap, .nuc > .pc, .nuc > .outs { position: relative; z-index: 1; min-width: 0; }
+.nuc .q1 { grid-column: 1; grid-row: 1; }
+.nuc .q2 { grid-column: 2 / span 2; grid-row: 1; }
+.nuc .q4 { grid-column: 4; grid-row: 1; }
+.nuc .q5 { grid-column: 5; grid-row: 1; }
+.nuc .q3 { grid-column: 1 / span 5; grid-row: 3; margin-top: 4.2cqw; }
+#n-rot { grid-column: 1; grid-row: 2; }
+#n-csrf { grid-column: 2; grid-row: 2; }
+#n-auth { grid-column: 3; grid-row: 2; }
+#n-ctl { grid-column: 4; grid-row: 2; }
+.nuc > .outs { grid-column: 5; grid-row: 2; display: flex; flex-direction: column; justify-content: space-between; gap: 1.4cqw; }
+#n-ses { grid-column: 1 / span 3; grid-row: 4; }
+#n-sb { grid-column: 4; grid-row: 4; }
+#n-con { grid-column: 5; grid-row: 4; }
+.nuc .kcap { margin-right: .1cqw; }
+.pc { border-radius: 12px; padding: .9cqw 1cqw; display: flex; flex-direction: column; gap: .5cqw; background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface)); border: 1px solid var(--rose-mid); }
+.pc-h { display: flex; align-items: center; gap: .75cqw; }
+.pc-h .ic { flex: none; width: 2.3cqw; height: 2.3cqw; border-radius: 8px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--border); color: var(--accent); }
+.pc-h .ic svg { width: 55%; height: 55%; }
+.pc-h .ic.gate { width: 1.8cqw; height: 1.8cqw; margin: .25cqw; border-radius: 4px; transform: rotate(45deg); border: 1.5px solid var(--accent); }
+.pc-h .ic.gate svg { transform: rotate(-45deg); width: 70%; height: 70%; }
+.pc h4 { margin: 0; font-family: var(--font-mono); font-size: 1.05cqw; font-weight: 600; }
+.pc p { margin: 0; font-size: .9cqw; line-height: 1.35; color: var(--fg); }
+.pc code { font-size: .78cqw; color: var(--accent); }
+.pc .no { display: flex; gap: .4cqw; align-items: center; font-size: .8cqw; line-height: 1.3; padding: .3cqw .5cqw; border-radius: 6px; border: 1px dashed var(--no); background: var(--surface); }
+.pc .no svg { width: .95cqw; height: .95cqw; flex: none; color: var(--no); }
+.pc.ctl { background: var(--surface); border: 1.5px dashed var(--line); }
+.pc.ctl .ic { color: var(--muted); }
+.pc.mem .pc-h p { margin-left: .6cqw; color: var(--muted); }
+.pc .chips { display: flex; flex-wrap: wrap; gap: .5cqw; }
+.pc .chips code { padding: .25cqw .6cqw; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
+.pc.db { background: radial-gradient(circle, var(--fabric-dot) 18%, transparent 22%) 0 0 / .85cqw .85cqw, var(--hoop); border-color: var(--hoop); color: var(--on-hoop); }
+.pc.db p { color: var(--on-hoop); }
+.pc.db code { color: color-mix(in srgb, var(--on-hoop) 80%, transparent); }
+.pc.db .ic { background: transparent; border-color: color-mix(in srgb, var(--on-hoop) 45%, transparent); color: var(--on-hoop); }
+.kcap { display: inline-grid; place-items: center; width: 1.35cqw; height: 1.35cqw; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); background: var(--surface); font-family: var(--font-mono); font-size: .8cqw; line-height: 1; }
+
+/* Slide 07: subsistemas, o montador no centro */
+.dep7 { grid-template-columns: 28fr 38fr 26fr; column-gap: 6.5cqw; }
+.side { background: var(--surface-2); border: 1px solid var(--border); }
+.mnd { position: relative; border: 2px solid var(--accent); border-radius: 16px; background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); padding: 2cqw 1.4cqw 1.2cqw; display: flex; flex-direction: column; gap: 1cqw; }
+.mnd .tag { position: absolute; top: -1.05cqw; left: 1.4cqw; display: inline-flex; align-items: center; gap: .5cqw; padding: .3cqw .9cqw; border-radius: 6px; background: var(--hoop); color: var(--on-hoop); font-size: .85cqw; font-weight: 600; letter-spacing: .04em; }
+.mnd .tag svg { width: 1cqw; height: 1cqw; }
+.stack-v { display: flex; flex-direction: column; gap: .55cqw; }
+.stop-v { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: .6cqw .9cqw; display: flex; flex-direction: column; gap: .15cqw; }
+.stop-v b { font-size: .92cqw; font-weight: 600; }
+.stop-v code { font-size: .72cqw; color: var(--accent); }
+.subs span.ok { border-color: var(--ok); color: var(--ok); }
+.subs span.par { border-color: var(--accent); color: var(--accent); }
+.subs span.esq { border-color: var(--line); color: var(--muted); border-style: dashed; }
+
+/* Slide 07: compressao para caber na altura */
+.dep7 .place { padding: .8cqw .95cqw; gap: .5cqw; border-radius: 12px; }
+.dep7 .place-h h4 { font-size: 1.15cqw; }
+.dep7 .place-h p { font-size: .8cqw; }
+.dep7 .place-h .ic { width: 2.2cqw; height: 2.2cqw; border-radius: 8px; }
+.dep7 .lines { gap: .32cqw; }
+.dep7 .lines li { font-size: .8cqw; padding: .35cqw .55cqw; line-height: 1.25; }
+.dep7 .subs { gap: .3cqw; }
+.dep7 .subs span { font-size: .72cqw; padding: .18cqw .5cqw; }
+.dep7 .stack-v { gap: .4cqw; }
+.dep7 .stop-v { padding: .5cqw .8cqw; }
+.dep7 .stop-v b { font-size: .84cqw; }
+.dep7 .stop-v code { font-size: .72cqw; }
+.dep7 .mnd { padding: 1.7cqw 1.2cqw 1cqw; gap: .7cqw; }
+.dep7 .colcap { margin-bottom: .5cqw; }
+/* 4 colunas: a IA fica ao lado do Hub (que a chama), e cada coluna tem no máximo 2 cartões */
+.dep.dep7 { grid-template-columns: 19fr 24fr 25fr 16fr; column-gap: 7cqw; }
+.dep7 .svc { height: 100%; justify-content: space-between; gap: 4cqw; }
+.dep7 > .col > .svc { align-self: stretch; }
+.dep7 > .col-ia > .place { align-self: start; }
+.footrow { display: flex; justify-content: space-between; align-items: center; gap: 2cqw; }
+.note { display: flex; align-items: center; gap: .8cqw; font-size: 1cqw; color: var(--fg); padding: .7cqw 1.2cqw; border-radius: 10px; background: var(--rose-soft); border: 1px solid var(--rose-mid); }
+.note svg { width: 1.3cqw; height: 1.3cqw; color: var(--rose-ink); flex: none; }
+.keys { display: flex; gap: 1.6cqw; font-size: .85cqw; color: var(--muted); }
+.keys span { display: inline-flex; align-items: center; gap: .5cqw; }
+.keys i { width: 2.4cqw; height: 0; border-top: 2.5px dashed var(--accent); }
+.keys i.l { border-top: 2.5px dotted var(--line); }
+.keys i.p { border-top-color: var(--rose); }
+
+/* Controles */
+.controls { display: flex; align-items: center; gap: 14px; padding-block: 10px 14px; width: 100%; margin-inline: auto; }
+.controls .count { font-family: var(--font-mono); font-size: .85rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rail { flex: 1; height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.rail i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s ease; }
+.ctrl { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; cursor: pointer; }
+.ctrl:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.ctrl:disabled { opacity: .35; cursor: default; }
+.ctrl svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+.hint { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+
+@media (min-width: 761px) {
+  /* O palco mede o espaço que sobra entre as barras; o slide 16:9 cabe nele sem conta fixa.
+     Fica depois das regras base de .deck e .controls para vencer na cascata. */
+  .stage { container-type: size; }
+  .deck { width: min(100cqw, 100cqh * 16 / 9); }
+  .controls { width: var(--deck-w, 100%); }
+}
+
+/* Sumário */
+.index { position: fixed; inset: 0; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(4px); z-index: 20; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.index .box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: min(980px, 100%); max-height: 100%; overflow: auto; padding: 24px 28px; }
+.index .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.index h2 { font-family: var(--font-display); font-size: 2rem; font-weight: 600; }
+.index .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px 28px; }
+.index h3 { font-size: .75rem; text-transform: uppercase; letter-spacing: .14em; color: var(--accent); margin-bottom: 6px; }
+.index ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.index button.go { width: 100%; text-align: left; border: 0; background: none; padding: 6px 8px; border-radius: 6px; cursor: pointer; display: flex; gap: 10px; font-size: .95rem; }
+.index button.go:hover, .index button.go[aria-current="true"] { background: var(--surface-2); }
+.index button.go span { font-family: var(--font-mono); color: var(--muted); font-size: .8rem; padding-top: 2px; }
+
+/* Celular: página contínua */
+@media (max-width: 760px) {
+  .app { height: auto; display: block; }
+  .deck { width: 100%; }
+  .deck.stacked { display: flex; flex-direction: column; gap: 16px; padding-bottom: 32px; }
+  .slide { aspect-ratio: auto; padding: 20px 18px; gap: 14px; overflow: visible; }
+  .eyebrow { font-size: .72rem; gap: 8px; }
+  .slide h2 { font-size: 1.75rem; }
+  .body, .slide--wide .body { grid-template-columns: 1fr; gap: 14px; }
+  .slide--wide .copy { flex-direction: column; gap: 12px; }
+  .copy p { font-size: 1rem; }
+  .facts li { font-size: .9rem; padding-left: 16px; }
+  .facts li::before { width: 6px; height: 6px; }
+  .fig { overflow-x: auto; gap: 8px; }
+  .mmd { display: block; }
+  .mmd svg { min-width: 620px; height: auto; }
+  .mmd .wait, .mmd .err { font-size: .85rem; }
+  .legend { font-size: .78rem; gap: 6px 14px; }
+  .sw { width: 18px; height: 11px; }
+  .controls, .hint { display: none; }
+  .cover .inner { grid-template-columns: 1fr; }
+  .cover h1 { font-size: 3rem; }
+  .cover .lead { font-size: 1.05rem; margin-top: 12px; }
+  .cover .toc { font-size: .88rem; grid-template-columns: 1fr; margin-top: 16px; gap: 4px; }
+  .hoop .ring { width: 60vw; border-width: 8px; }
+  .hoop pre { font-size: .7rem; padding: 10px 12px; white-space: pre-wrap; word-break: break-all; }
+  .layers, .shield, .routes { overflow-x: auto; }
+  .layers { display: flex; flex-direction: column; gap: 10px; }
+  .nuc { grid-template-columns: 1fr; row-gap: 10px; }
+  .nuc .q1, .nuc .q2, .nuc .q3, .nuc .q4, .nuc .q5, #n-rot, #n-csrf, #n-auth, #n-ctl, .nuc > .outs, #n-ses, #n-sb, #n-con { grid-column: auto; grid-row: auto; }
+  .nuc .q3 { margin-top: 8px; }
+  .nuc > .outs { gap: 10px; }
+  .pc { padding: 10px 12px; gap: 6px; }
+  .pc-h { gap: 10px; flex-wrap: wrap; }
+  .pc-h .ic { width: 32px; height: 32px; }
+  .pc-h .ic.gate { width: 24px; height: 24px; margin: 4px; }
+  .pc h4 { font-size: .95rem; }
+  .pc p, .pc.mem .pc-h p { font-size: .85rem; margin-left: 0; }
+  .pc code, .pc .no { font-size: .78rem; }
+  .pc .no svg { width: 14px; height: 14px; }
+  .kcap { width: 24px; height: 24px; font-size: .75rem; }
+  .tier.main::after, .tier.views::after, .tier.ai::after, .st::after { display: none; }
+  .tier h3, .st h3, .rcol h3 { font-size: .95rem; }
+  .tier .k, .tier .rule, .st li, .r, .rcol h3 small { font-size: .78rem; }
+  .tier .cls span, .st .where, .chip { font-size: .72rem; }
+  .shield { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .st .n { font-size: 1.6rem; }
+  .st8 { row-gap: 14px; }
+  .scols { grid-template-columns: 1fr; row-gap: 20px; }
+  .scol { gap: 8px; justify-content: start; }
+  .frac b { font-size: 2rem; }
+  .frac span { font-size: .8rem; }
+  .scol .role { font-size: .82rem; }
+  .cbar { padding: 2px 0; }
+  .knot8 { width: 12px; height: 12px; box-shadow: 0 0 0 2.5px var(--surface); }
+  .knot8.half { border-width: 1px; }
+  .knot8.esq { border-width: 1.5px; }
+  .gcap { font-size: .68rem; }
+  .sfe { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+  .sfe .ic { width: 34px; height: 34px; }
+  .sfe h4 { font-size: .95rem; }
+  .sfe .sfe-t p { font-size: .8rem; }
+  .sfe .chips8 { margin-left: 0; }
+  .routes { grid-template-columns: 1fr; gap: 10px; }
+  .r { grid-template-columns: 44px 1fr; }
+  .lede { font-size: .95rem; }
+  .colcap { font-size: .7rem; margin-bottom: 8px; }
+  .colcap::before { width: 14px; }
+  .ctx { grid-template-columns: 1fr; row-gap: 22px; }
+  .wires, .wlabel { display: none; }
+  .step, .step.s2, .step.s3 { margin-left: 0; padding: 10px 12px; gap: 10px; }
+  .step .ic, .ext .ic { width: 34px; height: 34px; }
+  .step h4, .ext h4 { font-size: .95rem; }
+  .step p, .ext p { font-size: .82rem; }
+  .bastidor { max-width: 62vw; border-width: 8px; }
+  .bastidor::before { top: -18px; width: 22px; height: 14px; }
+  .bastidor b { font-size: 1.8rem; }
+  .bastidor small, .mods span { font-size: .72rem; }
+  .bastidor .in { padding: 16px; gap: 4px; }
+  .mods { gap: 4px; margin-top: 6px; }
+  .mods svg { width: 12px; height: 12px; }
+  .ext { gap: 10px; }
+  .footrow { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .note { font-size: .85rem; padding: 8px 12px; gap: 8px; }
+  .note svg { width: 16px; height: 16px; }
+  .keys { display: none; }
+  .dep { grid-template-columns: 1fr; row-gap: 26px; }  .dep7 { grid-template-columns: 1fr; row-gap: 14px; }
+  .mnd { padding: 22px 14px 14px; }
+  .stop-v { padding: 10px 12px; }
+  .stop-v b { font-size: .92rem; }
+  .stop-v code { font-size: .78rem; }  .dep7 .place { padding: 12px; gap: 8px; border-radius: 12px; }
+  .dep7 .place-h h4 { font-size: .95rem; }
+  .dep7 .place-h p { font-size: .78rem; }
+  .dep7 .lines li { font-size: .8rem; padding: 7px 10px; }
+  .dep7 .subs span { font-size: .7rem; padding: 3px 8px; }
+  .dep7 .stop-v b { font-size: .88rem; }
+  .dep7 .stop-v code { font-size: .72rem; }
+  .dep7 .mnd { padding: 18px 12px 12px; gap: 8px; }
+  .place { padding: 12px; gap: 8px; }
+  .place-h .ic { width: 34px; height: 34px; }
+  .place-h h4 { font-size: .95rem; }
+  .place-h p, .lines li, .stop span, .pill, .subs span, .gh span { font-size: .8rem; }
+  .lines li svg, .pill svg { width: 14px; height: 14px; }
+  .gh { margin-bottom: 18px; padding: 8px 12px; gap: 8px; }
+  .gh svg { width: 16px; height: 16px; }
+  .gh b { font-size: .9rem; }
+  .box { padding: 22px 12px 12px; gap: 10px; }
+  .box .tag { top: -12px; font-size: .72rem; padding: 3px 8px; }
+  .box .tag svg { width: 12px; height: 12px; }
+  .flow, .aside-row { grid-template-columns: 1fr; gap: 8px; }
+  .stop::after, .stop::before { display: none; }
+  .stop b { font-size: .9rem; }
+  .stop code { font-size: .75rem; }
+  .svc { gap: 12px; }
+  .mvc { grid-template-columns: 1fr; grid-template-rows: none; row-gap: 10px; }
+  .mvc .t-tel, .mvc .t-ai, .mvc .core, #l-in, #l-ctl, #l-proc, #l-dad, #l-db { grid-column: auto; grid-row: auto; }
+  .lay { padding: 12px; gap: 6px; }
+  .lay .k, .core .chips span { font-size: .72rem; }
+  .lay h4 { font-size: 1rem; }
+  .lay h4 svg, .core h4 svg { width: 16px; height: 16px; }
+  .lay .verb, .rules li, .lay .count, .core p { font-size: .82rem; }
+  .rules li svg { width: 13px; height: 13px; }
+  .lay .count b { font-size: 1.2rem; }
+  .core { padding: 12px; gap: 8px; }
+  .core h4 { font-size: .9rem; }
+  .trip { display: flex; flex-direction: column; gap: 10px; }
+  .zone { display: none; }
+  .stations { display: flex; flex-direction: column; gap: 8px; }
+  .stations::before { left: 15px; right: auto; top: 10px; bottom: 10px; border-top: 0; border-left: 2.5px dashed var(--accent); }
+  .sta { flex-direction: row; text-align: left; gap: 10px; }
+  .knot { width: 30px; height: 30px; font-size: 1rem; flex: none; }
+  .sta.gate .knot { width: 22px; height: 22px; margin: 4px; }
+  .sta b { font-size: .88rem; }
+  .sta code { font-size: .74rem; }
+  .exit { font-size: .8rem; padding: 8px 10px; }
+  .exit::before { display: none; }
+  .exit b { font-size: .85rem; }
+  .exit svg { width: 14px; height: 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><b>Desenrola</b><span id="secLabel">por dentro</span></div>
+    <button class="btn" id="openIndex" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Sumário
+    </button>
+  </header>
+
+  <main class="stage">
+    <div class="deck" id="deck">
+
+<!-- 1 CAPA -->
+<section class="slide cover" id="capa" data-sec="Abertura" data-title="Desenrola por dentro">
+  <div class="inner">
+    <div>
+      <p class="eyebrow">Arquitetura da plataforma</p>
+      <h1>Desenrola<br>por dentro</h1>
+      <p class="lead">Como a plataforma de bordados está organizada: as camadas, os subsistemas, as classes e o caminho que cada pedido percorre até o banco.</p>
+      <div class="toc">
+        <span><b>Visão geral</b> · contexto e implantação</span>
+        <span><b>Arquitetura</b> · camadas, requisição e núcleo</span>
+        <span><b>Subsistemas</b> · contas, vitrine, Hub, montador, IA, gerente</span>
+        <span><b>Dados e interface</b> · banco, rotas, front-end e segurança</span>
+      </div>
+    </div>
+    <div class="hoop">
+      <div class="ring"><svg id="stitch" viewBox="0 0 11 10" role="img" aria-label="Coração bordado em ponto cruz, desenhado a partir de uma grade de pontos"></svg></div>
+      <pre id="gridJson"></pre>
+    </div>
+  </div>
+</section>
+
+<!-- 2 CONTEXTO -->
+<section class="slide slide--draw" id="contexto" data-sec="Visão geral" data-title="Quem usa e com quem conversa">
+  <div>
+    <p class="eyebrow">Visão geral</p>
+    <h2>Quem usa e com quem conversa</h2>
+    <p class="lede">Uma aplicação, <b>três perfis de pessoa</b> e <b>três serviços de fora</b>. Cada degrau da escada herda tudo o que o degrau de baixo pode fazer.</p>
+  </div>
+
+  <div class="ctx" data-wires='[
+    {"from":"#p-vis","to":"#hub-d","kind":"people"},
+    {"from":"#p-usu","to":"#hub-d","kind":"people"},
+    {"from":"#p-ger","to":"#hub-d","kind":"people"},
+    {"from":"#hub-d","to":"#x-db","kind":"thread","label":"dados e sessões"},
+    {"from":"#hub-d","to":"#x-ai","kind":"thread","label":"pede o tutorial"},
+    {"from":"#hub-d","to":"#x-wa","kind":"loose","label":"botão de orçamento"}
+  ]'>
+    <div class="col">
+      <p class="colcap">Pessoas</p>
+      <div class="stairs">
+        <div class="step s3" id="p-ger"><span class="ic"><i data-lucide="shield-check"></i></span>
+          <div><h4>Gerente</h4><p><b>+</b> cadastros, painel e moderação do Hub</p></div></div>
+        <div class="step s2" id="p-usu"><span class="ic"><i data-lucide="user"></i></span>
+          <div><h4>Usuário</h4><p><b>+</b> monta, publica, curte e comenta</p></div></div>
+        <div class="step s1" id="p-vis"><span class="ic"><i data-lucide="eye"></i></span>
+          <div><h4>Visitante</h4><p>vê a vitrine e o Hub, cria a conta</p></div></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <p class="colcap">Plataforma</p>
+      <div class="bastidor" id="hub-d" role="img" aria-label="A plataforma Desenrola com quatro módulos: Vitrine, Hub, Montador e Gerência">
+        <div class="in">
+          <b>Desenrola</b>
+          <small>uma aplicação PHP</small>
+          <div class="mods">
+            <span><i data-lucide="store"></i>Vitrine</span>
+            <span><i data-lucide="heart"></i>Hub</span>
+            <span><i data-lucide="scissors"></i>Montador</span>
+            <span><i data-lucide="clipboard-list"></i>Gerência</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <p class="colcap">Serviços de fora</p>
+      <div class="ext">
+        <div class="card" id="x-db"><span class="ic"><i data-lucide="database"></i></span>
+          <div><h4>Supabase</h4><p>PostgreSQL, via PDO com SSL</p></div></div>
+        <div class="card" id="x-ai"><span class="ic"><i data-lucide="sparkles"></i></span>
+          <div><h4>Google Gemini</h4><p>só o servidor chama, com a chave guardada lá</p></div></div>
+        <div class="card loose" id="x-wa"><span class="ic"><i data-lucide="message-circle"></i></span>
+          <div><h4>WhatsApp do ateliê</h4><p>um link com a mensagem pronta, sem API</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="info"></i><span><b>Cliente não é usuário.</b> É um cadastro comercial feito pela gerente e nunca faz login.</span></p>
+    <div class="keys"><span><i class="p"></i>pessoas usando</span><span><i></i>integração real</span><span><i class="l"></i>só um link</span></div>
+  </div>
+</section>
+
+<!-- 3 IMPLANTACAO -->
+<section class="slide slide--draw" id="implantacao" data-sec="Visão geral" data-title="Onde cada peça roda">
+  <div>
+    <p class="eyebrow">Visão geral</p>
+    <h2>Onde cada peça roda</h2>
+    <p class="lede">Três lugares: <b>o aparelho de quem acessa</b>, <b>um contêiner no Render</b> e <b>os serviços de dados e IA</b>. Cada push na branch main troca o contêiner por um novo.</p>
+  </div>
+
+  <div class="dep" data-wires='[
+    {"from":"#d-nav","to":"#r-caddy","kind":"thread","label":"HTTPS","at":0.5},
+    {"from":"#r-gh","to":"#r-box","kind":"thread","label":"push na main faz o deploy","at":0.5},
+    {"from":"#r-app","to":"#x-pg","kind":"thread","label":"PDO com SSL","at":0.5},
+    {"from":"#r-app","to":"#x-gem","kind":"thread","label":"cURL, até 25 s","at":0.5}
+  ]'>
+    <div class="col">
+      <p class="colcap">No aparelho</p>
+      <div class="place device" id="d-nav">
+        <div class="place-h"><span class="ic"><i data-lucide="smartphone"></i></span>
+          <div><h4>Navegador</h4><p>celular ou computador</p></div></div>
+        <ul class="lines">
+          <li><i data-lucide="file-code-2"></i>HTML pronto, vindo do PHP</li>
+          <li><i data-lucide="mouse-pointer-click"></i>Scripts curtem e pedem tutorial sem recarregar</li>
+          <li class="hl"><i data-lucide="lock"></i><span><code>conversor.js</code> transforma a foto em grade aqui mesmo. A foto nunca sai do aparelho.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <p class="colcap">No Render</p>
+      <div class="stack" style="display:flex;flex-direction:column">
+      <div class="gh" id="r-gh"><i data-lucide="github"></i><b>GitHub</b><span>branch main</span></div>
+      <div class="box" id="r-box">
+        <span class="tag"><i data-lucide="container"></i>contêiner Docker</span>
+        <div class="flow">
+          <div class="stop" id="r-caddy"><b>Caddy</b><code>public/</code><span>entrega CSS, JS e imagens direto</span></div>
+          <div class="stop main"><b>FrankenPHP</b><code>index.php</code><span>a porta única de todo pedido</span></div>
+          <div class="stop" id="r-app"><b>Aplicação</b><code>app/</code><span>roteador, regras e telas</span></div>
+        </div>
+        <div class="aside-row">
+          <p class="pill"><i data-lucide="key-round"></i><span><b>Segredos</b> só em variáveis de ambiente: <code>DB_*</code>, <code>GEMINI_*</code></span></p>
+          <p class="pill gone"><i data-lucide="hard-drive"></i><span><b>Disco temporário:</b> é apagado a cada deploy</span></p>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <p class="colcap">Serviços de fora</p>
+      <div class="svc">
+        <div class="place cloud" id="x-pg">
+          <div class="place-h"><span class="ic"><i data-lucide="database"></i></span>
+            <div><h4>Supabase</h4><p>PostgreSQL, porta 6543</p></div></div>
+          <div class="subs"><span>10 tabelas</span><span class="hl">sessões de login</span><span>RLS ligado</span></div>
+        </div>
+        <div class="place cloud" id="x-gem">
+          <div class="place-h"><span class="ic"><i data-lucide="sparkles"></i></span>
+            <div><h4>Google Gemini</h4><p>escreve o tutorial de bordado</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="laptop"></i><span><b>No seu computador:</b> o <code>rodar-local.bat</code> sobe o PHP em localhost:8000 e usa o mesmo Supabase. O <code>.env</code> nunca vai para o Git.</span></p>
+    <div class="keys"><span><i></i>conexão real</span></div>
+  </div>
+</section>
+
+<!-- 4 CAMADAS -->
+<section class="slide slide--draw" id="camadas" data-sec="Arquitetura" data-title="Camadas MVC2">
+  <div>
+    <p class="eyebrow">Arquitetura</p>
+    <h2>Camadas MVC2: cada uma só fala com a vizinha</h2>
+    <p class="lede">Siga a linha com um exemplo: <b>a gerente salva um insumo</b>. O pedido desce camada por camada até o banco, e cada uma só faz a sua parte.</p>
+  </div>
+
+  <div class="mvc" data-wires='[
+    {"from":"#l-in","to":"#l-ctl","kind":"thread","label":"salvar()","code":true,"at":0.5},
+    {"from":"#l-ctl","to":"#l-proc","kind":"thread","label":"salvar($_POST)","code":true,"at":0.5},
+    {"from":"#l-proc","to":"#l-dad","kind":"thread","label":"inserir($d)","code":true,"at":0.5},
+    {"from":"#l-dad","to":"#l-db","kind":"thread","label":"INSERT","code":true,"at":0.5},
+    {"from":"#l-ctl","to":"#l-tel","kind":"thread","label":"Visao::render","code":true,"at":0.5},
+    {"from":"#l-proc","to":"#l-ai","kind":"loose","label":"só GeminiServico","at":0.5}
+  ]'>
+    <div class="lay side t-tel" id="l-tel">
+      <h4><i data-lucide="layout-template"></i>Telas</h4>
+      <p class="verb">Só exibem o que recebem, sempre escapado com <code>e()</code>.</p>
+    </div>
+    <div class="lay side t-ai" id="l-ai">
+      <h4><i data-lucide="sparkles"></i>Gemini API</h4>
+      <p class="verb">Serviço de fora. A chave fica só no servidor.</p>
+    </div>
+
+    <div class="lay l0" id="l-in">
+      <span class="k">public/index.php</span>
+      <h4>Entrada</h4>
+      <p class="verb">A porta única de todo pedido.</p>
+      <ul class="rules">
+        <li class="go"><i data-lucide="chevron-right"></i>bootstrap prepara o ambiente</li>
+        <li class="go"><i data-lucide="chevron-right"></i>Sessao abre a sessão</li>
+        <li class="go"><i data-lucide="chevron-right"></i>Roteador confere CSRF e acesso</li>
+      </ul>
+      <p class="count"><b>1</b>arquivo e a lista de rotas</p>
+    </div>
+    <div class="lay l1" id="l-ctl">
+      <span class="k">app/controladores</span>
+      <h4>Controladores</h4>
+      <p class="verb">Recebem o pedido e escolhem a resposta.</p>
+      <ul class="rules">
+        <li class="yes"><i data-lucide="check"></i>ler $_GET, $_POST e a sessão</li>
+        <li class="yes"><i data-lucide="check"></i>chamar um serviço</li>
+        <li class="no"><i data-lucide="x"></i>escrever SQL</li>
+      </ul>
+      <p class="count"><b>13</b>classes</p>
+    </div>
+    <div class="lay l2" id="l-proc">
+      <span class="k">app/processamento</span>
+      <h4>Processamento</h4>
+      <p class="verb">Validam os campos e aplicam as regras.</p>
+      <ul class="rules">
+        <li class="yes"><i data-lucide="check"></i>validar e decidir</li>
+        <li class="yes"><i data-lucide="check"></i>chamar a camada de dados</li>
+        <li class="no"><i data-lucide="x"></i>ler $_POST ou a sessão</li>
+        <li class="no"><i data-lucide="x"></i>gerar HTML</li>
+      </ul>
+      <p class="count"><b>11</b>serviços</p>
+    </div>
+    <div class="lay l3" id="l-dad">
+      <span class="k">app/dados</span>
+      <h4>Dados</h4>
+      <p class="verb">Conversam com o banco, e só isso.</p>
+      <ul class="rules">
+        <li class="yes"><i data-lucide="check"></i>SQL com parâmetros</li>
+        <li class="no"><i data-lucide="x"></i>regra de negócio</li>
+        <li class="no"><i data-lucide="x"></i>HTML</li>
+      </ul>
+      <p class="count"><b>8</b>classes</p>
+    </div>
+    <div class="lay l4" id="l-db">
+      <span class="k">Supabase</span>
+      <h4><i data-lucide="database"></i>Banco</h4>
+      <p class="verb">PostgreSQL</p>
+      <ul class="rules">
+        <li>10 tabelas</li>
+        <li>CHECK, chaves e RLS</li>
+      </ul>
+    </div>
+
+    <div class="core">
+      <h4><i data-lucide="cog"></i>Core, usado por todas</h4>
+      <div class="chips"><span>Roteador</span><span>Sessao</span><span>SessaoBanco</span><span>Auth</span><span>Csrf</span><span>Conexao</span><span>Visao</span><span>Resposta</span><span>ajudantes.php</span></div>
+      <p><code>Conexao</code> é a única porta para o banco.</p>
+    </div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="package-open"></i><span><b>Sem framework e sem Composer.</b> Um autoloader acha cada classe pelo nome do arquivo, procurando em core, controladores, processamento e dados.</span></p>
+    <div class="keys"><span><i></i>caminho do pedido</span><span><i class="l"></i>chamada externa</span></div>
+  </div>
+</section>
+
+<!-- 5 REQUISICAO -->
+<section class="slide slide--draw" id="requisicao" data-sec="Arquitetura" data-title="O caminho de uma requisição">
+  <div>
+    <p class="eyebrow">Arquitetura</p>
+    <h2>O caminho de uma requisição</h2>
+    <p class="lede">Todo pedido passa pelos mesmos pontos. <b>Três portões</b> podem barrá-lo antes de chegar ao controlador, e cada um tem a sua saída.</p>
+  </div>
+
+  <div class="trip" role="img" aria-label="Linha do tempo de um pedido em 11 passos, com três portões que podem barrar o pedido">
+    <p class="zone z-in">Entrada<small>public/index.php</small></p>
+    <p class="zone z-gate">Portaria<small>Roteador</small></p>
+    <p class="zone z-work">Trabalho<small>as camadas</small></p>
+    <p class="zone z-out">Saída<small>resposta e sessão</small></p>
+
+    <div class="stations">
+      <div class="sta"><span class="knot">1</span><b>Chega o pedido</b><code>POST + _csrf</code></div>
+      <div class="sta"><span class="knot">2</span><b>Prepara o ambiente</b><code>bootstrap.php</code></div>
+      <div class="sta"><span class="knot">3</span><b>Lê a sessão</b><code>SessaoBanco</code></div>
+      <div class="sta gate"><span class="knot"><span>4</span></span><b>A rota existe?</b><code>rotas.php</code></div>
+      <div class="sta gate"><span class="knot"><span>5</span></span><b>O token confere?</b><code>Csrf::valido</code></div>
+      <div class="sta gate"><span class="knot"><span>6</span></span><b>Pode entrar?</b><code>Auth::eGerente</code></div>
+      <div class="sta work"><span class="knot">7</span><b>Controlador</b><code>salvar()</code></div>
+      <div class="sta work"><span class="knot">8</span><b>Serviço valida</b><code>InsumoServico</code></div>
+      <div class="sta work"><span class="knot">9</span><b>Dados gravam</b><code>INSERT</code></div>
+      <div class="sta out"><span class="knot">10</span><b>Redireciona</b><code>302 + flash</code></div>
+      <div class="sta out"><span class="knot">11</span><b>Grava a sessão</b><code>SessaoBanco</code></div>
+    </div>
+
+    <div class="exit e4"><b><i data-lucide="ban"></i>404</b>tela de página não encontrada</div>
+    <div class="exit e5"><b><i data-lucide="ban"></i>403</b>formulário sem token válido</div>
+    <div class="exit e6"><b><i data-lucide="ban"></i>/login</b>sem login vai ao login, ou 401 em JSON. Sem perfil, 403</div>
+    <div class="exit e8"><b><i data-lucide="undo-2"></i>volta</b>campos inválidos voltam ao formulário com os erros</div>
+    <div class="exit e500"><b><i data-lucide="bug"></i>Erro inesperado</b>em qualquer passo vira a tela 500 e fica registrado no log</div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="refresh-ccw"></i><span><b>Depois do 302</b> o navegador pede <code>GET /gerente/insumos</code> e mostra o aviso de sucesso. Apertar F5 não reenvia o formulário.</span></p>
+    <div class="keys"><span><i class="kc"></i>passo</span><span><i class="kd"></i>portão</span><span><i class="ke"></i>saída antecipada</span></div>
+  </div>
+</section>
+
+<!-- 6 CORE -->
+<section class="slide slide--draw" id="nucleo" data-sec="Arquitetura" data-title="O núcleo">
+  <div>
+    <p class="eyebrow">Arquitetura</p>
+    <h2>O núcleo: oito classes que todos usam</h2>
+    <p class="lede">Todo pedido passa pela mesma linha: o Roteador acha a rota, <b>dois portões</b> conferem quem pode passar e só então o controlador age. <b>A memória fica no banco.</b></p>
+  </div>
+
+  <div class="nuc" data-wires='[
+    {"from":"#n-rot","to":"#n-csrf","kind":"thread"},
+    {"from":"#n-csrf","to":"#n-auth","kind":"thread"},
+    {"from":"#n-auth","to":"#n-ctl","kind":"thread"},
+    {"from":"#n-ctl","to":"#n-vis","kind":"thread","label":"HTML","at":0.5},
+    {"from":"#n-ctl","to":"#n-res","kind":"thread","label":"302 · JSON","at":0.5},
+    {"from":"#n-csrf","to":"#n-ses","kind":"loose","label":"lê o token","at":0.3,"fromSide":"bottom","toSide":"top","toAt":0.5},
+    {"from":"#n-auth","to":"#n-ses","kind":"loose","label":"lê o usuário","at":0.3,"fromSide":"bottom","toSide":"top","toAt":0.84},
+    {"from":"#n-ses","to":"#n-sb","kind":"thread"},
+    {"from":"#n-sb","to":"#n-con","kind":"thread","label":"pdo()","code":true,"at":0.5}
+  ]'>
+    <p class="colcap q1"><span class="kcap">1</span>Entrada</p>
+    <div class="pc" id="n-rot">
+      <div class="pc-h"><span class="ic"><i data-lucide="chevron-right"></i></span><h4>Roteador</h4></div>
+      <p>Acha a rota pelo método e pelo caminho.</p>
+      <code class="m">despachar()</code>
+      <span class="no"><i data-lucide="x"></i>rota não existe: 404</span>
+    </div>
+
+    <p class="colcap q2"><span class="kcap">2</span>Quem pode passar</p>
+    <div class="pc" id="n-csrf">
+      <div class="pc-h"><span class="ic gate"><i data-lucide="shield-check"></i></span><h4>Csrf</h4></div>
+      <p>Todo POST traz o token da sessão.</p>
+      <code class="m">valido() · campo()</code>
+      <span class="no"><i data-lucide="x"></i>token errado: 403</span>
+    </div>
+    <div class="pc" id="n-auth">
+      <div class="pc-h"><span class="ic gate"><i data-lucide="key-round"></i></span><h4>Auth</h4></div>
+      <p>Confere o acesso: público, login ou gerente.</p>
+      <code class="m">usuario() · eGerente()</code>
+      <span class="no"><i data-lucide="x"></i>sem login: /login ou 401</span>
+      <span class="no"><i data-lucide="x"></i>não é gerente: 403</span>
+    </div>
+
+    <p class="colcap q4">Controlador</p>
+    <div class="pc ctl" id="n-ctl">
+      <div class="pc-h"><span class="ic"><i data-lucide="cog"></i></span><h4>Da rota</h4></div>
+      <p>Só aqui entra a regra da tela. Nunca encerra sozinho.</p>
+      <code class="m">(new $classe())-&gt;$acao()</code>
+    </div>
+
+    <p class="colcap q5"><span class="kcap">4</span>Resposta</p>
+    <div class="outs">
+      <div class="pc" id="n-vis">
+        <div class="pc-h"><span class="ic"><i data-lucide="layout-template"></i></span><h4>Visao</h4></div>
+        <code class="m">render(tela, dados, layout)</code>
+      </div>
+      <div class="pc" id="n-res">
+        <div class="pc-h"><span class="ic"><i data-lucide="file-code-2"></i></span><h4>Resposta</h4></div>
+        <code class="m">redirecionar()<br>json()</code>
+      </div>
+    </div>
+
+    <p class="colcap q3"><span class="kcap">3</span>Memória, guardada no banco</p>
+    <div class="pc mem" id="n-ses">
+      <div class="pc-h"><span class="ic"><i data-lucide="user"></i></span><h4>Sessao</h4><p>Memória do visitante entre pedidos. O <code>index.php</code> a inicia antes do Roteador.</p></div>
+      <div class="chips"><code>obter() · definir()</code><code>flash() · tirarFlash()</code><code>guardarVelhos()</code></div>
+    </div>
+    <div class="pc mem" id="n-sb">
+      <div class="pc-h"><span class="ic"><i data-lucide="hard-drive"></i></span><h4>SessaoBanco</h4></div>
+      <p>Grava na tabela sessoes, não no disco.</p>
+      <code class="m">read() · write() · gc()</code>
+    </div>
+    <div class="pc db" id="n-con">
+      <div class="pc-h"><span class="ic"><i data-lucide="database"></i></span><h4>Conexao</h4></div>
+      <p>Uma só conexão PDO com o Supabase.</p>
+      <code class="m">:6543 · sslmode=require</code>
+    </div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="info"></i><span><b>Por que elas existem?</b> Nenhuma tela repete isso. Uma rota nova ganha CSRF, login e sessão só por estar em <code>rotas.php</code>.</span></p>
+    <div class="keys"><span><i></i>o pedido segue</span><span><i class="l"></i>consulta</span></div>
+  </div>
+</section>
+
+<!-- 7 SUBSISTEMAS -->
+<section class="slide slide--draw" id="subsistemas" data-sec="Subsistemas" data-title="Seis subsistemas">
+  <div>
+    <p class="eyebrow">Subsistemas</p>
+    <h2>Seis subsistemas e como se alimentam</h2>
+    <p class="lede">Cada um é uma fatia vertical: controlador, serviço e dados. <b>O montador é o centro:</b> ele cria as matrizes e os bordados que o Hub, a vitrine e a gerente usam.</p>
+  </div>
+
+  <div class="dep dep7" data-wires='[
+    {"from":"#ss-cts","to":"#ss-mon","kind":"thread","label":"login","at":0.5},
+    {"from":"#ss-ger","to":"#ss-mon","kind":"thread","label":"matriz padrão","at":0.5},
+    {"from":"#ss-mon","to":"#ss-hub","kind":"thread","label":"tipo hub","at":0.5},
+    {"from":"#ss-mon","to":"#ss-most","kind":"thread","label":"tipo produto","at":0.5},
+    {"from":"#ss-hub","to":"#ss-ia","kind":"loose","label":"como bordar","at":0.5},
+    {"from":"#ss-most","to":"#ss-hub","kind":"loose","label":"mais curtidos","at":0.5}
+  ]'>
+    <div class="col">
+      <p class="colcap">Alimentam o montador</p>
+      <div class="svc">
+        <div class="place side" id="ss-cts">
+          <div class="place-h"><span class="ic"><i data-lucide="key-round"></i></span><div><h4>Contas</h4><p>cadastro, login e sessão</p></div></div>
+          <ul class="lines">
+            <li><code>AuthControlador</code></li>
+            <li><code>AuthServico</code></li>
+            <li><code>UsuarioDados</code></li>
+          </ul>
+          <div class="subs"><span class="ok">pronto</span></div>
+        </div>
+        <div class="place side" id="ss-ger">
+          <div class="place-h"><span class="ic"><i data-lucide="clipboard-list"></i></span><div><h4>Área da gerente</h4><p>insumos, clientes e cadastros</p></div></div>
+          <ul class="lines">
+            <li><code>Insumo e Cliente</code></li>
+            <li><code>Matriz, Produto, Painel, Usuario</code></li>
+          </ul>
+          <div class="subs"><span class="ok">insumos e clientes</span><span class="esq">matrizes, produtos, painel</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <p class="colcap">O centro</p>
+      <div class="mnd" id="ss-mon">
+        <span class="tag"><i data-lucide="package-open"></i>centro</span>
+        <div class="place-h"><span class="ic"><i data-lucide="scissors"></i></span><div><h4>Conversor e montador</h4><p>imagem ou padrão vira matriz</p></div></div>
+        <div class="stack-v">
+          <div class="stop-v"><b>MontadorControlador</b><code>POST /montador/salvar</code></div>
+          <div class="stop-v"><b>MontadorServico · GradeServico</b><code>valida a grade</code></div>
+          <div class="stop-v"><b>MatrizDados · BordadoDados</b><code>CAST(:grade AS jsonb)</code></div>
+        </div>
+        <div class="subs"><span class="esq">esqueleto, ainda lança "Não implementado"</span></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <p class="colcap">São alimentados</p>
+      <div class="svc">
+        <div class="place side" id="ss-hub">
+          <div class="place-h"><span class="ic"><i data-lucide="heart"></i></span><div><h4>Hub</h4><p>feed, curtidas e comentários</p></div></div>
+          <ul class="lines">
+            <li><code>HubControlador · ComentarioControlador</code></li>
+            <li><code>HubServico · ComentarioServico</code></li>
+            <li><code>HubDados · ComentarioDados</code></li>
+          </ul>
+          <div class="subs"><span class="par">parcial</span></div>
+        </div>
+        <div class="place side" id="ss-most">
+          <div class="place-h"><span class="ic"><i data-lucide="store"></i></span><div><h4>Mostruário</h4><p>home e catálogo, lidos do banco</p></div></div>
+          <ul class="lines">
+            <li><code>HomeControlador · CatalogoControlador</code></li>
+            <li><code>ProdutoServico</code></li>
+            <li><code>ProdutoDados</code></li>
+          </ul>
+          <div class="subs"><span class="ok">pronto</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col col-ia">
+      <p class="colcap">Usa o Hub</p>
+      <div class="place side" id="ss-ia">
+        <div class="place-h"><span class="ic"><i data-lucide="sparkles"></i></span><div><h4>Tutorial com IA</h4><p>o "como bordar?" do Hub</p></div></div>
+        <ul class="lines">
+          <li><code>TutorialControlador</code></li>
+          <li><code>TutorialServico</code></li>
+          <li><code>GeminiServico</code></li>
+        </ul>
+        <div class="subs"><span class="esq">esqueleto</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="info"></i><span><b>Por que o montador é o centro?</b> É ele quem cria as matrizes e os bordados que o Hub, a vitrine e a gerente usam. Sem ele, Hub e Mostruário ficam vazios.</span></p>
+    <div class="keys"><span><i></i>alimenta</span><span><i class="l"></i>consulta</span></div>
+  </div>
+</section>
+<!-- 8 ESTADO -->
+<section class="slide slide--draw" id="estado" data-sec="Subsistemas" data-title="O que já existe">
+  <div>
+    <p class="eyebrow">Subsistemas</p>
+    <h2>O que já funciona e o que é esqueleto</h2>
+    <p class="lede">Contagem feita no código atual, camada por camada. <b>Nó cheio é pronto</b>, meio nó é parcial e nó vazado é esqueleto.</p>
+  </div>
+
+  <div class="st8">
+    <div class="scols">
+      <div class="scol">
+        <p class="colcap">Controladores</p>
+        <p class="frac"><b>5/13</b><span>prontos</span></p>
+        <p class="role">Um por rota de <code>rotas.php</code>. Recebem o pedido e escolhem a resposta.</p>
+        <div class="cbar" role="img" aria-label="5 de 13 controladores prontos">
+          <span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span>
+        </div>
+        <p class="gcap">Prontos</p>
+        <div class="chips8">
+          <span class="chip ok">Auth</span><span class="chip ok">Catalogo</span><span class="chip ok">Home</span><span class="chip ok">Insumo</span><span class="chip ok">Cliente</span>
+        </div>
+        <p class="gcap">Esqueleto</p>
+        <div class="chips8">
+          <span class="chip esq">Hub</span><span class="chip esq">Comentario</span><span class="chip esq">Montador</span><span class="chip esq">Tutorial</span><span class="chip esq">Matriz</span><span class="chip esq">Produto</span><span class="chip esq">Painel</span><span class="chip esq">Usuario</span>
+        </div>
+      </div>
+
+      <div class="scol">
+        <p class="colcap">Serviços</p>
+        <p class="frac"><b>4/11</b><span>prontos, 1 parcial</span></p>
+        <p class="role">Validam os campos e aplicam as regras de negócio.</p>
+        <div class="cbar" role="img" aria-label="4 de 11 serviços prontos e 1 parcial">
+          <span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 half"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span>
+        </div>
+        <p class="gcap">Prontos</p>
+        <div class="chips8">
+          <span class="chip ok">AuthServico</span><span class="chip ok">ClienteServico</span><span class="chip ok">InsumoServico</span><span class="chip ok">ProdutoServico</span>
+        </div>
+        <p class="gcap">Parcial e esqueleto</p>
+        <div class="chips8">
+          <span class="chip par">HubServico</span><span class="chip esq">ComentarioServico</span><span class="chip esq">GeminiServico</span><span class="chip esq">GradeServico</span><span class="chip esq">MatrizServico</span><span class="chip esq">MontadorServico</span><span class="chip esq">TutorialServico</span>
+        </div>
+      </div>
+
+      <div class="scol">
+        <p class="colcap">Dados</p>
+        <p class="frac"><b>5/8</b><span>prontas</span></p>
+        <p class="role">SQL com parâmetros, e só isso.</p>
+        <div class="cbar" role="img" aria-label="5 de 8 classes de dados prontas">
+          <span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span>
+        </div>
+        <p class="gcap">Prontas</p>
+        <div class="chips8">
+          <span class="chip ok">UsuarioDados</span><span class="chip ok">HubDados</span><span class="chip ok">InsumoDados</span><span class="chip ok">ClienteDados</span><span class="chip ok">ProdutoDados</span>
+        </div>
+        <p class="gcap">Esqueleto</p>
+        <div class="chips8">
+          <span class="chip esq">BordadoDados</span><span class="chip esq">ComentarioDados</span><span class="chip esq">MatrizDados</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sfe">
+      <span class="ic"><i data-lucide="smartphone"></i></span>
+      <div class="sfe-t"><h4>No navegador</h4><p>scripts de página que curtem, montam e pedem o tutorial sem recarregar</p></div>
+      <div class="chips8">
+        <span class="chip ok">main.js</span><span class="chip ok">header.js</span><span class="chip ok">showcase.js</span>
+        <span class="chip esq">conversor.js</span><span class="chip esq">montador.js</span><span class="chip esq">hub.js</span><span class="chip esq">tutorial.js</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="info"></i><span><b>Esqueleto não é vazio.</b> Os métodos já existem com a assinatura final; chamá-los hoje lança "Não implementado".</span></p>
+  </div>
+</section>
+
+<!-- 9 LOGIN -->
+<section class="slide" id="login" data-sec="Contas" data-title="Entrar na conta">
+  <div><p class="eyebrow">Subsistema · Contas</p><h2>Entrar na conta</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>A pessoa digita só o nome de usuário. O controlador completa com <code>@example.com</code> e o serviço confere a senha com <code>password_verify</code>.</p>
+      <ul class="facts">
+        <li><b>Mensagem genérica:</b> não revela se o erro foi no usuário ou na senha.</li>
+        <li><b>Conta inativa</b> não entra, mesmo com a senha certa.</li>
+        <li><b>Cadastro</b> segue o mesmo caminho: valida, grava os hashes, faz login e leva ao montador.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+sequenceDiagram
+  actor P as Pessoa
+  participant AC as AuthControlador
+  participant AS as AuthServico
+  participant UD as UsuarioDados
+  participant A as Auth e Sessao
+  P->>AC: POST /login com usuário e senha
+  AC->>AC: monta usuario@example.com
+  AC->>AS: autenticar(email, senha)
+  AS->>UD: buscarPorEmail(email)
+  UD-->>AS: linha da tabela usuarios
+  AS->>AS: password_verify e ativo = true
+  alt não confere
+    AS-->>AC: null
+    AC->>A: flash de erro e guardarVelhos
+    AC-->>P: volta para /login
+  else confere
+    AS-->>AC: usuário sem os hashes
+    AC->>A: Auth::entrar() troca o id da sessão
+    AC-->>P: gerente vai a /gerente, usuário vai a /hub
+  end
+</script><div class="mmd" aria-label="Sequência do login: controlador, serviço, dados e sessão"></div></figure>
+  </div>
+</section>
+
+<!-- 10 RECUPERAR -->
+<section class="slide" id="recuperar" data-sec="Contas" data-title="Recuperar a senha">
+  <div><p class="eyebrow">Subsistema · Contas</p><h2>Recuperar a senha em duas etapas</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>Sem envio de e-mail: a pessoa responde a pergunta de segurança escolhida no cadastro. O progresso fica guardado na sessão.</p>
+      <ul class="facts">
+        <li><b>Na sessão:</b> <code>recuperar_id</code>, <code>recuperar_pergunta</code> e <code>recuperar_tentativas</code>.</li>
+        <li><b>A resposta</b> é salva só como hash e comparada em minúsculas.</li>
+        <li><b>Na quinta tentativa errada</b>, tudo é apagado e o processo recomeça.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+stateDiagram-v2
+  direction LR
+  state "Informa o usuário" as Pedido
+  state "Responde a pergunta<br/>e cria nova senha" as Pergunta
+  state "Limite atingido" as Bloqueio
+  state "Volta ao login" as Login
+  [*] --> Pedido: GET /recuperar-senha
+  Pedido --> Pedido: usuário não existe
+  Pedido --> Pergunta: perguntaDe() acha o usuário
+  Pergunta --> Pergunta: erro, tentativa + 1
+  Pergunta --> Bloqueio: quinta tentativa
+  Bloqueio --> Pedido: recomeça
+  Pergunta --> Login: redefinirSenha() ok
+  Login --> [*]
+</script><div class="mmd" aria-label="Estados da recuperação de senha"></div></figure>
+  </div>
+</section>
+
+<!-- 11 MOSTRUARIO -->
+<section class="slide" id="mostruario" data-sec="Mostruário" data-title="Vitrine e home">
+  <div><p class="eyebrow">Subsistema · Mostruário</p><h2>Vitrine e home</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>Um produto não guarda imagem. Ele aponta para um bordado do tipo produto, que junta uma matriz, uma categoria de peça, a cor do tecido e a posição. A tela desenha tudo isso na hora.</p>
+      <ul class="facts">
+        <li><b>Banco fora do ar</b> não derruba a home: o controlador registra o erro e mostra a página vazia.</li>
+        <li><b>Filtro por categoria</b> aceita só slugs simples, como <code>bolsa</code>.</li>
+        <li><b>Orçamento</b> abre o WhatsApp do ateliê com a mensagem pronta.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+flowchart LR
+  HC["HomeControlador<br/>index()"]:::ok
+  CC["CatalogoControlador<br/>listar() e produto()"]:::ok
+  PS["ProdutoServico<br/>catalogo, destaques,<br/>mostrar, categorias"]:::ok
+  HS["HubServico<br/>maisCurtidos()"]:::ok
+  PD["ProdutoDados"]:::ok
+  HD["HubDados"]:::ok
+  Q[("produtos JOIN bordados<br/>JOIN categorias<br/>JOIN matrizes")]
+  Q2[("bordados tipo hub<br/>e curtidas")]
+  T["Tela: peca_bordada<br/>mockup + SVG da matriz<br/>em pos_x, pos_y, escala"]
+  WA["Botão de orçamento<br/>link_whatsapp()"]
+  HC --> PS
+  HC -->|"seção Direto do Hub"| HS
+  CC --> PS
+  PS --> PD --> Q
+  HS --> HD --> Q2
+  CC -->|"Visao::render"| T
+  HC -->|"Visao::render"| T
+  T --> WA
+</script><div class="mmd" aria-label="Fluxo da vitrine: controladores, ProdutoServico, ProdutoDados e a tela peca_bordada"></div></figure>
+  </div>
+</section>
+
+<!-- 12 HUB ESTRUTURA -->
+<section class="slide" id="hub" data-sec="Hub" data-title="O Hub social">
+  <div><p class="eyebrow">Subsistema · Hub</p><h2>O Hub: feed, curtidas e comentários</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>O Hub é o feed público dos bordados. Dois controladores dividem o trabalho: um cuida dos posts e das curtidas, o outro dos comentários.</p>
+      <ul class="facts">
+        <li><b>Feed:</b> 12 por página, e a consulta busca 13 para saber se existe próxima página.</li>
+        <li><b>Post oculto</b> só abre para a gerente. Autor ou gerente pode excluir.</li>
+        <li><b>Comentários</b> têm de 1 a 280 caracteres.</li>
+      </ul>
+      <div class="legend"><span><i class="sw ok"></i>pronto</span><span><i class="sw par"></i>parcial</span><span><i class="sw esq"></i>esqueleto</span></div>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+flowchart LR
+  R1["GET /hub<br/>GET /hub/bordado<br/>GET /meus-bordados"]
+  R2["POST /hub/curtir<br/>POST /bordado/excluir<br/>POST /gerente/hub/ocultar"]
+  R3["POST /hub/comentar<br/>POST /hub/comentario/excluir<br/>POST /gerente/hub/comentario/ocultar"]
+  HC["HubControlador"]:::esq
+  CC["ComentarioControlador"]:::esq
+  HS["HubServico"]:::par
+  CS["ComentarioServico"]:::esq
+  HD["HubDados"]:::par
+  CD["ComentarioDados"]:::esq
+  B[("bordados")]
+  CU[("curtidas")]
+  CO[("comentarios")]
+  R1 --> HC
+  R2 --> HC
+  R3 --> CC
+  HC --> HS
+  HC -->|"listar() na página do bordado"| CS
+  CC --> CS
+  HS --> HD
+  CS --> CD
+  HD --> B
+  HD --> CU
+  CD --> CO
+</script><div class="mmd" aria-label="Rotas, controladores, serviços, dados e tabelas do Hub"></div></figure>
+  </div>
+</section>
+
+<!-- 13 CURTIR -->
+<section class="slide" id="curtir" data-sec="Hub" data-title="Curtir sem recarregar">
+  <div><p class="eyebrow">Subsistema · Hub</p><h2>Curtir sem recarregar a página</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>O mesmo botão curte e descurte. O banco decide qual dos dois aconteceu: se a curtida já existia, o INSERT não grava nada e o servidor apaga a curtida.</p>
+      <ul class="facts">
+        <li><b>Chave dupla</b> em <code>curtidas</code> (usuario_id, bordado_id) impede curtida repetida.</li>
+        <li><b>Visitante</b> recebe 401 em JSON, e o script leva ao login.</li>
+        <li><b>O token CSRF</b> vai no cabeçalho <code>X-CSRF-Token</code>.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+sequenceDiagram
+  actor P as Usuário
+  participant J as hub.js
+  participant R as Roteador
+  participant H as HubControlador
+  participant D as HubDados
+  participant DB as curtidas
+  P->>J: toca no coração
+  J->>R: fetch POST /hub/curtir
+  alt sem login
+    R-->>J: 401 em JSON
+    J-->>P: leva para /login
+  end
+  R->>H: curtir()
+  H->>D: INSERT com ON CONFLICT DO NOTHING
+  D->>DB: grava o par usuário e bordado
+  alt rowCount = 0, já tinha curtido
+    H->>D: DELETE da curtida
+  end
+  H-->>J: JSON com curtiu e total
+  J-->>P: atualiza ícone e número
+</script><div class="mmd" aria-label="Sequência de curtir: hub.js, Roteador, HubControlador, HubDados"></div></figure>
+  </div>
+</section>
+
+<!-- 14 CONVERSOR -->
+<section class="slide slide--wide" id="conversor" data-sec="Montador" data-title="De imagem a matriz">
+  <div><p class="eyebrow">Subsistema · Conversor e montador</p><h2>De imagem a matriz de bordado</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>A foto nunca sai do celular. O navegador reduz a imagem a uma grade de pontos e só essa grade vai ao servidor. O PHP confere a grade e desenha o SVG ele mesmo.</p>
+      <ul class="facts">
+        <li><b>Formato dos pontos:</b> <code>.</code> é vazio, e de <code>0</code> a <code>f</code> é a posição da cor na paleta.</li>
+        <li><b>SVG enviado pelo navegador nunca é salvo</b>, porque um SVG pode carregar script.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+flowchart LR
+  subgraph NAV["No navegador: conversor.js"]
+    A["Imagem<br/>PNG, JPEG ou WebP<br/>até 5 MB"] --> B["Canvas reduzido<br/>32, 48 ou 64<br/>pontos de largura"]
+    B --> C["Pixel quase<br/>transparente<br/>vira vazio"]
+    C --> D["Median cut<br/>4 a 16 cores"]
+    D --> E["Grade JSON<br/>largura, altura,<br/>paleta, pontos"]
+  end
+  subgraph SRV["No servidor"]
+    F["GradeServico<br/>validar()"]:::esq --> G["GradeServico<br/>gerarSvg()<br/>um path por cor"]:::esq
+    G --> H[("matrizes<br/>grade jsonb + svg")]
+  end
+  E -->|"POST /montador/salvar<br/>só a grade"| F
+</script><div class="mmd" aria-label="Pipeline do conversor: imagem no navegador vira grade JSON, servidor valida e gera SVG"></div></figure>
+  </div>
+</section>
+
+<!-- 15 MONTADOR -->
+<section class="slide slide--wide" id="montador" data-sec="Montador" data-title="Salvar no montador">
+  <div><p class="eyebrow">Subsistema · Conversor e montador</p><h2>Um montador, três destinos</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>O montador tem quatro etapas: matriz, peça, posição e publicar. O mesmo formulário serve à gerente: o parâmetro <code>modo</code> decide se o resultado vira post do Hub, matriz padrão ou combinação para produto.</p>
+      <ul class="facts">
+        <li><b>Transação:</b> quando a matriz e o bordado são novos, os dois entram juntos ou nenhum entra.</li>
+        <li><b>Limite de abuso:</b> no máximo 20 bordados por pessoa a cada hora.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+flowchart LR
+  P["montador.js<br/>POST /montador/salvar"] --> V{"Título, categoria,<br/>cor e posição ok?<br/>Menos de 20 na hora?"}
+  V -->|"não"| ERR["Volta com<br/>mensagem de erro"]
+  V -->|"sim"| O{"De onde vem<br/>a matriz?"}
+  O -->|"grade_json"| NG["Valida a grade,<br/>gera SVG e<br/>MatrizDados::inserir"]
+  O -->|"matriz_id"| MI["Aceita só matriz<br/>padrão ou do<br/>próprio autor"]
+  NG --> M{"modo"}
+  MI --> M
+  M -->|"matriz, só gerente"| MZ["Matriz padrão<br/>vai a /gerente/matrizes"]
+  M -->|"produto, só gerente"| PR["Bordado tipo produto<br/>vai a /gerente/produtos/form"]
+  M -->|"sem modo"| HB["Bordado tipo hub<br/>vai a /hub/bordado"]
+</script><div class="mmd" aria-label="Decisões do MontadorServico ao salvar: validação, origem da matriz e modo"></div></figure>
+  </div>
+</section>
+
+<!-- 16 TUTORIAL -->
+<section class="slide" id="tutorial" data-sec="Tutorial IA" data-title="Tutorial com Gemini">
+  <div><p class="eyebrow">Subsistema · Tutorial com IA</p><h2>O tutorial de bordado à mão</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>A IA é chamada no máximo uma vez por bordado. A resposta fica salva em <code>bordados.tutorial_ia</code>, e se o Gemini falhar o PHP monta um texto simples com os mesmos dados.</p>
+      <ul class="facts">
+        <li><b>Três origens:</b> <code>cache</code>, <code>ia</code> ou <code>reserva</code>.</li>
+        <li><b>Contra prompt injection:</b> os dados do bordado vão entre marcadores, com a ordem de ignorar instruções dentro deles.</li>
+        <li><b>Limite:</b> 5 tutoriais novos a cada 10 minutos por pessoa.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+sequenceDiagram
+  actor P as Usuário
+  participant J as tutorial.js
+  participant TC as TutorialControlador
+  participant TS as TutorialServico
+  participant BD as BordadoDados
+  participant G as GeminiServico
+  participant API as Gemini API
+  P->>J: Como bordar à mão
+  J->>TC: fetch POST /bordado/tutorial
+  TC->>TC: confere o limite na sessão
+  TC->>TS: obter(bordadoId)
+  TS->>BD: buscarParaTutorial(id)
+  alt tutorial já salvo
+    TS-->>TC: texto, origem cache
+  else ainda não existe
+    TS->>TS: montarPrompt() com marcadores
+    TS->>G: gerar(prompt)
+    G->>API: POST generateContent
+    alt resposta 200
+      API-->>G: texto do tutorial
+      TS->>BD: salvarTutorial(id, texto)
+      TS-->>TC: texto, origem ia
+    else falha ou 429
+      TS->>TS: textoReserva(bordado)
+      TS-->>TC: texto, origem reserva
+    end
+  end
+  TC-->>J: JSON com texto e origem
+  J-->>P: mostra com textContent
+</script><div class="mmd" aria-label="Sequência do tutorial: cache, chamada ao Gemini ou texto reserva"></div></figure>
+  </div>
+</section>
+
+<!-- 17 GERENTE -->
+<section class="slide slide--wide" id="gerente" data-sec="Gerente" data-title="Área da gerente">
+  <div><p class="eyebrow">Subsistema · Área da gerente</p><h2>Área da gerente: o mesmo molde em todos os cadastros</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>Insumos, clientes, matrizes e produtos repetem a mesma fatia: listar, formulário, salvar e excluir. Insumos e clientes já servem de modelo para os outros dois. O painel só soma os totais de cada tabela.</p>
+      <div class="legend" style="flex:1"><span><i class="sw ok"></i>pronto</span><span><i class="sw esq"></i>esqueleto</span><span>Todas as rotas em <code>/gerente</code> exigem perfil gerente</span></div>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+flowchart LR
+  IC["InsumoControlador"]:::ok --> IS["InsumoServico<br/>tipo, unidade, custo maior que 0,<br/>nome único por tipo"]:::ok --> ID["InsumoDados"]:::ok --> IT[("insumos")]
+  CC["ClienteControlador"]:::ok --> CS["ClienteServico<br/>CPF 11 ou CNPJ 14 dígitos,<br/>único, e-mail válido"]:::ok --> CD["ClienteDados"]:::ok --> CT[("clientes")]
+  MC["MatrizControlador"]:::esq --> MS["MatrizServico<br/>não exclui matriz<br/>usada em bordados"]:::esq --> MD["MatrizDados"]:::esq --> MT[("matrizes")]
+  PC["ProdutoControlador"]:::esq --> PS["ProdutoServico<br/>preço maior que 0,<br/>uma combinação por produto"]:::ok --> PD["ProdutoDados"]:::ok --> PT[("produtos")]
+  ID & CD & MD & PD -.->|"contar()"| PN["PainelControlador<br/>cartões com totais"]:::esq
+</script><div class="mmd" aria-label="Quatro cadastros da gerente seguindo Controlador, Serviço, Dados e tabela, com o painel somando totais"></div></figure>
+  </div>
+</section>
+
+<!-- 18 PRG -->
+<section class="slide" id="prg" data-sec="Gerente" data-title="Salvar um cadastro">
+  <div><p class="eyebrow">Subsistema · Área da gerente</p><h2>Salvar um cadastro sem perder o que foi digitado</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>Se a validação falhar, o controlador guarda o formulário na sessão e redireciona. A tela de formulário lê esses valores e preenche os campos de novo.</p>
+      <ul class="facts">
+        <li><b>Mensagens flash</b> vivem uma única tela: a parcial <code>mensagens</code> lê e apaga.</li>
+        <li><b>guardarVelhos</b> nunca guarda campos de senha ou resposta de segurança.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+sequenceDiagram
+  actor G as Gerente
+  participant C as InsumoControlador
+  participant S as InsumoServico
+  participant SE as Sessao
+  G->>C: POST /gerente/insumos/salvar
+  C->>S: salvar(id, $_POST)
+  alt com erros
+    S-->>C: lista de erros
+    C->>SE: flash de erro e guardarVelhos()
+    C-->>G: 302 de volta ao formulário
+    G->>C: GET form
+    C->>SE: tirarVelhos()
+    C-->>G: campos preenchidos de novo
+  else sem erros
+    S-->>C: lista vazia
+    C->>SE: flash de sucesso
+    C-->>G: 302 para /gerente/insumos
+    G->>C: GET lista com aviso de sucesso
+  end
+</script><div class="mmd" aria-label="Sequência Post, Redirect, Get ao salvar um insumo"></div></figure>
+  </div>
+</section>
+
+<!-- 19 BANCO -->
+<section class="slide" id="banco" data-sec="Dados" data-title="O banco de dados">
+  <div><p class="eyebrow">Dados</p><h2>O banco: o bordado no centro</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>Quase tudo gira em torno de <code>bordados</code>: ele liga quem publicou, qual matriz, em que peça, e recebe curtidas e comentários. Um produto é só um bordado com preço.</p>
+      <ul class="facts">
+        <li><b>Tabelas soltas:</b> <code>sessoes</code>, <code>clientes</code> e <code>insumos</code> não têm chaves estrangeiras.</li>
+        <li><b>RESTRICT</b> impede apagar matriz usada ou bordado que virou produto.</li>
+        <li><b>RLS</b> está ativo em todas as 10 tabelas.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+erDiagram
+  usuarios ||--o{ bordados : "publica"
+  usuarios |o--o{ matrizes : "cria"
+  matrizes ||--o{ bordados : "aplicada em"
+  categorias ||--o{ bordados : "tipo de peça"
+  bordados ||--o| produtos : "vira produto"
+  usuarios ||--o{ curtidas : "curte"
+  bordados ||--o{ curtidas : "recebe"
+  usuarios ||--o{ comentarios : "escreve"
+  bordados ||--o{ comentarios : "recebe"
+  usuarios {
+    bigint id PK
+    text email UK
+    text perfil "usuario ou gerente"
+    text senha_hash
+  }
+  matrizes {
+    bigint id PK
+    jsonb grade
+    text svg
+    bool padrao
+    bigint autor_id FK
+  }
+  bordados {
+    bigint id PK
+    bigint autor_id FK
+    bigint matriz_id FK
+    bigint categoria_id FK
+    int pos_x "0 a 100"
+    int escala "10 a 90"
+    text tipo "hub ou produto"
+    text tutorial_ia
+  }
+  categorias {
+    bigint id PK
+    text slug UK
+    text mockup
+  }
+  produtos {
+    bigint id PK
+    bigint bordado_id FK "único"
+    numeric preco_base
+    bool ativo
+  }
+  curtidas {
+    bigint usuario_id PK, FK
+    bigint bordado_id PK, FK
+  }
+  comentarios {
+    bigint id PK
+    bigint bordado_id FK
+    text texto "1 a 280"
+    bool oculto
+  }
+</script><div class="mmd" aria-label="Diagrama entidade-relacionamento das tabelas ligadas a bordados"></div></figure>
+  </div>
+</section>
+
+<!-- 20 ROTAS -->
+<section class="slide slide--wide" id="rotas" data-sec="Interface" data-title="Mapa de rotas">
+  <div><p class="eyebrow">Interface</p><h2>Mapa de rotas por nível de acesso</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>Todas as rotas estão em <code>app/config/rotas.php</code>, no formato método, caminho, controlador e acesso. O roteador compara o caminho exato, sem parâmetros na URL.</p>
+      <ul class="facts">
+        <li><b>Todo POST</b> passa pelo CSRF antes da checagem de acesso.</li>
+      </ul>
+    </div>
+    <div class="routes">
+      <div class="rcol pub"><h3>Público <small>qualquer pessoa</small></h3>
+        <div class="r"><em>GET</em><span>/ <small>Home::index</small></span></div>
+        <div class="r"><em>GET</em><span>/catalogo · /produto <small>Catalogo::listar, produto</small></span></div>
+        <div class="r"><em>GET</em><span>/hub · /hub/bordado <small>Hub::feed, detalhe</small></span></div>
+        <div class="r"><em>GET POST</em><span>/login <small>Auth::loginForm, login</small></span></div>
+        <div class="r"><em>GET POST</em><span>/cadastro <small>Auth::cadastroForm, cadastrar</small></span></div>
+        <div class="r"><em>GET POST</em><span>/recuperar-senha <small>Auth::recuperarForm, recuperar</small></span></div>
+        <div class="r"><em>POST</em><span>/recuperar-senha/redefinir <small>Auth::redefinir</small></span></div>
+      </div>
+      <div class="rcol log"><h3>Login <small>sem login vai a /login</small></h3>
+        <div class="r"><em>POST</em><span>/sair <small>Auth::sair</small></span></div>
+        <div class="r"><em>GET</em><span>/meus-bordados <small>Hub::meus</small></span></div>
+        <div class="r"><em>POST</em><span>/hub/curtir <small>Hub::curtir, JSON</small></span></div>
+        <div class="r"><em>POST</em><span>/hub/comentar · /hub/comentario/excluir <small>Comentario::comentar, excluir</small></span></div>
+        <div class="r"><em>POST</em><span>/bordado/excluir <small>Hub::excluirBordado</small></span></div>
+        <div class="r"><em>GET</em><span>/montador <small>Montador::index, modo matriz ou produto</small></span></div>
+        <div class="r"><em>POST</em><span>/montador/salvar <small>Montador::salvar</small></span></div>
+        <div class="r"><em>POST</em><span>/bordado/tutorial <small>Tutorial::gerar, JSON</small></span></div>
+      </div>
+      <div class="rcol ger"><h3>Gerente <small>outros perfis recebem 403</small></h3>
+        <div class="r"><em>GET</em><span>/gerente <small>Painel::index</small></span></div>
+        <div class="r"><em>GET</em><span>/gerente/usuarios <small>Usuario::listar</small></span></div>
+        <div class="r"><em>CRUD</em><span>/gerente/insumos <small>Insumo: listar, form, salvar, excluir</small></span></div>
+        <div class="r"><em>CRUD</em><span>/gerente/clientes <small>Cliente: listar, form, salvar, excluir</small></span></div>
+        <div class="r"><em>CRUD</em><span>/gerente/matrizes <small>Matriz: listar, form, salvar, excluir</small></span></div>
+        <div class="r"><em>CRUD</em><span>/gerente/produtos <small>Produto: os quatro e mais ativar</small></span></div>
+        <div class="r"><em>POST</em><span>/gerente/hub/ocultar <small>Hub::ocultar</small></span></div>
+        <div class="r"><em>POST</em><span>/gerente/hub/comentario/ocultar <small>Comentario::ocultar</small></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 21 FRONT -->
+<section class="slide" id="frontend" data-sec="Interface" data-title="O que roda no navegador">
+  <div><p class="eyebrow">Interface</p><h2>Telas no servidor, scripts no navegador</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>O HTML nasce no PHP. A classe <code>Visao</code> renderiza a tela dentro de um layout, e quatro scripts de página dão vida ao que precisa de interação.</p>
+      <ul class="facts">
+        <li><b>CSS</b> em camadas pelo <code>main.css</code>: base, componentes, páginas e responsivo.</li>
+        <li><b>Sem script</b> o site continua legível: as animações são só um acréscimo.</li>
+      </ul>
+    </div>
+    <figure class="fig"><script type="text/plain" class="src">
+flowchart LR
+  subgraph SERV["Servidor: telas PHP"]
+    VI["Visao::render"] --> LP["layout publico"]
+    VI --> LG["layout gerente"]
+    LP --> PA["parciais: header, footer,<br/>mensagens, peca_bordada,<br/>tutorial"]
+  end
+  subgraph NAVJS["Navegador: ES Modules"]
+    MAIN["main.js"]:::ok --> HE["header.js<br/>menu móvel"]:::ok
+    MAIN --> SH["showcase.js<br/>vitrine da home"]:::ok
+    MO["montador.js<br/>quatro etapas"]:::esq --> CO["conversor.js<br/>imagem em grade"]:::esq
+    HU["hub.js<br/>curtir"]:::esq
+    TU["tutorial.js<br/>pede o tutorial"]:::esq
+  end
+  RT["Roteador"]
+  SERV -->|"HTML + main.css"| NAVJS
+  MO -.->|"POST /montador/salvar"| RT
+  HU -.->|"fetch /hub/curtir"| RT
+  TU -.->|"fetch /bordado/tutorial"| RT
+</script><div class="mmd" aria-label="Telas PHP renderizadas por Visao e módulos JavaScript que chamam o Roteador"></div></figure>
+  </div>
+</section>
+
+<!-- 22 SEGURANCA -->
+<section class="slide slide--wide" id="seguranca" data-sec="Segurança" data-title="Camadas de defesa">
+  <div><p class="eyebrow">Segurança</p><h2>Onde cada proteção acontece</h2></div>
+  <div class="body">
+    <div class="copy">
+      <p>A proteção não depende de um ponto só. Cada etapa do caminho de uma requisição tem a sua barreira, e uma falha em uma camada ainda encontra a próxima.</p>
+      <ul class="facts">
+        <li><b>Regra de ouro:</b> nunca confiar no navegador. Toda validação é refeita no servidor.</li>
+      </ul>
+    </div>
+    <div class="shield">
+      <div class="st"><span class="n">1</span><h3>Cookie e transporte</h3><span class="where">Sessao::iniciar</span>
+        <ul><li>HTTPS no Render</li><li>Cookie HttpOnly e SameSite=Lax</li><li>Secure quando o proxy diz HTTPS</li></ul></div>
+      <div class="st"><span class="n">2</span><h3>Portaria</h3><span class="where">Roteador · Csrf</span>
+        <ul><li>CSRF em todo POST, com hash_equals</li><li>Acesso público, login ou gerente</li><li>Rota só por caminho exato</li></ul></div>
+      <div class="st"><span class="n">3</span><h3>Identidade</h3><span class="where">Auth · AuthServico</span>
+        <ul><li>password_hash na senha e na resposta</li><li>Novo id de sessão no login</li><li>5 tentativas na recuperação</li></ul></div>
+      <div class="st"><span class="n">4</span><h3>Regras</h3><span class="where">Servicos · GradeServico</span>
+        <ul><li>Validação de todo campo</li><li>SVG gerado só no servidor</li><li>Limites de 20 bordados por hora e 5 tutoriais em 10 min</li></ul></div>
+      <div class="st"><span class="n">5</span><h3>Banco</h3><span class="where">Dados · Conexao</span>
+        <ul><li>SQL sempre com parâmetros</li><li>CHECK, UNIQUE e chaves estrangeiras</li><li>SSL e RLS no Supabase</li></ul></div>
+      <div class="st"><span class="n">6</span><h3>Saída</h3><span class="where">e() · Visao · bootstrap</span>
+        <ul><li>Todo dado escapado com e()</li><li>Texto da IA com textContent</li><li>Erros só no log em produção</li></ul></div>
+    </div>
+  </div>
+</section>
+
+    </div>
+  </main>
+
+  <nav class="controls" aria-label="Navegação entre slides">
+    <button class="ctrl" id="prev" type="button" aria-label="Slide anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <span class="count" id="count">ponto 01 de 22</span>
+    <div class="rail"><i id="bar"></i></div>
+    <span class="hint">Use as setas do teclado</span>
+    <button class="ctrl" id="next" type="button" aria-label="Próximo slide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+  </nav>
+</div>
+
+<div class="index" id="index" role="dialog" aria-modal="true" aria-labelledby="indexTitle" hidden>
+  <div class="box">
+    <div class="head"><h2 id="indexTitle">Sumário</h2><button class="btn" id="closeIndex" type="button">Fechar</button></div>
+    <div class="groups" id="groups"></div>
+  </div>
+</div>
+
+<script>
+/* A barra de controles acompanha a largura real do deck (calculada pelo CSS do palco). */
+(function () {
+  var d = document.getElementById('deck');
+  function medir() { document.documentElement.style.setProperty('--deck-w', d.offsetWidth + 'px'); }
+  medir();
+  if (window.ResizeObserver) new ResizeObserver(medir).observe(d);
+  else window.addEventListener('resize', medir);
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<script>
+(function () {
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var total = slides.length;
+  var cur = 0;
+  var narrow = window.matchMedia('(max-width: 760px)');
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+
+  /* Capa: coração em ponto cruz, desenhado com a mesma lógica de grade do GradeServico */
+  var grade = {
+    largura: 11, altura: 10, paleta: ['#691818', '#d9a7a0'],
+    pontos: '..00...00..' + '.0110.0110.' + '01111011110' + '01111111110' + '01111111110' +
+            '.011111110.' + '..0111110..' + '...01110...' + '....010....' + '.....0.....'
+  };
+  (function desenhar() {
+    var s = '';
+    for (var y = 0; y < grade.altura; y++) {
+      for (var x = 0; x < grade.largura; x++) {
+        var c = grade.pontos[y * grade.largura + x];
+        s += '<circle class="hole" cx="' + (x + .5) + '" cy="' + (y + .5) + '" r=".06"/>';
+        if (c !== '.') {
+          var a = x + .18, b = y + .18, e = x + .82, f = y + .82;
+          s += '<path class="x' + c + '" d="M' + a + ' ' + b + 'L' + e + ' ' + f + 'M' + e + ' ' + b + 'L' + a + ' ' + f + '" stroke-width=".2" stroke-linecap="round" fill="none"/>';
+        }
+      }
+    }
+    document.getElementById('stitch').innerHTML = s;
+    document.getElementById('gridJson').innerHTML =
+      '{ <b>"largura"</b>: 11, <b>"altura"</b>: 10,\n  <b>"paleta"</b>: ["#691818", "#d9a7a0"],\n  <b>"pontos"</b>: "' + grade.pontos.slice(0, 22) + '..." }';
+  })();
+
+  /* Navegação */
+  var count = document.getElementById('count');
+  var bar = document.getElementById('bar');
+  var secLabel = document.getElementById('secLabel');
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+
+  function setStacked() { deck.classList.toggle('stacked', narrow.matches); }
+
+  function go(i, fromHash) {
+    cur = Math.max(0, Math.min(total - 1, i));
+    slides.forEach(function (s, k) { s.classList.toggle('is-active', k === cur); });
+    count.textContent = 'ponto ' + pad(cur + 1) + ' de ' + total;
+    bar.style.width = ((cur + 1) / total * 100) + '%';
+    prev.disabled = cur === 0;
+    next.disabled = cur === total - 1;
+    secLabel.textContent = slides[cur].dataset.sec;
+    if (!fromHash) {
+      try { history.replaceState(null, '', '#' + slides[cur].id); } catch (e) {}
+    }
+    if (narrow.matches && fromHash) slides[cur].scrollIntoView({ block: 'start' });
+    costurar(slides[cur]);
+  }
+
+  /* Linhas de costura: liga elementos declarados em data-wires */
+  var NS = 'http://www.w3.org/2000/svg';
+  /* lado ('top', 'bottom', 'left', 'right') e pos (0 a 1 ao longo da borda) são opcionais */
+  function ancora(stage, el, alvo, lado, pos) {
+    var S = stage.getBoundingClientRect(), r = el.getBoundingClientRect(), o = alvo.getBoundingClientRect();
+    var cx = r.left + r.width / 2 - S.left, cy = r.top + r.height / 2 - S.top;
+    var ox = o.left + o.width / 2 - S.left, oy = o.top + o.height / 2 - S.top;
+    var dx = ox - cx, dy = oy - cy;
+    var f = typeof pos === 'number' ? pos : .5;
+    if (lado === 'top' || lado === 'bottom') {
+      var sv = lado === 'bottom' ? 1 : -1;
+      return { x: r.left - S.left + f * r.width, y: cy + sv * r.height / 2, nx: 0, ny: sv };
+    }
+    if (lado === 'left' || lado === 'right') {
+      var sh = lado === 'right' ? 1 : -1;
+      return { x: cx + sh * r.width / 2, y: r.top - S.top + f * r.height, nx: sh, ny: 0 };
+    }
+    if (getComputedStyle(el).borderRadius === '50%') {
+      var raio = r.width / 2, d = Math.hypot(dx, dy) || 1;
+      return { x: cx + dx / d * raio, y: cy + dy / d * raio, nx: dx / d, ny: dy / d, round: true };
+    }
+    /* Alvo bem acima ou abaixo: sai pela borda de cima ou de baixo; senão, pela lateral */
+    if (Math.abs(dy) > Math.abs(dx) * 1.5) {
+      var s = dy > 0 ? 1 : -1;
+      return { x: cx, y: cy + s * r.height / 2, nx: 0, ny: s };
+    }
+    var h = dx > 0 ? 1 : -1;
+    return { x: cx + h * r.width / 2, y: cy, nx: h, ny: 0 };
+  }
+  function costurar(slide) {
+    var stage = slide && slide.querySelector('[data-wires]');
+    if (!stage || narrow.matches) return;
+    var S = stage.getBoundingClientRect();
+    if (!S.width) return;
+    var spec;
+    try { spec = JSON.parse(stage.dataset.wires); } catch (e) { return; }
+    stage.querySelectorAll(':scope > .wires, :scope > .wlabel').forEach(function (n) { n.remove(); });
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'wires');
+    svg.setAttribute('viewBox', '0 0 ' + S.width + ' ' + S.height);
+    svg.setAttribute('aria-hidden', 'true');
+    spec.forEach(function (w) {
+      var A = stage.querySelector(w.from), B = stage.querySelector(w.to);
+      if (!A || !B) return;
+      var a = ancora(stage, A, B, w.fromSide, w.fromAt), b = ancora(stage, B, A, w.toSide, w.toAt);
+      var dist = Math.hypot(b.x - a.x, b.y - a.y);
+      var la = Math.max(24, dist * (a.round ? .2 : .45)), lb = Math.max(24, dist * (b.round ? .2 : .45));
+      var c1x = a.x + a.nx * la, c1y = a.y + a.ny * la, c2x = b.x + b.nx * lb, c2y = b.y + b.ny * lb;
+      var p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', 'M' + a.x + ' ' + a.y + ' C' + c1x + ' ' + c1y + ' ' + c2x + ' ' + c2y + ' ' + b.x + ' ' + b.y);
+      p.setAttribute('class', w.kind);
+      svg.appendChild(p);
+      [a, b].forEach(function (pt) {
+        var n = document.createElementNS(NS, 'circle');
+        n.setAttribute('cx', pt.x); n.setAttribute('cy', pt.y); n.setAttribute('r', 4.5);
+        n.setAttribute('class', 'knot k-' + w.kind);
+        svg.appendChild(n);
+      });
+      if (w.label) {
+        var t = w.at || .55, u = 1 - t;
+        var mx = u * u * u * a.x + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t * t * t * b.x;
+        var my = u * u * u * a.y + 3 * u * u * t * c1y + 3 * u * t * t * c2y + t * t * t * b.y;
+        var lb = document.createElement('span');
+        lb.className = 'wlabel' + (w.kind === 'loose' ? ' loose' : '') + (w.code ? ' code' : '');
+        lb.textContent = w.label;
+        lb.style.left = mx + 'px'; lb.style.top = my + 'px';
+        stage.appendChild(lb);
+      }
+    });
+    stage.prepend(svg);
+  }
+  function recosturar() {
+    if (narrow.matches) return;
+    costurar(slides[cur]);
+  }
+  window.addEventListener('resize', recosturar);
+  if (window.ResizeObserver) new ResizeObserver(recosturar).observe(deck);
+
+  function fromHash() {
+    var id = (location.hash || '').slice(1);
+    var i = slides.findIndex(function (s) { return s.id === id; });
+    go(i >= 0 ? i : 0, true);
+  }
+
+  prev.addEventListener('click', function () { go(cur - 1); });
+  next.addEventListener('click', function () { go(cur + 1); });
+  window.addEventListener('hashchange', fromHash);
+  narrow.addEventListener('change', setStacked);
+
+  /* Sumário */
+  var index = document.getElementById('index');
+  var groups = document.getElementById('groups');
+  var bySec = [];
+  slides.forEach(function (s, k) {
+    var g = bySec[bySec.length - 1];
+    if (!g || g.sec !== s.dataset.sec) { g = { sec: s.dataset.sec, items: [] }; bySec.push(g); }
+    g.items.push({ k: k, t: s.dataset.title });
+  });
+  groups.innerHTML = bySec.map(function (g) {
+    return '<div><h3>' + g.sec + '</h3><ol>' + g.items.map(function (it) {
+      return '<li><button class="go" type="button" data-k="' + it.k + '"><span>' + pad(it.k + 1) + '</span>' + it.t + '</button></li>';
+    }).join('') + '</ol></div>';
+  }).join('');
+  function openIndex() {
+    groups.querySelectorAll('.go').forEach(function (b) { b.setAttribute('aria-current', String(+b.dataset.k === cur)); });
+    index.hidden = false;
+    var c = groups.querySelector('[aria-current="true"]') || groups.querySelector('.go');
+    if (c) c.focus();
+  }
+  function closeIndex() { index.hidden = true; document.getElementById('openIndex').focus(); }
+  document.getElementById('openIndex').addEventListener('click', openIndex);
+  document.getElementById('closeIndex').addEventListener('click', closeIndex);
+  index.addEventListener('click', function (e) {
+    var b = e.target.closest('.go');
+    if (b) {
+      var k = +b.dataset.k;
+      index.hidden = true;
+      go(k);
+      if (narrow.matches) slides[k].scrollIntoView({ block: 'start' });
+    } else if (e.target === index) closeIndex();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!index.hidden) { if (e.key === 'Escape') closeIndex(); return; }
+    if (narrow.matches || e.altKey || e.ctrlKey || e.metaKey) return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    if (['ArrowRight', 'PageDown', ' '].indexOf(e.key) >= 0) { e.preventDefault(); go(cur + 1); }
+    else if (['ArrowLeft', 'PageUp'].indexOf(e.key) >= 0) { e.preventDefault(); go(cur - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+  });
+
+  /* Toque: deslizar para os lados */
+  var x0 = null;
+  deck.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  deck.addEventListener('touchend', function (e) {
+    if (x0 === null || narrow.matches) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1));
+    x0 = null;
+  });
+
+  if (window.lucide) { try { lucide.createIcons(); } catch (e) {} }
+  setStacked();
+  fromHash();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(recosturar);
+
+  /* Diagramas Mermaid com as cores do tema */
+  var css = function (n) { return getComputedStyle(document.documentElement).getPropertyValue('--' + n).trim(); };
+  var dark = function () {
+    var t = document.documentElement.getAttribute('data-theme');
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  };
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.fig'));
+  boxes.forEach(function (f) { f.querySelector('.mmd').innerHTML = '<p class="wait">Desenhando o diagrama…</p>'; });
+
+  var geracao = 0;
+  var rendering = false, pending = false;
+
+  function statusDefs() {
+    return '\n  classDef ok fill:' + css('accent-soft') + ',stroke:' + css('accent') + ',stroke-width:2px,color:' + css('fg') +
+           '\n  classDef par fill:' + css('surface') + ',stroke:' + css('accent') + ',stroke-width:2px,stroke-dasharray:7 4,color:' + css('fg') +
+           '\n  classDef esq fill:' + css('surface') + ',stroke:' + css('muted') + ',stroke-width:1.6px,stroke-dasharray:2 4,color:' + css('muted');
+  }
+
+  async function renderAll() {
+    if (rendering) { pending = true; return; }
+    if (!window.mermaid) {
+      boxes.forEach(function (f) { f.querySelector('.mmd').innerHTML = '<p class="wait">Os diagramas usam a biblioteca Mermaid, carregada da internet. Conecte-se e recarregue a página.</p>'; });
+      return;
+    }
+    rendering = true;
+    var g = ++geracao;
+    var v = {
+      bg: css('bg'), surface: css('surface'), s2: css('surface-2'), fg: css('fg'), muted: css('muted'),
+      line: css('line'), border: css('border'), accent: css('accent'), soft: css('accent-soft')
+    };
+    mermaid.initialize({
+      startOnLoad: false, theme: 'base', securityLevel: 'strict',
+      fontFamily: 'Jost, "Segoe UI", system-ui, sans-serif',
+      themeVariables: {
+        darkMode: dark(), background: v.surface, fontFamily: 'Jost, "Segoe UI", system-ui, sans-serif', fontSize: '15px',
+        primaryColor: v.s2, primaryTextColor: v.fg, primaryBorderColor: v.line,
+        secondaryColor: v.soft, secondaryTextColor: v.fg, secondaryBorderColor: v.accent,
+        tertiaryColor: v.surface, tertiaryTextColor: v.fg, tertiaryBorderColor: v.border,
+        mainBkg: v.s2, nodeBorder: v.line, nodeTextColor: v.fg, textColor: v.fg, lineColor: v.line,
+        clusterBkg: v.bg, clusterBorder: v.border, titleColor: v.muted, edgeLabelBackground: v.surface,
+        actorBkg: v.s2, actorBorder: v.line, actorTextColor: v.fg, actorLineColor: v.border,
+        signalColor: v.fg, signalTextColor: v.fg, labelBoxBkgColor: v.soft, labelBoxBorderColor: v.accent,
+        labelTextColor: v.fg, loopTextColor: v.fg, noteBkgColor: v.soft, noteTextColor: v.fg, noteBorderColor: v.accent,
+        activationBkgColor: v.soft, activationBorderColor: v.accent, sequenceNumberColor: v.surface,
+        altSectionBkgColor: v.bg, attributeBackgroundColorOdd: v.surface, attributeBackgroundColorEven: v.s2,
+        classText: v.fg, labelColor: v.fg, stateLabelColor: v.fg, transitionColor: v.line, transitionLabelColor: v.fg,
+        stateBkg: v.s2, compositeBackground: v.bg
+      },
+      flowchart: { curve: 'basis', htmlLabels: true, nodeSpacing: 34, rankSpacing: 46, padding: 10, useMaxWidth: true },
+      sequence: { mirrorActors: false, actorMargin: 36, messageMargin: 26, boxMargin: 8, useMaxWidth: true },
+      er: { useMaxWidth: true }, state: { useMaxWidth: true }, class: { useMaxWidth: true }
+    });
+    for (var i = 0; i < boxes.length; i++) {
+      if (g !== geracao) break;
+      var f = boxes[i];
+      var out = f.querySelector('.mmd');
+      var def = f.querySelector('script.src').textContent.trim();
+      if (/^flowchart/.test(def)) def += statusDefs();
+      var id = 'mmd' + g + '_' + i;
+      try {
+        var r = await mermaid.render(id, def);
+        out.innerHTML = r.svg;
+        var svg = out.querySelector('svg');
+        if (svg) {
+          svg.removeAttribute('style');
+          svg.setAttribute('width', '100%');
+          svg.setAttribute('height', '100%');
+          svg.setAttribute('role', 'img');
+          svg.setAttribute('aria-label', out.getAttribute('aria-label') || 'Diagrama');
+        }
+      } catch (err) {
+        out.innerHTML = '<p class="err"></p>';
+        out.firstChild.textContent = 'Não foi possível desenhar este diagrama.\n' + (err && err.message ? err.message : err);
+        var lixo = document.getElementById('d' + id); if (lixo) lixo.remove();
+      }
+    }
+    rendering = false;
+    if (pending) { pending = false; renderAll(); }
+  }
+
+  var pronto = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 2500); })]) : Promise.resolve();
+  pronto.then(renderAll);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderAll);
+  new MutationObserver(renderAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
+
+</body>
+</html>

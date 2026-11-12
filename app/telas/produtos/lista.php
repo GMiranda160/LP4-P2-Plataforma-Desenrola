@@ -1,7 +1,11 @@
 <?php
-/*
- * produtos/lista.php
- * Tela de listagem de produtos.
+/**
+ * Tela: lista de produtos
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /gerente/produtos
+ * Recebe: $titulo, $produtos
+ * Campos de $produtos: id, nome, categoria, preco_base, destaque, ativo
+ * Responsabilidade: listar produtos com situação (ativo/inativo e destaque) e ações de editar, ativar/desativar e excluir.
  */
 ?>
 <div class="page-head">

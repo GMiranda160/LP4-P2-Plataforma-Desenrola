@@ -1,7 +1,7 @@
 <?php
-/*
- * InsumoControlador.php
- * Controlador dos insumos.
+/**
+ * Camada: Controlador. Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: receber os pedidos de insumos, chamar InsumoServico e escolher a tela do painel (layout gerente).
  */
 
 class InsumoControlador

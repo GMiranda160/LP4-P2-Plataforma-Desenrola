@@ -7,6 +7,30 @@
   grid-template-columns: 240px minmax(0, 1fr);
   gap: var(--space-6);
   align-items: start;
+  margin-block: var(--space-5);
+}
+
+.admin-topbar {
+  border-bottom: 1px solid var(--color-sand-200);
+  background-color: var(--color-white);
+}
+
+.admin-topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: 0.6rem;
+}
+
+.admin-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin-topbar__sair {
+  margin: 0;
 }
 
 .admin-nav {
@@ -29,9 +53,14 @@
   color: var(--color-ink);
 }
 
-.admin-nav a:hover {
+.admin-nav a:hover,
+.admin-nav a[aria-current="page"] {
   background-color: var(--color-sand-100);
   color: var(--color-wine-700);
+}
+
+.admin-nav a[aria-current="page"] {
+  font-weight: 600;
 }
 
 @media (max-width: 900px) {

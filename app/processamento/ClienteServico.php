@@ -1,7 +1,8 @@
 <?php
-/*
- * ClienteServico.php
- * Camada de processamento dos clientes.
+/**
+ * Camada: Processamento. Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: validar clientes (nome, CPF/CNPJ de 11 ou 14 dígitos, e-mail, telefone e unicidade de CPF/CNPJ) e chamar ClienteDados.
+ * Sem $_POST, sem sessão e sem HTML.
  */
 
 class ClienteServico

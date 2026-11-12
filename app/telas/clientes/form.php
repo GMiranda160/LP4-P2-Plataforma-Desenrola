@@ -1,7 +1,11 @@
 <?php
-/*
- * clientes/form.php
- * Tela de cadastro e edição de clientes.
+/**
+ * Tela: formulário de cliente
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /gerente/clientes/form
+ * Recebe: $titulo, $cliente
+ * Envia POST para /gerente/clientes/salvar.
+ * Responsabilidade: cadastro e edição de clientes; a validação final acontece no ClienteServico.
  */
 ?>
 <div class="page-head"><h1><?= e($titulo) ?></h1></div>

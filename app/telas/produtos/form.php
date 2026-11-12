@@ -1,7 +1,12 @@
 <?php
-/*
- * produtos/form.php
- * Tela de cadastro e edição de produtos.
+/**
+ * Tela: formulário de produto
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /gerente/produtos/form
+ * Recebe: $titulo, $produto, $combinacoes
+ * Envia POST para /gerente/produtos/salvar.
+ * Campos: id, bordado_id, nome, descricao, preco_base, destaque, ativo
+ * Responsabilidade: cadastro e edição de produtos; a combinação é sempre um bordado do tipo produto, criado no Montador.
  */
 ?>
 <div class="page-head"><h1><?= e($titulo) ?></h1></div>

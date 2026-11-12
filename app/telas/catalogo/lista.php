@@ -1,7 +1,10 @@
 <?php
-/*
- * catalogo/lista.php
- * Tela pública do catálogo.
+/**
+ * Tela: catálogo público
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /catalogo
+ * Recebe: $titulo, $pagina, $categorias, $categoriaAtual, $produtos
+ * Responsabilidade: filtros por categoria e grade de produtos do mostruário; sem produtos, exibe o estado vazio.
  */
 ?>
 <section class="section">

@@ -1,7 +1,11 @@
 <?php
-/*
- * matrizes/lista.php
- * Tela de listagem de matrizes.
+/**
+ * Tela: lista de matrizes
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /gerente/matrizes
+ * Recebe: $titulo, $matrizes
+ * Campos de $matrizes: id, nome, categoria, largura, altura, total_pontos, tempo_medio_min, svg
+ * Responsabilidade: listar matrizes (miniatura SVG, nome, categoria, tamanho, pontos e tempo) e ações de editar/excluir.
  */
 ?>
 <div class="page-head">

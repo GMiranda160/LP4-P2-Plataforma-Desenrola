@@ -1,6 +1,7 @@
-/* catalog.css
- * Estilos da página pública do catálogo.
- * Os cards usam o componente product-card.css; aqui ficam só os filtros.
+/*
+ * Arquivo: catalog.css
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: filtros do catálogo público (.catalog-filters e .filter-chip). Os cards usam components/product-card.css.
  */
 
 .catalog-filters {

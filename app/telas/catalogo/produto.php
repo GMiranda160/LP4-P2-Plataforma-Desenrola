@@ -1,7 +1,11 @@
 <?php
-/*
- * catalogo/produto.php
- * Tela pública de um produto.
+/**
+ * Tela: página do produto
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /produto?id=
+ * Recebe: $titulo, $pagina, $produto
+ * Campos de $produto: id, nome, descricao, preco_base, categoria e dados da peça
+ * Responsabilidade: peça, dados do produto e botão Solicitar orçamento (link para o WhatsApp).
  */
 ?>
 <section class="section">

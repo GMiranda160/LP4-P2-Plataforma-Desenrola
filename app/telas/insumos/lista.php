@@ -1,7 +1,10 @@
 <?php
-/*
- * insumos/lista.php
- * Tela de listagem de insumos.
+/**
+ * Tela: lista de insumos
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /gerente/insumos
+ * Recebe: $titulo, $busca, $insumos
+ * Responsabilidade: listar insumos com busca por nome, situação de estoque e ações de editar/excluir.
  */
 
 /** Quantidade em pt-BR, sem zeros à direita ("10", "2,5", "1,75"). */

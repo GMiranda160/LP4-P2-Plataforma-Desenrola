@@ -1,7 +1,10 @@
 <?php
-/*
- * clientes/lista.php
- * Tela de listagem de clientes.
+/**
+ * Tela: lista de clientes
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /gerente/clientes
+ * Recebe: $titulo, $busca, $clientes
+ * Responsabilidade: listar clientes com busca por nome ou CPF/CNPJ e ações de editar/excluir.
  */
 ?>
 <div class="page-head">

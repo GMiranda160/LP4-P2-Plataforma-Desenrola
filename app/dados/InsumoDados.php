@@ -1,7 +1,7 @@
 <?php
-/*
- * InsumoDados.php
- * Camada de dados dos insumos.
+/**
+ * Camada: Dados. Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: SQL da tabela insumos. Sem validação e sem HTML. Todo valor vai em parâmetro.
  */
 
 class InsumoDados

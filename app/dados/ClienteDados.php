@@ -1,7 +1,7 @@
 <?php
-/*
- * ClienteDados.php
- * Camada de dados dos clientes.
+/**
+ * Camada: Dados. Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: SQL da tabela clientes. Sem validação e sem HTML. Todo valor vai em parâmetro.
  */
 
 class ClienteDados
