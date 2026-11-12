@@ -18,10 +18,17 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* O miolo estica e empurra o rodapé para o fundo da janela. */
+#conteudo {
+  flex: 1 0 auto;
 }
 
 img,
