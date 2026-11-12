@@ -5,7 +5,7 @@
  */
 ?>
 <div class="page-head">
-  <h1><?= e($titulo) ?></h1>
+  <h1><?= e($pagina ?? $titulo) ?></h1>
 </div>
 
 <nav class="catalog-filters" aria-label="Filtrar por categoria">
@@ -29,8 +29,11 @@
           <?php Visao::parcial('peca_bordada', ['item' => $produto]); ?>
         </a>
         <div class="product-card__body">
+          <?php if (!empty($produto['categoria'])): ?>
+            <p class="product-card__category"><?= e($produto['categoria']) ?></p>
+          <?php endif; ?>
           <h2 class="product-card__name"><?= e($produto['nome']) ?></h2>
-          <p class="product-card__price">A partir de <?= moeda($produto['preco_base']) ?></p>
+          <p class="product-card__price"><span class="product-card__price-label">A partir de</span> <strong><?= moeda($produto['preco_base']) ?></strong></p>
         </div>
       </article>
     <?php endforeach; ?>

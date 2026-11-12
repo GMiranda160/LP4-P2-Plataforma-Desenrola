@@ -5,7 +5,7 @@
  */
 ?>
 <div class="page-head">
-  <h1><?= e($titulo) ?></h1>
+  <h1><?= e($pagina ?? $produto['nome']) ?></h1>
 </div>
 
 <article class="product-detail">

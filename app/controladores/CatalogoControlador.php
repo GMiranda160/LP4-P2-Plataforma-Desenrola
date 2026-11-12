@@ -26,6 +26,7 @@ class CatalogoControlador
 
         Visao::render('catalogo/lista', [
             'titulo' => 'Catálogo | Desenrola',
+            'pagina' => 'Catálogo',
             'produtos' => $produtos,
             'categorias' => $categorias,
             'categoriaAtual' => $categoria,
@@ -53,6 +54,7 @@ class CatalogoControlador
 
         Visao::render('catalogo/produto', [
             'titulo' => $produto['nome'] . ' | Desenrola',
+            'pagina' => $produto['nome'],
             'produto' => $produto,
         ]);
     }
