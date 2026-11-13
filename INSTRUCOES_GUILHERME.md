@@ -926,7 +926,7 @@ classes seguem o padrão de `InsumoDados`, `InsumoServico` e `InsumoControlador`
 | Área | Regras |
 |---|---|
 | Produtos | Preço > 0; combinação do tipo `produto`; cada combinação em um só produto; `/gerente/produtos/ativar` inverte `ativo` |
-| Matrizes | Nome obrigatório; tempo médio > 0; não excluir matriz usada em `bordados` |
+| Matrizes | Nome obrigatório; tempo médio > 0; não excluir matriz usada em `bordados`; gerente edita só matriz padrão, e as de usuários só exclui |
 | Hub | Post oculto só abre para a gerente; autor ou gerente pode excluir |
 
 Mensagens: `Produto cadastrado com sucesso!`, `Esta combinação já está em outro produto.` e

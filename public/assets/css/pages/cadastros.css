@@ -7,3 +7,22 @@
  * 1. Reunir aqui o que for compartilhado entre Insumos, Clientes, Produtos e Matrizes.
  * Veja INSTRUCOES_GUILHERME.md, seção 9.
  */
+
+/* Agrupamentos dentro de uma lista (ex.: matrizes padrão e criadas por usuários). */
+.cadastro-grupo + .cadastro-grupo {
+  margin-top: 2.5rem;
+}
+
+.cadastro-grupo__titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+  font-size: 1.35rem;
+}
+
+.cadastro-grupo__nota {
+  margin: -0.4rem 0 0.9rem;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}

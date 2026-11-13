@@ -157,10 +157,14 @@ Ativar ou desativar: POST para `/gerente/produtos/ativar`, com `id`.
 
 **`matrizes/lista.php`**: rota `/gerente/matrizes`
 
-- Recebe `$titulo`, `$matrizes`.
-- Cada matriz: `id`, `nome`, `categoria`, `largura`, `altura`, `total_pontos`, `tempo_medio_min`,
-  `svg`.
-- Mostra miniatura, nome, categoria, tamanho, pontos, tempo, editar e excluir.
+- Recebe `$titulo`, `$matrizes`, `$matrizesUsuarios` e `$limiteUsuarios`.
+- Cada item de `$matrizes` (padrão do ateliê): `id`, `nome`, `categoria`, `largura`, `altura`,
+  `total_pontos`, `tempo_medio_min`, `svg`.
+- Cada item de `$matrizesUsuarios` (criadas por usuários, as `$limiteUsuarios` mais recentes): os
+  mesmos campos, mais `autor` (pode ser null, se a conta foi excluída) e `criado_em`.
+- Mostra dois grupos. **Padrão do ateliê:** miniatura, nome, categoria, tamanho, pontos, tempo,
+  editar e excluir. **Criadas por usuários:** miniatura, nome, autor, tamanho, pontos, data e só
+  excluir. A gerente não edita matriz de usuário.
 - O botão **Nova matriz** leva para `/montador?modo=matriz`.
 
 Mostre a miniatura sempre em uma tag `img`:
