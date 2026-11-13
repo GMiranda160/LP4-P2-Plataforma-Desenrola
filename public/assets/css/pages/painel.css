@@ -1,9 +1,50 @@
 /*
  * Arquivo: painel.css
  * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: estilos do painel da gerente.
- *
- * TODO(Guilherme):
- * 1. Criar os cartões com os totais do sistema.
+ * Responsabilidade: cartões com os totais do sistema no painel da gerente (.painel-cards e .painel-card).
  * Veja INSTRUCOES_GUILHERME.md, seção 10.
  */
+
+.painel-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.painel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  height: 100%;
+  min-height: 44px;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-sand-50);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.painel-card:hover,
+.painel-card:focus-visible {
+  border-color: var(--color-wine-500);
+  box-shadow: var(--shadow-sm);
+}
+
+.painel-card__total {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-wine-900);
+}
+
+.painel-card__rotulo {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}

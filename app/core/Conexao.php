@@ -35,12 +35,28 @@ class Conexao
                 getenv('DB_NAME') ?: 'postgres'
             );
 
-            self::$pdo = new PDO($dsn, $user, (string) $pass, [
+            $opcoes = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => true,
                 PDO::ATTR_TIMEOUT => 8,
-            ]);
+            ];
+
+            // Reaproveita a conexão entre requisições. O FrankenPHP mantém as threads do PHP
+            // vivas, então só a primeira requisição de cada thread paga TCP, TLS e login no
+            // banco (mais de 1 s até o Supabase). Funciona com o Transaction pooler (6543)
+            // porque os prepares são emulados; transação aberta é desfeita no fim da requisição.
+            try {
+                $pdo = new PDO($dsn, $user, (string) $pass, $opcoes + [PDO::ATTR_PERSISTENT => true]);
+                // A conexão guardada pode ter sido fechada pelo pooler enquanto estava parada.
+                // Este teste custa uma ida e volta e evita um erro 500 nesse caso.
+                $pdo->query('SELECT 1');
+            } catch (PDOException) {
+                // Conexão nova e não persistente: a quebrada fica de fora até a thread reiniciar.
+                $pdo = new PDO($dsn, $user, (string) $pass, $opcoes);
+            }
+
+            self::$pdo = $pdo;
         }
 
         return self::$pdo;
