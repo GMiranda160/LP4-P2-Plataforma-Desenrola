@@ -3,6 +3,7 @@
  * Camada: Processamento. Dono: Arthur. Só Arthur altera este arquivo.
  * Responsabilidade: validar insumos (tipo e unidade fixos, quantidade >= 0, custo > 0, unicidade de nome por tipo) e chamar InsumoDados.
  * Sem $_POST, sem sessão e sem HTML.
+ * Veja INSTRUCOES_ARTHUR.md, seção 6.
  */
 
 class InsumoServico
@@ -12,17 +13,24 @@ class InsumoServico
 
     public function __construct(private InsumoDados $dados = new InsumoDados()) {}
 
+    /** Insumos cujo nome contém a busca. Busca vazia devolve todos. */
     public function listar(string $busca = ''): array
     {
         return $this->dados->listar($busca);
     }
 
+    /** Um insumo, ou null se não existir. */
     public function buscar(int $id): ?array
     {
         return $this->dados->buscar($id);
     }
 
-    /** Devolve a lista de erros. Lista vazia significa que salvou. */
+    /**
+     * Valida e grava o insumo: cadastra com id 0 e atualiza com id maior que 0.
+     * Regras: tipo e unidade da lista fixa, nome obrigatório, quantidade >= 0, custo > 0,
+     * cor no formato #rrggbb e nome único dentro do mesmo tipo.
+     * Devolve a lista de erros. Lista vazia significa que salvou.
+     */
     public function salvar(int $id, array $c): array
     {
         $d = [
@@ -55,6 +63,7 @@ class InsumoServico
         return [];
     }
 
+    /** Exclui o insumo. */
     public function excluir(int $id): void
     {
         $this->dados->excluir($id);

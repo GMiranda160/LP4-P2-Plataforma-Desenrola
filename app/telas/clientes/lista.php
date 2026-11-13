@@ -4,7 +4,9 @@
  * Dono: Arthur. Só Arthur altera este arquivo.
  * Rota: GET /gerente/clientes
  * Recebe: $titulo, $busca, $clientes
+ * Campos de $clientes: id, nome, cpf_cnpj, email, telefone, endereco, cep, criado_em
  * Responsabilidade: listar clientes com busca por nome ou CPF/CNPJ e ações de editar/excluir.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <div class="page-head">

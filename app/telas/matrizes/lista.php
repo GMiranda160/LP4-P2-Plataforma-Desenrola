@@ -9,6 +9,7 @@
  * Responsabilidade: listar matrizes em dois grupos.
  *   1. Padrão do ateliê: miniatura, nome, categoria, tamanho, pontos, tempo, editar e excluir.
  *   2. Criadas por usuários: miniatura, nome, autor, tamanho, pontos, data e só excluir (moderação).
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <div class="page-head">

@@ -5,7 +5,9 @@
  * Rota: GET /gerente/clientes/form
  * Recebe: $titulo, $cliente
  * Envia POST para /gerente/clientes/salvar.
+ * Campos: id, nome, cpf_cnpj, email, telefone, endereco, cep
  * Responsabilidade: cadastro e edição de clientes; a validação final acontece no ClienteServico.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <div class="page-head"><h1><?= e($titulo) ?></h1></div>

@@ -365,7 +365,9 @@ Crie os mockups em `public/assets/img/mockups/` com `fill="currentColor"`: `toal
 ### Arquivos comentados para a equipe
 
 Antes de avisar os colegas, deixe **todos** os arquivos deles no repositório. Cada arquivo começa com
-um comentário neste formato.
+um comentário neste formato. O modelo completo de comentários (cabeçalho, método, linha e TODO) está
+no `README.md`, seção 6.1, e vale também para os seus arquivos. Ao revisar uma entrega, confira se os
+`TODO` do dono viraram comentários explicativos.
 
 **Tela:**
 

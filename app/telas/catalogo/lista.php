@@ -4,7 +4,10 @@
  * Dono: Arthur. Só Arthur altera este arquivo.
  * Rota: GET /catalogo
  * Recebe: $titulo, $pagina, $categorias, $categoriaAtual, $produtos
+ * Campos de $categorias: nome, slug
+ * Campos de $produtos: id, nome, descricao, preco_base, categoria e dados da peça
  * Responsabilidade: filtros por categoria e grade de produtos do mostruário; sem produtos, exibe o estado vazio.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <section class="section">

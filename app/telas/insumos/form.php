@@ -7,6 +7,7 @@
  * Envia POST para /gerente/insumos/salvar.
  * Campos: id, tipo, nome, cor_hex, quantidade, unidade, custo_unitario, fornecedor, estoque_minimo
  * Responsabilidade: cadastro e edição de insumos; a validação final acontece no InsumoServico.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 
 $tipos = ['tecido' => 'Tecido', 'linha' => 'Linha', 'aviamento' => 'Aviamento'];

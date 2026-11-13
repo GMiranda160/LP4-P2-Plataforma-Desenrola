@@ -4,10 +4,8 @@
  * Dono: Eduardo. Só Eduardo altera este arquivo.
  * Rota: GET /recuperar-senha
  * Recebe: $titulo
- * Envia POST para /recuperar-senha, com email.
- *
- * TODO(Eduardo):
- * 1. Criar o formulário com Csrf::campo().
+ * Envia POST para /recuperar-senha, com usuario. O servidor monta usuario@example.com.
+ * Responsabilidade: primeiro passo da recuperação de senha, pedindo o usuário da conta.
  * Veja INSTRUCOES_EDUARDO.md, seção 4.
  */
 ?>

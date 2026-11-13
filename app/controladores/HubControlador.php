@@ -1,45 +1,121 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Camada: Controlador. Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: feed, detalhe e curtidas. As telas são de Eduardo.
- * Enquanto a lógica não estiver pronta, enviar dados de exemplo no formato do contrato da tela.
+ * Responsabilidade: feed, detalhe, meus bordados, curtidas, exclusão e ocultação de bordados.
+ * As telas são de Eduardo. O roteador já cuida de login, perfil de gerente e CSRF.
  * Veja INSTRUCOES_GUILHERME.md, seção 14.
  */
 class HubControlador
 {
-    /** TODO(Guilherme): mostrar hub/feed com $titulo, $bordados, $categorias, $categoriaAtual, $ordem, $pagina e $temMais. */
+    public function __construct(private HubServico $servico = new HubServico()) {}
+
+    /** GET /hub: feed com filtro de categoria, ordenação e paginação. */
     public function feed(): void
     {
-        throw new RuntimeException('Não implementado: HubControlador::feed');
+        $categoria = $this->servico->categoria($_GET['categoria'] ?? null);
+        $ordem = $this->servico->ordem($_GET['ordem'] ?? null);
+        $pagina = max(1, (int) ($_GET['pagina'] ?? 1));
+
+        $resultado = $this->servico->feed(Auth::id() ?? 0, $categoria, $ordem, $pagina);
+
+        Visao::render('hub/feed', [
+            'titulo' => 'Hub de bordados',
+            'bordados' => $resultado['bordados'],
+            'categorias' => (new ProdutoServico())->categorias(),
+            'categoriaAtual' => $categoria,
+            'ordem' => $ordem,
+            'pagina' => $pagina,
+            'temMais' => $resultado['temMais'],
+        ]);
     }
 
-    /** TODO(Guilherme): mostrar hub/detalhe com $titulo, $bordado, $comentarios e $podeExcluir. Post oculto só abre para a gerente. */
+    /** GET /hub/bordado?id=: página do bordado. Post oculto só abre para a gerente. */
     public function detalhe(): void
     {
-        throw new RuntimeException('Não implementado: HubControlador::detalhe');
+        $id = (int) ($_GET['id'] ?? 0);
+        $eGerente = Auth::eGerente();
+        $bordado = $this->servico->detalhe($id, Auth::id() ?? 0, $eGerente);
+
+        if ($bordado === null) {
+            Sessao::flash('erro', 'Bordado não encontrado.');
+            Resposta::redirecionar('/hub');
+        }
+
+        Visao::render('hub/detalhe', [
+            'titulo' => $bordado['titulo'],
+            'bordado' => $bordado,
+            'comentarios' => $this->comentarios($id, $eGerente),
+            'podeExcluir' => $this->servico->podeExcluir($bordado, Auth::id(), $eGerente),
+        ]);
     }
 
-    /** TODO(Guilherme): mostrar hub/meus com $titulo e $bordados do usuário logado. */
+    /** GET /meus-bordados: bordados do usuário logado, inclusive os ocultos. */
     public function meus(): void
     {
-        throw new RuntimeException('Não implementado: HubControlador::meus');
+        Visao::render('hub/meus', [
+            'titulo' => 'Meus bordados',
+            'bordados' => $this->servico->doAutor((int) Auth::id()),
+        ]);
     }
 
-    /** TODO(Guilherme): alternar a curtida e responder JSON com curtiu e curtidas. */
+    /** POST /hub/curtir: alterna a curtida e responde JSON com curtiu e curtidas. */
     public function curtir(): void
     {
-        throw new RuntimeException('Não implementado: HubControlador::curtir');
+        $resultado = $this->servico->curtir((int) Auth::id(), (int) ($_POST['id'] ?? 0));
+
+        if ($resultado === null) {
+            Resposta::json(['erro' => 'Bordado não encontrado.'], 404);
+        }
+
+        Resposta::json($resultado);
     }
 
-    /** TODO(Guilherme): permitir só para o autor ou a gerente. */
+    /** POST /bordado/excluir: só o autor ou a gerente. */
     public function excluirBordado(): void
     {
-        throw new RuntimeException('Não implementado: HubControlador::excluirBordado');
+        $id = (int) ($_POST['id'] ?? 0);
+        $erro = $this->servico->excluir($id, (int) Auth::id(), Auth::eGerente());
+
+        if ($erro !== null) {
+            Sessao::flash('erro', $erro);
+            Resposta::redirecionar($id > 0 ? '/hub/bordado?id=' . $id : '/hub');
+        }
+
+        Sessao::flash('sucesso', 'Bordado excluído com sucesso!');
+        Resposta::redirecionar(Auth::eGerente() ? '/hub' : '/meus-bordados');
     }
 
-    /** TODO(Guilherme): inverter bordados.oculto. */
+    /** POST /gerente/hub/ocultar: inverte bordados.oculto e volta para o bordado. */
     public function ocultar(): void
     {
-        throw new RuntimeException('Não implementado: HubControlador::ocultar');
+        $id = (int) ($_POST['id'] ?? 0);
+
+        if (!$this->servico->alternarOculto($id)) {
+            Sessao::flash('erro', 'Bordado não encontrado.');
+            Resposta::redirecionar('/hub');
+        }
+
+        Sessao::flash('sucesso', 'Visibilidade do bordado atualizada.');
+        Resposta::redirecionar('/hub/bordado?id=' . $id);
+    }
+
+    /**
+     * Comentários do bordado, pela lógica de Eduardo (ocultos só para a gerente).
+     * TODO(Guilherme): remover o try/catch quando ComentarioServico::listar estiver pronto.
+     * Até lá, a página do bordado abre sem comentários em vez de dar erro 500.
+     */
+    private function comentarios(int $bordadoId, bool $eGerente): array
+    {
+        try {
+            return (new ComentarioServico())->listar($bordadoId, $eGerente);
+        } catch (RuntimeException $e) {
+            if (str_starts_with($e->getMessage(), 'Não implementado')) {
+                return [];
+            }
+            throw $e;
+        }
     }
 }

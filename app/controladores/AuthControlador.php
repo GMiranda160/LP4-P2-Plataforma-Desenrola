@@ -6,7 +6,7 @@
  */
 class AuthControlador
 {
-    /** TODO(Eduardo): mostrar auth/login com $titulo e $velhos. */
+    /** GET /login: mostra o formulário de login, repreenchido após um erro. */
     public function loginForm(): void
     {
         Visao::render('auth/login', [
@@ -16,7 +16,10 @@ class AuthControlador
         ]);
     }
 
-    /** TODO(Eduardo): chamar AuthServico::autenticar. Com sucesso, usar Auth::entrar; gerente vai para /gerente e usuário vai para /hub. Com erro: Usuário ou senha inválidos. */
+    /**
+     * POST /login: monta usuario@example.com e confere a senha no AuthServico.
+     * Gerente vai para /gerente e usuário vai para /hub. Com erro: Usuário ou senha inválidos.
+     */
     public function login(): void
     {
         $usuario = mb_strtolower(trim((string) ($_POST['usuario'] ?? '')));
@@ -40,7 +43,7 @@ class AuthControlador
         Resposta::redirecionar('/hub');
     }
 
-    /** TODO(Eduardo): mostrar auth/cadastro com $titulo, $perguntas e $velhos. */
+    /** GET /cadastro: mostra o formulário de cadastro com as perguntas de segurança. */
     public function cadastroForm(): void
     {
         Visao::render('auth/cadastro', [
@@ -54,7 +57,7 @@ class AuthControlador
         ]);
     }
 
-    /** TODO(Eduardo): chamar o serviço. Com sucesso, usar Auth::entrar e ir para /montador. */
+    /** POST /cadastro: cria a conta, já entra com ela e vai para /montador. Com erro, volta ao formulário. */
     public function cadastrar(): void
     {
         [$erros, $usuario] = (new AuthServico())->cadastrar($_POST);
@@ -70,14 +73,14 @@ class AuthControlador
         Resposta::redirecionar('/montador');
     }
 
-    /** TODO(Eduardo): chamar Auth::sair e voltar para /. */
+    /** POST /sair: encerra a sessão e volta para a home. */
     public function sair(): void
     {
         Auth::sair();
         Resposta::redirecionar('/');
     }
 
-    /** TODO(Eduardo): mostrar auth/recuperar. */
+    /** GET /recuperar-senha: pede o usuário da conta. */
     public function recuperarForm(): void
     {
         Visao::render('auth/recuperar', [
@@ -85,7 +88,10 @@ class AuthControlador
         ]);
     }
 
-    /** TODO(Eduardo): buscar o usuário, gravar recuperar_id na Sessao e mostrar auth/redefinir com a pergunta. E-mail desconhecido recebe mensagem genérica. */
+    /**
+     * POST /recuperar-senha: guarda na sessão o id e a pergunta da conta e mostra auth/redefinir.
+     * Usuário desconhecido recebe uma mensagem genérica, para não revelar quem tem conta.
+     */
     public function recuperar(): void
     {
         $usuario = mb_strtolower(trim((string) ($_POST['usuario'] ?? '')));
@@ -107,7 +113,10 @@ class AuthControlador
         ]);
     }
 
-    /** TODO(Eduardo): contar tentativas na Sessao, com limite de 5, chamar o serviço, apagar recuperar_id e ir para /login. */
+    /**
+     * POST /recuperar-senha/redefinir: confere a resposta e troca a senha.
+     * Depois de 5 tentativas erradas, a recuperação recomeça do início.
+     */
     public function redefinir(): void
     {
         $id = Sessao::obter('recuperar_id');

@@ -7,6 +7,7 @@
  * Envia POST para /gerente/matrizes/salvar.
  * Campos: id, nome, descricao, categoria, tempo_medio_min
  * Responsabilidade: cadastro e edição dos dados de uma matriz; a grade vem do Montador.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <div class="page-head"><h1><?= e($titulo) ?></h1></div>

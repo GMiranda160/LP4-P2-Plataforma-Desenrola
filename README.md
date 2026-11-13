@@ -22,6 +22,9 @@ Valem para todas as pessoas do grupo e para qualquer IA usada no projeto:
    Use vírgula, dois-pontos, parênteses ou ponto final.
 2. **Não fazer commits sem avisar.** Uma IA só faz commit ou push depois de avisar quem a está usando
    e receber autorização nesse momento.
+3. **Comentar seguindo o modelo.** Todo arquivo tem cabeçalho e todo método público tem um comentário
+   explicativo, no formato da [seção 6.1](#61-modelo-de-comentários). Um arquivo só está pronto
+   quando os comentários estão no modelo.
 
 ## Sumário
 
@@ -226,6 +229,91 @@ Só o dono altera o arquivo.
 
 Guilherme coloca **todos** esses arquivos no repositório antes de os colegas começarem. Cada arquivo
 abre com um comentário informando dono, responsabilidade e um `TODO` do que falta.
+
+### 6.1 Modelo de comentários
+
+Os comentários são em português, sem travessões, e explicam **o que** o código faz e **por que**,
+nunca repetem linha por linha o que o código já diz. São quatro níveis.
+
+**1. Cabeçalho do arquivo.** Logo depois de `<?php` (ou no topo do CSS e do JS), em um bloco `/** */`.
+
+Classe PHP (controlador, processamento ou dados):
+
+```php
+<?php
+/**
+ * Camada: Dados. Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: SQL da tabela insumos. Sem validação e sem HTML. Todo valor vai em parâmetro.
+ * Veja INSTRUCOES_ARTHUR.md, seção 6.
+ */
+```
+
+Tela:
+
+```php
+<?php
+/**
+ * Tela: lista de insumos
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Rota: GET /gerente/insumos
+ * Recebe: $titulo, $busca, $insumos
+ * Campos de $insumos: id, tipo, nome, cor_hex, quantidade, unidade, custo_unitario,
+ *                     fornecedor, estoque_minimo
+ * Envia POST para ... (só em formulário, seguido de "Campos: ...")
+ * Responsabilidade: listar insumos com busca por nome, situação de estoque e ações de editar/excluir.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
+ */
+?>
+```
+
+CSS e JavaScript:
+
+```css
+/*
+ * Arquivo: catalog.css
+ * Dono: Arthur. Só Arthur altera este arquivo.
+ * Responsabilidade: filtros do catálogo público (.catalog-filters e .filter-chip).
+ * Veja INSTRUCOES_ARTHUR.md, seção 7.
+ */
+```
+
+| Linha | Obrigatória em | Conteúdo |
+|---|---|---|
+| `Camada` / `Tela` / `Arquivo` | Todos | Camada da classe, nome da tela ou nome do arquivo |
+| `Dono` | Todos | Uma única pessoa, com a frase "Só X altera este arquivo." |
+| `Rota` | Telas | Método e caminho que abrem a tela |
+| `Recebe` e `Campos de $x` | Telas | Variáveis do contrato e campos de cada lista |
+| `Envia POST para` e `Campos` | Telas com formulário | Destino e nomes dos campos |
+| `Responsabilidade` | Todos | O que o arquivo faz e o que ele **não** faz |
+| `Veja` | Todos | Documento e seção com as regras |
+
+**2. Comentário de método.** Todo método público tem um `/** */` logo acima, com uma frase que diz o
+que ele faz e o que devolve. Use uma linha só quando couber; se não couber, use várias.
+
+```php
+/** GET /gerente/insumos: lista os insumos, com busca por nome em ?busca=. */
+public function listar(): void
+
+/** Um insumo, ou null se não existir. */
+public function buscar(int $id): ?array
+
+/**
+ * Valida e grava o insumo: cadastra com id 0 e atualiza com id maior que 0.
+ * Devolve a lista de erros. Lista vazia significa que salvou.
+ */
+public function salvar(int $id, array $c): array
+```
+
+- **Controlador:** comece com a rota (`GET /caminho:` ou `POST /caminho:`) e diga para onde redireciona.
+- **Processamento:** diga as regras validadas e o que devolve (lista de erros, `null`, `bool`).
+- **Dados:** diga o que a consulta busca ou grava, e o que devolve quando não acha.
+
+**3. Comentário de linha.** Use `//` só para explicar uma decisão que não é óbvia, por exemplo
+`// Prepares emulados: booleano vai como 't' ou 'f'.` Não comente o óbvio.
+
+**4. TODO.** `TODO(Nome): o que falta` marca trabalho pendente e tem sempre o nome do dono. Quando o
+trabalho estiver pronto, **troque o TODO por um comentário do nível 2** (ou apague a lista de TODO do
+cabeçalho, mantendo as demais linhas). Arquivo entregue não tem `TODO` do próprio dono.
 
 ## 7. Banco de dados
 

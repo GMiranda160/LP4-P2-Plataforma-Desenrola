@@ -6,6 +6,7 @@
  * Recebe: $titulo, $pagina, $produto
  * Campos de $produto: id, nome, descricao, preco_base, categoria e dados da peça
  * Responsabilidade: peça, dados do produto e botão Solicitar orçamento (link para o WhatsApp).
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <section class="section">

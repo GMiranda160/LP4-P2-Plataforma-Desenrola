@@ -4,7 +4,10 @@
  * Dono: Arthur. Só Arthur altera este arquivo.
  * Rota: GET /gerente/insumos
  * Recebe: $titulo, $busca, $insumos
+ * Campos de $insumos: id, tipo, nome, cor_hex, quantidade, unidade, custo_unitario,
+ *                     fornecedor, estoque_minimo
  * Responsabilidade: listar insumos com busca por nome, situação de estoque e ações de editar/excluir.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 
 /** Quantidade em pt-BR, sem zeros à direita ("10", "2,5", "1,75"). */

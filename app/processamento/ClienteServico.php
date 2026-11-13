@@ -3,23 +3,31 @@
  * Camada: Processamento. Dono: Arthur. Só Arthur altera este arquivo.
  * Responsabilidade: validar clientes (nome, CPF/CNPJ de 11 ou 14 dígitos, e-mail, telefone e unicidade de CPF/CNPJ) e chamar ClienteDados.
  * Sem $_POST, sem sessão e sem HTML.
+ * Veja INSTRUCOES_ARTHUR.md, seção 6.
  */
 
 class ClienteServico
 {
     public function __construct(private ClienteDados $dados = new ClienteDados()) {}
 
+    /** Clientes cujo nome ou CPF/CNPJ contém a busca. Busca vazia devolve todos. */
     public function listar(string $busca = ''): array
     {
         return $this->dados->listar($busca);
     }
 
+    /** Um cliente, ou null se não existir. */
     public function buscar(int $id): ?array
     {
         return $this->dados->buscar($id);
     }
 
-    /** Devolve a lista de erros. Lista vazia significa que salvou. */
+    /**
+     * Valida e grava o cliente: cadastra com id 0 e atualiza com id maior que 0.
+     * CPF/CNPJ e CEP são gravados só com dígitos. Regras: nome, e-mail válido e telefone
+     * obrigatórios; CPF com 11 dígitos ou CNPJ com 14; CPF/CNPJ único.
+     * Devolve a lista de erros. Lista vazia significa que salvou.
+     */
     public function salvar(int $id, array $c): array
     {
         $d = [
@@ -60,6 +68,7 @@ class ClienteServico
         return [];
     }
 
+    /** Exclui o cliente. */
     public function excluir(int $id): void
     {
         $this->dados->excluir($id);

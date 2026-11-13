@@ -6,10 +6,7 @@
  * Recebe: $titulo, $pergunta
  * Envia POST para /recuperar-senha/redefinir.
  * Campos: resposta, senha, confirmar_senha
- *
- * TODO(Eduardo):
- * 1. Mostrar a pergunta de segurança com e().
- * 2. Criar o formulário com Csrf::campo().
+ * Responsabilidade: mostrar a pergunta de segurança e receber a resposta e a nova senha.
  * Veja INSTRUCOES_EDUARDO.md, seção 4.
  */
 ?>

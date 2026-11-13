@@ -7,7 +7,7 @@
  */
 class UsuarioDados
 {
-    /** TODO(Eduardo): buscar o usuário pelo e-mail, ou devolver null. */
+    /** O usuário com este e-mail, com os hashes, ou null. Os hashes nunca saem do serviço. */
     public function buscarPorEmail(string $email): ?array
     {
         $pdo = Conexao::pdo();
@@ -25,7 +25,7 @@ class UsuarioDados
         return $usuario === false ? null : $usuario;
     }
 
-    /** TODO(Eduardo): buscar o usuário pelo id, ou devolver null. */
+    /** O usuário com este id, com os hashes, ou null. */
     public function buscarPorId(int $id): ?array
     {
         $pdo = Conexao::pdo();
@@ -43,7 +43,7 @@ class UsuarioDados
         return $usuario === false ? null : $usuario;
     }
 
-    /** TODO(Eduardo): inserir e devolver o id com RETURNING id. */
+    /** Grava a conta nova como ativa e devolve o id com RETURNING id. */
     public function inserir(array $d): int
     {
         $pdo = Conexao::pdo();
@@ -70,7 +70,7 @@ class UsuarioDados
         return (int) $consulta->fetchColumn();
     }
 
-    /** TODO(Eduardo): trocar o hash da senha. */
+    /** Troca o hash da senha. */
     public function atualizarSenha(int $id, string $hash): void
     {
         $consulta = Conexao::pdo()->prepare(
@@ -85,7 +85,7 @@ class UsuarioDados
         ]);
     }
 
-    /** TODO(Eduardo): listar id, nome, email, perfil, criado_em e total_bordados, sem hashes. */
+    /** Lista para a gerente: id, nome, email, perfil, criado_em e total_bordados, sem nenhum hash. */
     public function listar(string $busca = ''): array
     {
         $pdo = Conexao::pdo();
@@ -123,7 +123,7 @@ class UsuarioDados
         return $consulta->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** TODO(Eduardo): devolver o total de usuários. */
+    /** Total de usuários, usado no painel. */
     public function contar(): int
     {
         $consulta = Conexao::pdo()->query('SELECT COUNT(*) FROM usuarios');

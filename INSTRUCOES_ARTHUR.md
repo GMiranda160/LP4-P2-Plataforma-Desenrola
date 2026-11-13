@@ -63,6 +63,15 @@ Nos seus controladores e classes de dados, use também:
 
 O roteador já valida o CSRF e já bloqueia quem não é gerente nas rotas `/gerente/...`.
 
+**Comentários:** siga o modelo da seção 6.1 do `README.md`. Em resumo:
+
+- Cabeçalho em todo arquivo, com `Camada` ou `Tela`, `Dono`, `Responsabilidade` e `Veja`. Nas telas,
+  inclua também `Rota`, `Recebe`, `Campos de $x` e, nos formulários, `Envia POST para` e `Campos`.
+- Um `/** */` acima de todo método público, dizendo o que ele faz e o que devolve. No controlador,
+  comece pela rota: `/** GET /gerente/insumos: lista os insumos, com busca por nome em ?busca=. */`.
+- `//` só para decisões que não são óbvias.
+- Ao terminar um método, troque o `TODO(Arthur)` por esse comentário explicativo.
+
 O título da página, o menu, o rodapé e as mensagens de sucesso ou erro vêm do layout. Não crie outros.
 
 ## 3. Seus arquivos
@@ -586,5 +595,5 @@ git commit -m "feat(insumos): monta a tela de listagem"
 - [ ] Todo texto dinâmico passa por `e()`
 - [ ] Todo formulário POST tem `Csrf::campo()` e seus campos usam os nomes deste documento
 - [ ] Todas as telas funcionam no celular
-- [ ] Os `TODO(Arthur)` foram removidos
+- [ ] Os `TODO(Arthur)` foram trocados por comentários explicativos no modelo do README, seção 6.1
 - [ ] Você consegue explicar o caminho de um cadastro, da tela ao banco

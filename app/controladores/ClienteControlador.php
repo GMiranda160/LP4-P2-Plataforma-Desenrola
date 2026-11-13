@@ -2,12 +2,14 @@
 /**
  * Camada: Controlador. Dono: Arthur. Só Arthur altera este arquivo.
  * Responsabilidade: receber os pedidos de clientes, chamar ClienteServico e escolher a tela do painel (layout gerente).
+ * Veja INSTRUCOES_ARTHUR.md, seção 6.
  */
 
 class ClienteControlador
 {
     public function __construct(private ClienteServico $servico = new ClienteServico()) {}
 
+    /** GET /gerente/clientes: lista os clientes, com busca por nome ou CPF/CNPJ em ?busca=. */
     public function listar(): void
     {
         $busca = trim($_GET['busca'] ?? '');
@@ -18,6 +20,7 @@ class ClienteControlador
         ], 'gerente');
     }
 
+    /** GET /gerente/clientes/form: abre o formulário vazio ou, com ?id=, para edição. Id inexistente volta para a lista. */
     public function form(): void
     {
         $id = (int) ($_GET['id'] ?? 0);
@@ -34,6 +37,7 @@ class ClienteControlador
         ], 'gerente');
     }
 
+    /** POST /gerente/clientes/salvar: cadastra ou atualiza. Com erro, volta ao formulário com o que foi digitado. */
     public function salvar(): void
     {
         $id = (int) ($_POST['id'] ?? 0);
@@ -49,6 +53,7 @@ class ClienteControlador
         Resposta::redirecionar('/gerente/clientes');
     }
 
+    /** POST /gerente/clientes/excluir: exclui pelo id do $_POST e volta para a lista. */
     public function excluir(): void
     {
         $this->servico->excluir((int) ($_POST['id'] ?? 0));

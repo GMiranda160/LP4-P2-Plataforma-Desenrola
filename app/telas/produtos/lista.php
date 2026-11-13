@@ -6,6 +6,7 @@
  * Recebe: $titulo, $produtos
  * Campos de $produtos: id, nome, categoria, preco_base, destaque, ativo
  * Responsabilidade: listar produtos com situação (ativo/inativo e destaque) e ações de editar, ativar/desativar e excluir.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <div class="page-head">

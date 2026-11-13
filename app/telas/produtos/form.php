@@ -7,6 +7,7 @@
  * Envia POST para /gerente/produtos/salvar.
  * Campos: id, bordado_id, nome, descricao, preco_base, destaque, ativo
  * Responsabilidade: cadastro e edição de produtos; a combinação é sempre um bordado do tipo produto, criado no Montador.
+ * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <div class="page-head"><h1><?= e($titulo) ?></h1></div>

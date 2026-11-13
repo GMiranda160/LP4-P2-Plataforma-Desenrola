@@ -62,6 +62,16 @@ regra real fica no servidor.
 
 **Booleanos:** a conexão usa prepares emulados. Envie booleanos como `'t'` ou `'f'`.
 
+**Comentários:** siga o modelo da seção 6.1 do `README.md`. Em resumo:
+
+- Cabeçalho em todo arquivo, com `Camada` ou `Tela`, `Dono`, `Responsabilidade` e `Veja`. Nas telas,
+  inclua também `Rota`, `Recebe`, `Campos de $x` e, nos formulários, `Envia POST para` e `Campos`.
+- Um `/** */` acima de todo método público, dizendo o que ele faz e o que devolve. No controlador,
+  comece pela rota: `/** POST /sair: encerra a sessão e volta para a home. */`.
+- `//` só para decisões que não são óbvias.
+- Ao terminar um método, troque o `TODO(Eduardo)` por esse comentário explicativo. Método pronto
+  com o `TODO` antigo em cima não conta como pronto.
+
 O título da página, o menu, o rodapé e as mensagens de sucesso ou erro vêm do layout. Não crie outros.
 
 ## 3. Seus arquivos
@@ -424,5 +434,5 @@ git commit -m "feat(hub): adiciona curtidas sem recarregar a pagina"
 - [ ] Todo texto dinâmico passa por `e()`
 - [ ] Todo formulário POST tem `Csrf::campo()` e usa os nomes deste documento
 - [ ] Tudo funciona no celular, sem rolagem lateral
-- [ ] Os `TODO(Eduardo)` foram removidos
+- [ ] Os `TODO(Eduardo)` foram trocados por comentários explicativos no modelo do README, seção 6.1
 - [ ] Você consegue explicar sessão, hash de senha, CSRF e o clique em curtir

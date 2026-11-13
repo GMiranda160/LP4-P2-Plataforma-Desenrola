@@ -6,7 +6,11 @@
  */
 class AuthServico
 {
-    /** TODO(Eduardo): validar nome, e-mail único, senha com 6 caracteres, confirmação e resposta. Criar hashes, usar perfil usuario e devolver [erros, usuario]. */
+    /**
+     * Valida nome, usuário (3 a 30 caracteres, único), senha com 6 ou mais caracteres,
+     * confirmação e pergunta de segurança. Grava senha e resposta só como hash, com perfil usuario.
+     * Devolve [erros, usuario]: com erro, usuario é null.
+     */
     public function cadastrar(array $campos): array
     {
         $erros = [];
@@ -78,7 +82,7 @@ class AuthServico
         return [[], $usuario];
     }
 
-    /** TODO(Eduardo): conferir com password_verify e bloquear conta inativa. Devolver o usuário ou null. */
+    /** Confere a senha com password_verify e recusa conta inativa. Devolve o usuário sem os hashes, ou null. */
     public function autenticar(string $email, string $senha): ?array
     {
         $email = mb_strtolower(trim($email));
@@ -106,7 +110,7 @@ class AuthServico
         return $usuario;
     }
 
-    /** TODO(Eduardo): devolver id e pergunta do usuário, ou null. */
+    /** Id e pergunta de segurança da conta deste e-mail, ou null se não existir. */
     public function perguntaDe(string $email): ?array
     {
         $email = mb_strtolower(trim($email));
@@ -122,7 +126,10 @@ class AuthServico
         ];
     }
 
-    /** TODO(Eduardo): conferir a resposta normalizada, validar a nova senha, trocar o hash e devolver a lista de erros. */
+    /**
+     * Confere a resposta (sem diferença de maiúsculas e espaços), valida a nova senha e troca o hash.
+     * Devolve a lista de erros. Lista vazia significa que trocou.
+     */
     public function redefinirSenha(int $id, array $campos): array
     {
         $usuarios = new UsuarioDados();
