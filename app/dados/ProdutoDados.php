@@ -99,7 +99,7 @@ class ProdutoDados
      */
     public function combinacoes(int $atualId = 0): array
     {
-        $sql = "SELECT b.id, b.titulo
+        $sql = "SELECT b.id, b.titulo, b.descricao
                 FROM bordados b
                 WHERE b.tipo = 'produto'
                   AND (NOT EXISTS (SELECT 1 FROM produtos p WHERE p.bordado_id = b.id)

@@ -42,6 +42,28 @@ class MontadorControlador
     }
 
     /**
+     * GET /montador/imagem?url=: baixa a imagem de um link colado no enquadramento da foto
+     * e devolve os bytes, do mesmo site, para o navegador poder recortar no canvas.
+     * Erro volta em JSON com status 422 e a mensagem amigável.
+     */
+    public function imagem(): void
+    {
+        try {
+            $imagem = (new ImagemRemotaServico())->baixar((string) ($_GET['url'] ?? ''));
+        } catch (InvalidArgumentException $erro) {
+            Resposta::json(['erro' => $erro->getMessage()], 422);
+        }
+
+        header('Content-Type: ' . $imagem['tipo']);
+        header('Content-Length: ' . strlen($imagem['conteudo']));
+        header('X-Content-Type-Options: nosniff');
+        header('Content-Security-Policy: default-src \'none\'');
+        header('Cache-Control: private, no-store');
+        echo $imagem['conteudo'];
+        exit;
+    }
+
+    /**
      * POST /montador/salvar: valida e grava pelo MontadorServico.
      * Erro de validação volta para /montador com os valores antigos no formulário.
      * Sucesso segue o modo: hub vai para /hub/bordado?id=, matriz vai para o modo produto com a matriz marcada

@@ -9,6 +9,7 @@
 
 import { query, queryAll, on } from '../utils/dom.js';
 import { converterImagem, desenharGrade } from './conversor.js';
+import { criarEnquadrador } from '../components/enquadrador.js';
 
 const PASSOS = ['matriz', 'peca', 'posicao', 'publicar'];
 const COR_PADRAO = '#f3ded9';
@@ -56,8 +57,8 @@ export function initMontador(root) {
 
   // Etapa 2: peça base com foto real ou foto enviada pela própria pessoa.
   const radiosBase = queryAll('input[name="peca_base"]', root);
-  const arquivoPeca = query('.montador__arquivo-peca', root);
   const fotoLinha = query('[data-foto-linha]', root);
+  const fotoAbrirTexto = query('[data-foto-abrir-texto]', root);
   const fotoNota = query('[data-foto-nota]', root);
   const fotoMiniatura = query('[data-foto-miniatura]', root);
   const fotoIcone = query('[data-foto-icone]', root);
@@ -582,34 +583,24 @@ export function initMontador(root) {
   // Eventos: peça base com foto e foto enviada pela pessoa.
   radiosBase.forEach((radio) => on(radio, 'change', () => sincronizarModoPeca()));
 
-  on(arquivoPeca, 'change', () => {
-    const file = arquivoPeca?.files?.[0];
-
-    if (!file) return;
-
-    if (/heic|heif/i.test(file.type) || /\.(heic|heif)$/i.test(file.name)) {
-      arquivoPeca.value = '';
-      mostrarErro('Foto em HEIC (padrão do iPhone) não abre no navegador. No app Fotos, exporte como JPEG e envie de novo.');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024 || !/^image\/(png|jpeg|webp)$/.test(file.type)) {
-      fotoDoUsuario = null;
-      arquivoPeca.value = '';
-      mostrarFotoEnviada();
-      mostrarErro('Escolha uma imagem PNG, JPEG ou WebP de até 10 MB.');
-      return;
-    }
-
-    const leitor = new FileReader();
-    leitor.onload = () => {
-      fotoDoUsuario = String(leitor.result ?? '');
+  // Foto da pessoa: popup com origem (computador, arrastar, colar ou link) e enquadramento 4:5.
+  // A foto já sai em 4:5, a proporção da peça: preenche a área inteira, sem faixas nas laterais.
+  const enquadrador = criarEnquadrador(query('[data-enquadrador]', root), {
+    aoConfirmar(dataUrl) {
+      fotoDoUsuario = dataUrl;
+      if (fotoAbrirTexto) fotoAbrirTexto.textContent = 'Trocar ou reenquadrar a foto';
       esconderErro();
       mostrarFotoEnviada();
       renderizarFundo();
-    };
-    leitor.readAsDataURL(file);
+    },
   });
+
+  on(query('[data-foto-abrir]', root), 'click', () => enquadrador.abrir());
+
+  // Escolher "Minha foto" sem foto ainda já abre o popup.
+  radiosBase.forEach((radio) => on(radio, 'change', () => {
+    if (radio.checked && radio.value === 'foto' && !fotoDoUsuario) enquadrador.abrir();
+  }));
 
   // Eventos: paleta de cores da peça (multiplica sobre a foto).
   amostraCores.forEach((botao) => on(botao, 'click', () => definirCorSimples(botao.dataset.cor)));

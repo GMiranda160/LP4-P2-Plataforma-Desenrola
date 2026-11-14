@@ -35,10 +35,29 @@ class ProdutoControlador
 
         Visao::render('produtos/form', [
             'titulo' => $produto ? 'Editar produto' : 'Novo produto',
-            // Vindo do montador, a combinação recém-criada chega marcada.
-            'produto' => $velhos ? $velhos + ['id' => $id] : ($produto ?? ['bordado_id' => (int) ($_GET['bordado'] ?? 0), 'ativo' => true]),
+            'produto' => $velhos ? $velhos + ['id' => $id] : ($produto ?? $this->novoDaCombinacao($combinacoes)),
             'combinacoes' => $combinacoes,
         ], 'gerente');
+    }
+
+    /**
+     * Produto novo. Vindo do montador (?bordado=), a combinação chega marcada e o nome e a
+     * descrição já vêm do que a gerente escreveu no montador; ela só completa o preço.
+     */
+    private function novoDaCombinacao(array $combinacoes): array
+    {
+        $bordadoId = (int) ($_GET['bordado'] ?? 0);
+        $novo = ['bordado_id' => $bordadoId, 'ativo' => true];
+
+        foreach ($combinacoes as $c) {
+            if ((int) $c['id'] === $bordadoId) {
+                $novo['nome'] = (string) $c['titulo'];
+                $novo['descricao'] = (string) ($c['descricao'] ?? '');
+                break;
+            }
+        }
+
+        return $novo;
     }
 
     /** POST /gerente/produtos/salvar: cria ou atualiza. */

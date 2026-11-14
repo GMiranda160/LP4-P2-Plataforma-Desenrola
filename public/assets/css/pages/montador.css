@@ -547,3 +547,376 @@
 .swatch:disabled:hover {
   transform: none;
 }
+
+/* Popup da foto da peça: origem e enquadramento 4:5 (js/components/enquadrador.js) ---------- */
+.montador__upload-foto {
+  width: 100%;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.enquadrador {
+  --enq-coluna: 360px; /* largura da moldura e do zoom, alinhados no mesmo eixo */
+  /* margin: auto centraliza o dialog modal; o reset.css zera a margem de tudo. */
+  margin: auto;
+  width: min(520px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.enquadrador::backdrop {
+  background-color: rgba(46, 35, 33, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.enquadrador[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.enquadrador svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+/* Cabeçalho: título, subtítulo e fechar */
+.enquadrador__cabeca {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+
+.enquadrador__titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--color-wine-700);
+}
+
+.enquadrador__sub {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+.enquadrador__fechar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: -0.25rem -0.5rem 0 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.enquadrador__fechar:hover {
+  background-color: var(--color-sand-100);
+  color: var(--color-wine-700);
+}
+
+/* Corpo: rola sozinho em telas baixas; cabeçalho e rodapé ficam fixos */
+.enquadrador__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  padding: 0 var(--space-5) var(--space-5);
+  overflow-y: auto;
+}
+
+.enquadrador__origem,
+.enquadrador__ajuste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.enquadrador__origem[hidden],
+.enquadrador__ajuste[hidden],
+.enquadrador__erro[hidden] {
+  display: none;
+}
+
+/* Origem: área de soltar, "ou" e link */
+.enquadrador__soltar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: var(--space-6) var(--space-4);
+  border: 1.5px dashed rgba(105, 24, 24, 0.35);
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-50);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+.enquadrador__soltar:hover,
+.enquadrador__soltar.is-sobre {
+  border-color: var(--color-wine-700);
+  background-color: rgba(105, 24, 24, 0.05);
+}
+
+.enquadrador__soltar:focus-within {
+  outline: 2px solid var(--color-wine-700);
+  outline-offset: 2px;
+}
+
+.enquadrador .enquadrador__icone {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 0.2rem;
+  color: var(--color-wine-500);
+}
+
+.enquadrador__soltar-titulo {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-wine-700);
+}
+
+.enquadrador__dica {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+.enquadrador__ou {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.enquadrador__ou::before,
+.enquadrador__ou::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--color-sand-200);
+}
+
+.enquadrador__campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.enquadrador__rotulo {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.enquadrador__link {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.enquadrador__link .text-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.enquadrador__link .btn {
+  flex: none;
+}
+
+/* Ajuste: moldura e zoom na mesma coluna centralizada */
+.enquadrador__ajuste {
+  align-items: center;
+}
+
+.enquadrador__moldura {
+  position: relative;
+  width: min(100%, var(--enq-coluna), calc((100dvh - 300px) * 0.8));
+  min-width: 200px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow: 0 0 0 1px var(--color-sand-200), var(--shadow-sm);
+}
+
+.enquadrador__moldura:focus-visible {
+  outline: 2px solid var(--color-wine-700);
+  outline-offset: 3px;
+}
+
+.enquadrador__moldura.is-arrastando {
+  cursor: grabbing;
+}
+
+.enquadrador__imagem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+/* Linhas de terço: discretas, e só aparecem ao mexer na foto. */
+.enquadrador__grade {
+  --linha: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85));
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--linha), var(--linha), var(--linha), var(--linha);
+  background-repeat: no-repeat;
+  background-size: 1px 100%, 1px 100%, 100% 1px, 100% 1px;
+  background-position: 33.333% 0, 66.666% 0, 0 33.333%, 0 66.666%;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.enquadrador__moldura:hover .enquadrador__grade,
+.enquadrador__moldura:focus-visible .enquadrador__grade,
+.enquadrador__moldura.is-arrastando .enquadrador__grade {
+  opacity: 0.35;
+}
+
+.enquadrador__zoom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: min(100%, var(--enq-coluna));
+}
+
+.enquadrador__zoom input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  accent-color: var(--color-wine-700);
+}
+
+.enquadrador__zoom-botao {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid rgba(105, 24, 24, 0.22);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-white);
+  color: var(--color-wine-700);
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+.enquadrador__zoom-botao:hover {
+  border-color: var(--color-wine-700);
+  background-color: rgba(105, 24, 24, 0.06);
+}
+
+.enquadrador__erro {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-alerta-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-alerta-bg);
+  color: var(--color-alerta-ink);
+  font-size: 0.85rem;
+}
+
+/* Rodapé: trocar à esquerda, cancelar e usar à direita, sem quebrar texto */
+.enquadrador__acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-sand-200);
+  background-color: var(--color-sand-50);
+}
+
+.enquadrador__acoes .btn {
+  white-space: nowrap;
+}
+
+.enquadrador__trocar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-right: auto;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--color-wine-700);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.enquadrador .enquadrador__trocar svg {
+  width: 16px;
+  height: 16px;
+}
+
+.enquadrador__trocar:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Na escolha da origem não há o que trocar nem usar ainda. */
+.enquadrador[data-etapa="origem"] [data-enq-trocar],
+.enquadrador[data-etapa="origem"] [data-enq-usar] {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .enquadrador__cabeca {
+    padding: var(--space-4) var(--space-4) var(--space-3);
+  }
+
+  .enquadrador__corpo {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+
+  .enquadrador__acoes {
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .enquadrador__trocar {
+    flex-basis: 100%;
+    justify-content: center;
+    margin-right: 0;
+  }
+
+  .enquadrador__acoes .btn {
+    flex: 1;
+  }
+}

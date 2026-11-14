@@ -19,10 +19,11 @@
   <div class="form__grid">
     <div class="form__field">
       <label for="bordado_id">Combinação</label>
-      <select class="text-field" id="bordado_id" name="bordado_id" required>
+      <select class="text-field" id="bordado_id" name="bordado_id" required data-combinacao>
         <option value="">Selecione</option>
         <?php foreach ($combinacoes as $c): ?>
           <option value="<?= (int) $c['id'] ?>"
+            data-nome="<?= e($c['titulo']) ?>" data-descricao="<?= e($c['descricao'] ?? '') ?>"
             <?= (int) ($produto['bordado_id'] ?? 0) === (int) $c['id'] ? 'selected' : '' ?>>
             <?= e($c['titulo']) ?>
           </option>

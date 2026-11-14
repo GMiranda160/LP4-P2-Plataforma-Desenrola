@@ -179,10 +179,79 @@ $coresTecido = ['#f3ded9', '#ffffff', '#2e2321', '#691818', '#3f5a45', '#2f4a6b'
         </label>
       </div>
 
-      <label class="montador__upload montador__upload-foto" for="arquivo-peca" data-foto-linha hidden>
-        <input class="montador__arquivo-peca" id="arquivo-peca" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp,.heic,.heif">
-        <span class="montador__upload-texto">Escolher a foto da sua peça (PNG, JPEG ou WebP, até 10 MB)</span>
-      </label>
+      <button type="button" class="montador__upload montador__upload-foto" data-foto-linha data-foto-abrir hidden>
+        <span class="montador__upload-texto" data-foto-abrir-texto>Escolher a foto da sua peça</span>
+      </button>
+
+      <!-- Popup da foto: origem (computador, arrastar, colar ou link) e enquadramento 4:5.
+           Os campos não têm name: nada daqui vai no formulário; a foto pronta vai pelo montador.js. -->
+      <dialog class="enquadrador" data-enquadrador aria-labelledby="enquadrador-titulo" aria-describedby="enquadrador-sub">
+        <header class="enquadrador__cabeca">
+          <div>
+            <h2 class="enquadrador__titulo" id="enquadrador-titulo">Foto da sua peça</h2>
+            <p class="enquadrador__sub" id="enquadrador-sub" data-enq-sub
+               data-origem="Envie uma foto da peça, de frente e com boa luz."
+               data-ajuste="Arraste para enquadrar a peça e use o zoom para aproximar ou afastar.">
+              Envie uma foto da peça, de frente e com boa luz.
+            </p>
+          </div>
+          <button type="button" class="enquadrador__fechar" data-enq-fechar aria-label="Fechar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </header>
+
+        <div class="enquadrador__corpo">
+          <div class="enquadrador__origem" data-enq-origem>
+            <label class="enquadrador__soltar" data-enq-soltar>
+              <input class="montador__arquivo" type="file" data-enq-arquivo
+                     accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp,.heic,.heif">
+              <svg class="enquadrador__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span class="enquadrador__soltar-titulo">Escolher do computador</span>
+              <span class="enquadrador__dica">ou arraste a imagem para cá · PNG, JPEG ou WebP até 10 MB</span>
+            </label>
+
+            <div class="enquadrador__ou"><span>ou</span></div>
+
+            <div class="enquadrador__campo">
+              <label class="enquadrador__rotulo" for="enquadrador-url">Link de uma imagem da web</label>
+              <div class="enquadrador__link">
+                <input class="text-field" id="enquadrador-url" type="url" inputmode="url" data-enq-url
+                       placeholder="https://exemplo.com/foto.jpg" autocomplete="off">
+                <button type="button" class="btn btn--primary btn--sm" data-enq-carregar>Carregar</button>
+              </div>
+              <p class="enquadrador__dica">Na imagem do site, clique com o botão direito e use “Copiar endereço da imagem”. Ctrl+V também cola uma imagem copiada.</p>
+            </div>
+          </div>
+
+          <div class="enquadrador__ajuste" data-enq-ajuste hidden>
+            <div class="enquadrador__moldura" data-enq-moldura tabindex="0"
+                 aria-label="Enquadramento da foto. Setas movem, mais e menos dão zoom, zero preenche a moldura.">
+              <img class="enquadrador__imagem" data-enq-img alt="" draggable="false">
+              <span class="enquadrador__grade" aria-hidden="true"></span>
+            </div>
+            <div class="enquadrador__zoom">
+              <button type="button" class="enquadrador__zoom-botao" data-enq-inteira title="Foto inteira" aria-label="Mostrar a foto inteira">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M20 20l-4-4"/></svg>
+              </button>
+              <input type="range" min="0" max="1000" step="1" data-enq-zoom aria-label="Zoom">
+              <button type="button" class="enquadrador__zoom-botao" data-enq-preencher title="Preencher a moldura" aria-label="Preencher a moldura">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M11 8v6M20 20l-4-4"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <p class="enquadrador__erro" data-enq-erro role="alert" hidden></p>
+        </div>
+
+        <footer class="enquadrador__acoes">
+          <button type="button" class="enquadrador__trocar" data-enq-trocar>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.2L3 16M3 21v-5h5"/></svg>
+            Trocar imagem
+          </button>
+          <button type="button" class="btn btn--ghost btn--sm" data-enq-fechar>Cancelar</button>
+          <button type="button" class="btn btn--primary btn--sm" data-enq-usar>Usar esta foto</button>
+        </footer>
+      </dialog>
       <img class="montador__foto-preview" data-foto-preview alt="Prévia da foto da sua peça" hidden>
       <p class="field-hint montador__foto-nota" data-foto-nota hidden>
         A foto é reduzida neste navegador e guardada junto com o bordado quando você salvar.

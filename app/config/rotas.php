@@ -34,6 +34,7 @@ return [
     ['POST', '/bordado/excluir',             [HubControlador::class, 'excluirBordado'],       'login'],
     ['GET',  '/montador',                    [MontadorControlador::class, 'index'],           'login'],
     ['POST', '/montador/salvar',             [MontadorControlador::class, 'salvar'],          'login'],
+    ['GET',  '/montador/imagem',             [MontadorControlador::class, 'imagem'],          'login'],
     ['POST', '/bordado/tutorial',            [TutorialControlador::class, 'gerar'],           'login'],
 
     // Gerente
