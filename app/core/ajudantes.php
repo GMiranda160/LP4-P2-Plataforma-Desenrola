@@ -80,10 +80,16 @@ function link_whatsapp(string $mensagem = ''): string
 }
 
 /**
- * Converte um SVG em data URI, para uso no atributo src de uma tag img.
- * O SVG gerado pelo servidor entra aqui; nunca renderize SVG vindo do navegador.
+ * Devolve o src de uma tag img para a imagem de uma matriz.
+ * Recebe o caminho do arquivo no Storage (ex.: matrizes/abc.svg), que vira a URL pública,
+ * ou o SVG cru de matrizes antigas, que vira data URI. As consultas mandam o caminho no campo svg.
+ * Só o SVG gerado pelo servidor entra aqui; nunca renderize SVG vindo do navegador.
  */
 function svg_data_uri(string $svg): string
 {
+    if ($svg !== '' && !str_starts_with(ltrim($svg), '<')) {
+        return StorageServico::urlPublica($svg);
+    }
+
     return 'data:image/svg+xml;base64,' . base64_encode($svg);
 }

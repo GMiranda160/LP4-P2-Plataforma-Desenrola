@@ -37,7 +37,7 @@ class MatrizServico
     /**
      * Atualiza nome, descrição, categoria e tempo médio de uma matriz existente.
      * Matriz nova não passa por aqui: ela nasce no montador, com a grade.
-     * Só matrizes padrão são editáveis: nome e descrição de matriz de usuário pertencem ao autor.
+     * A gerente pode editar qualquer matriz (nem a grade e nem o SVG mudam).
      * Devolve a lista de erros. Lista vazia significa que salvou.
      */
     public function salvarDados(int $id, array $campos): array
@@ -46,9 +46,6 @@ class MatrizServico
 
         if ($matriz === null) {
             return ['Matriz não encontrada.'];
-        }
-        if (!$matriz['padrao']) {
-            return ['Matrizes criadas por usuários não podem ser editadas, apenas excluídas.'];
         }
 
         $tempo = filter_var(trim((string) ($campos['tempo_medio_min'] ?? '')), FILTER_VALIDATE_INT);
@@ -100,12 +97,18 @@ class MatrizServico
         }
 
         try {
-            $this->dados->excluir($id);
+            $arquivos = $this->dados->excluir($id);
         } catch (PDOException $e) {
             if ($e->getCode() === '23503') {
                 return false;
             }
             throw $e;
+        }
+
+        // Linha apagada: os arquivos no Storage não servem mais para nada.
+        $storage = new StorageServico();
+        foreach ($arquivos as $caminho) {
+            $storage->remover((string) $caminho);
         }
 
         return true;

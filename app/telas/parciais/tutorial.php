@@ -1,14 +1,28 @@
 <?php
 /**
- * Tela: bloco do tutorial de IA
+ * Parcial: tutorial com IA
  * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Recebe: $bordado
+ * Espera $bordado: id, titulo, tutorial_ia (texto ou null).
  *
- * TODO(Guilherme):
- * 1. Criar o botão Como bordar à mão, com o id do bordado.
- * 2. Mostrar tutorial_ia, se já existir.
- * 3. Criar a área de resposta usada por tutorial.js.
- * Veja INSTRUCOES_GUILHERME.md, seção 8.
+ * Uso, na tela do detalhe do bordado:
+ *   Visao::parcial('tutorial', ['bordado' => $bordado]);
+ * Se o tutorial já existir no banco, ele aparece direto; senão, fica o botão.
+ * O POST vai para /bordado/tutorial (rota 'login'); o CSRF vai no cabeçalho.
  */
+$tutorialSalvo = is_array($bordado ?? null) ? ($bordado['tutorial_ia'] ?? null) : null;
+$temTutorial = is_string($tutorialSalvo) && trim($tutorialSalvo) !== '';
 ?>
-<p class="empty-state">Tela em construção.</p>
+<section class="tutorial" data-tutorial data-bordado-id="<?= (int) ($bordado['id'] ?? 0) ?>">
+  <h3 class="tutorial__titulo">Tutorial para bordar</h3>
+
+  <?php if ($temTutorial): ?>
+    <p class="field-hint">Texto gerado por IA, revise antes de bordar.</p>
+    <div class="tutorial__texto"><?= e($tutorialSalvo) ?></div>
+  <?php else: ?>
+    <p class="field-hint">A IA monta um passo a passo simples, a partir deste bordado.</p>
+    <button type="button" class="btn btn--ghost" data-tutorial-gerar>Gerar tutorial com IA</button>
+    <p class="field-hint" data-tutorial-nota hidden>Texto gerado por IA, revise antes de bordar.</p>
+    <div class="tutorial__texto" data-tutorial-texto hidden></div>
+    <p class="tutorial__erro form__error" data-tutorial-erro role="alert" hidden></p>
+  <?php endif; ?>
+</section>

@@ -40,6 +40,6 @@
 
   <?php Visao::parcial('footer'); ?>
 
-  <script type="module" src="/assets/js/main.js"></script>
+  <script type="module" src="/assets/js/main.js?v=<?= (int) (@filemtime(RAIZ . '/public/assets/js/main.js') ?: 1) ?>"></script>
 </body>
 </html>

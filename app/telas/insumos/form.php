@@ -70,7 +70,7 @@ $corAtual = preg_match('/^#[0-9a-f]{6}$/i', $insumo['cor_hex'] ?? '')
 
     <div class="form__field">
       <label for="custo_unitario">Custo unitário</label>
-      <input class="text-field" type="number" step="0.01" min="0.01" id="custo_unitario" name="custo_unitario"
+      <input class="text-field" type="number" step="0.01" min="0.01" id="custo_unitario" name="custo_unitario" data-moeda
              value="<?= e($insumo['custo_unitario'] ?? '') ?>" required>
     </div>
 

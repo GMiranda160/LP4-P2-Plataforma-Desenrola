@@ -168,14 +168,12 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
 .tier.core { grid-row: 3; grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 1.4cqw; flex-wrap: wrap; }
 .tier.core h3 { white-space: nowrap; }
 
-/* Slide 08: o que existe, contado por camada; nos de costura por status */
+/* Slide 08: as peças do projeto, contadas por camada; tons separam o papel de cada classe */
 .chip { font-family: var(--font-mono); font-size: .76cqw; padding: .25cqw .55cqw; border-radius: 5px; }
-.chip.ok { background: var(--accent-soft); border: 1.5px solid var(--accent); }
-.chip.par { background: var(--surface); border: 1.5px dashed var(--accent); }
-.chip.esq { background: var(--surface); border: 1.5px dotted var(--muted); color: var(--muted); }
+.chip.n { background: var(--surface); border: 1px solid var(--border); }
 .st8 { display: grid; grid-template-rows: 1fr auto; row-gap: 1.5cqw; min-height: 0; }
 .scols { display: grid; grid-template-columns: 33fr 31fr 26fr; column-gap: 4.2cqw; align-content: center; min-height: 0; }
-.scol { display: flex; flex-direction: column; gap: 1.1cqw; justify-content: flex-start; min-width: 0; }
+.scol { display: flex; flex-direction: column; gap: .85cqw; justify-content: flex-start; min-width: 0; }
 .frac { display: flex; align-items: baseline; gap: .9cqw; }
 .frac b { font-family: var(--font-display); font-size: 3.4cqw; font-weight: 700; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
 .frac span { font-size: .95cqw; color: var(--muted); }
@@ -183,9 +181,12 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
 .cbar { position: relative; display: flex; justify-content: space-between; align-items: center; }
 .cbar::before { content: ""; position: absolute; left: .75cqw; right: .75cqw; top: 50%; border-top: 2.5px dashed var(--line); }
 .knot8 { position: relative; flex: none; width: 1.5cqw; height: 1.5cqw; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 .3cqw var(--surface); }
-.knot8.half { background: linear-gradient(90deg, var(--accent) 50%, var(--surface) 50%); border: 1.5px solid var(--accent); }
-.knot8.esq { background: var(--surface); border: 2px dashed var(--muted); }
-.gcap { font-size: .78cqw; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 600; }
+.knot8.t1 { background: var(--accent-soft); border: 2px solid var(--accent); }
+.knot8.t3 { background: var(--hoop); }
+.gcap { font-size: .78cqw; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: .5cqw; }
+.gcap::before { content: ""; flex: none; width: .9cqw; height: .9cqw; border-radius: 50%; background: var(--accent); }
+.gcap.t1::before { background: var(--accent-soft); border: 1.5px solid var(--accent); }
+.gcap.t3::before { background: var(--hoop); }
 .chips8 { display: flex; flex-wrap: wrap; gap: .4cqw; align-items: center; }
 .sfe { display: flex; align-items: center; gap: 1.2cqw; padding: .9cqw 1.2cqw; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); }
 .sfe .ic { flex: none; width: 2.6cqw; height: 2.6cqw; border-radius: 10px; display: grid; place-items: center; background: var(--surface); color: var(--rose-ink); border: 1px solid var(--rose-mid); }
@@ -317,6 +318,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
 .subs { display: flex; flex-wrap: wrap; gap: .4cqw; }
 .subs span { font-size: .82cqw; padding: .25cqw .6cqw; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
 .subs span.hl { border-color: var(--accent); color: var(--accent); font-weight: 500; }
+.subs span code { font-size: 1em; }
 
 /* Slide 04: camadas, com a cor escurecendo conforme o pedido desce até o banco */
 .mvc { position: relative; display: grid; grid-template-columns: 18fr 20fr 21fr 18fr 13fr; grid-template-rows: auto 1fr auto; column-gap: 6.2cqw; row-gap: 3.2cqw; min-height: 0; }
@@ -437,9 +439,6 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
 .stop-v { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: .6cqw .9cqw; display: flex; flex-direction: column; gap: .15cqw; }
 .stop-v b { font-size: .92cqw; font-weight: 600; }
 .stop-v code { font-size: .72cqw; color: var(--accent); }
-.subs span.ok { border-color: var(--ok); color: var(--ok); }
-.subs span.par { border-color: var(--accent); color: var(--accent); }
-.subs span.esq { border-color: var(--line); color: var(--muted); border-style: dashed; }
 
 /* Slide 07: compressao para caber na altura */
 .dep7 .place { padding: .8cqw .95cqw; gap: .5cqw; border-radius: 12px; }
@@ -461,6 +460,84 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
 .dep7 .svc { height: 100%; justify-content: space-between; gap: 4cqw; }
 .dep7 > .col > .svc { align-self: stretch; }
 .dep7 > .col-ia > .place { align-self: start; }
+
+/* Slide 09: login em linha; três portões no serviço, todas as falhas numa só saída */
+.wires .no { stroke: var(--no); stroke-width: 2; stroke-dasharray: 6 5; }
+.wires .k-no { fill: var(--no); }
+.keys i.n { border-top: 2.5px dashed var(--no); }
+.lg9 { position: relative; display: grid; grid-template-columns: 17fr 18fr 44fr 19fr; grid-template-rows: auto auto auto; column-gap: 5cqw; align-content: center; min-height: 0; }
+.lg9 > .colcap, .lg9 > .pc, .lg9 > .gates9, .lg9 > .err9, .lg9 > .dest9 { position: relative; z-index: 1; min-width: 0; }
+.lg9 .c1 { grid-column: 1; grid-row: 1; }
+.lg9 .c2 { grid-column: 2; grid-row: 1; }
+.lg9 .c3 { grid-column: 3; grid-row: 1; }
+.lg9 .c4 { grid-column: 4; grid-row: 1; }
+#g-tela { grid-column: 1; grid-row: 2; }
+#g-ctl { grid-column: 2; grid-row: 2; align-self: center; }
+.gates9 { grid-column: 3; grid-row: 2; align-self: center; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 3cqw; }
+#g-ok { grid-column: 4; grid-row: 2; align-self: center; }
+#g-db { grid-column: 2; grid-row: 3; margin-top: 4cqw; }
+#g-err { grid-column: 3; grid-row: 3; margin-top: 4cqw; align-self: start; }
+.dest9 { grid-column: 4; grid-row: 3; margin-top: 4cqw; align-self: start; display: grid; grid-template-columns: 1fr 1fr; gap: 1cqw; }
+.frm9 { background: var(--rose-soft); border-color: var(--rose-mid); }
+.frm9 .ic { color: var(--rose-ink); }
+.fld9 { display: flex; flex-direction: column; gap: .2cqw; }
+.fld9 span { font-size: .78cqw; color: var(--muted); }
+.fld9 b { display: flex; justify-content: space-between; gap: .4cqw; font-family: var(--font-mono); font-size: .85cqw; font-weight: 500; padding: .35cqw .55cqw; border-radius: 6px; background: var(--surface); border: 1px solid var(--rose-mid); }
+.fld9 em { font-style: normal; color: var(--muted); }
+.btn9 { align-self: stretch; text-align: center; font-size: .85cqw; font-weight: 600; padding: .35cqw; border-radius: 6px; background: var(--rose); color: var(--surface); }
+.xf9 { display: flex; flex-wrap: wrap; align-items: center; gap: .3cqw; }
+.xf9 code { padding: .15cqw .45cqw; border-radius: 5px; background: var(--surface); border: 1px solid var(--border); }
+.xf9 svg { width: .95cqw; height: .95cqw; color: var(--muted); }
+.gt9 h4 { font-family: var(--font-body); font-size: 1cqw; }
+.gt9 .ic.gate { border-color: var(--no); color: var(--no); }
+.ok9 { background: color-mix(in srgb, var(--ok) 10%, var(--surface)); border: 1.5px solid var(--ok); }
+.ok9 .ic { color: var(--ok); border-color: var(--ok); }
+.err9 { display: flex; flex-direction: column; gap: .4cqw; padding: .8cqw 1.1cqw; border-radius: 10px; border: 1.5px dashed var(--no); background: color-mix(in srgb, var(--no) 7%, var(--surface)); }
+.err9 b { display: flex; align-items: center; gap: .4cqw; color: var(--no); font-size: .95cqw; }
+.err9 b svg { width: 1.1cqw; height: 1.1cqw; flex: none; }
+.err9 p { margin: 0; font-size: .9cqw; line-height: 1.4; }
+.err9 q { font-weight: 600; }
+.err9 code { font-size: .8cqw; color: var(--accent); }
+.to9 { align-items: center; gap: .2cqw; padding: .6cqw .5cqw; }
+.to9 span { font-size: .8cqw; color: var(--muted); }
+.to9 code { font-size: .85cqw; font-weight: 600; }
+
+/* Slide 10: o produto desmontado; banco, peça desenhada na hora, três vitrines e o WhatsApp */
+.vt10 { position: relative; display: grid; grid-template-columns: 20fr 27fr 21fr 19fr; grid-template-rows: auto auto; column-gap: 5.5cqw; align-content: center; min-height: 0; }
+.vt10 > .colcap, .vt10 > .pc, .vt10 > .vits10, .vt10 > .ext10 { position: relative; z-index: 1; min-width: 0; }
+.vt10 .c1 { grid-column: 1; grid-row: 1; } .vt10 .c2 { grid-column: 2; grid-row: 1; }
+.vt10 .c3 { grid-column: 3; grid-row: 1; } .vt10 .c4 { grid-column: 4; grid-row: 1; }
+#v-db { grid-column: 1; grid-row: 2; align-self: center; }
+#v-peca { grid-column: 2; grid-row: 2; }
+.vits10 { grid-column: 3; grid-row: 2; display: flex; flex-direction: column; justify-content: space-between; gap: 1.2cqw; }
+#v-wa { grid-column: 4; grid-row: 2; align-self: end; }
+.tb10 { list-style: none; margin: .2cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: .4cqw; }
+.tb10 li { display: flex; flex-direction: column; gap: .1cqw; padding: .35cqw .6cqw; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--on-hoop) 25%, transparent); }
+.tb10 b { font-family: var(--font-mono); font-size: .8cqw; font-weight: 600; }
+.tb10 span { font-family: var(--font-mono); font-size: .76cqw; color: color-mix(in srgb, var(--on-hoop) 78%, transparent); }
+.stage10 { display: grid; grid-template-columns: auto 1fr; gap: 1.4cqw; align-items: center; }
+.peca10 { position: relative; width: 14.5cqw; aspect-ratio: 4 / 5; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.mock10 { position: absolute; inset: 0; width: 100%; height: 100%; }
+.heart10 { position: absolute; left: 50%; top: 62%; width: 30%; transform: translate(-50%, -50%); }
+.heart10 .hole { fill: none; }
+.heart10 .x0 { stroke: var(--accent); }
+.heart10 .x1 { stroke: var(--rose); }
+.gx10, .gy10 { position: absolute; pointer-events: none; }
+.gx10 { left: 50%; top: 4%; bottom: 4%; border-left: 1px dashed var(--line); }
+.gy10 { top: 62%; left: 4%; right: 4%; border-top: 1px dashed var(--line); }
+.ann10 { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .45cqw; }
+.ann10 li { display: flex; flex-direction: column; font-family: var(--font-mono); font-size: .76cqw; color: var(--muted); }
+.ann10 b { font-weight: 600; color: var(--accent); font-size: .8cqw; }
+.vs10 { padding: .7cqw .9cqw; gap: .4cqw; }
+.vs10 .pc-h { flex-wrap: wrap; row-gap: .2cqw; }
+.vs10 .pc-h p { flex: 1 1 100%; color: var(--muted); }
+.vs10 code { font-size: .8cqw; }
+.ext10 { display: flex; flex-direction: column; gap: .5cqw; padding: .9cqw 1cqw; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.ext10 h4 { margin: 0; font-size: 1.05cqw; font-weight: 600; }
+.ext10 .ic { color: var(--muted); }
+.ext10 p { margin: 0; font-size: .9cqw; line-height: 1.35; }
+.ext10 q { font-size: .85cqw; font-style: italic; padding: .4cqw .6cqw; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); }
+.ext10 code { font-size: .78cqw; color: var(--accent); }
 .footrow { display: flex; justify-content: space-between; align-items: center; gap: 2cqw; }
 .note { display: flex; align-items: center; gap: .8cqw; font-size: 1cqw; color: var(--fg); padding: .7cqw 1.2cqw; border-radius: 10px; background: var(--rose-soft); border: 1px solid var(--rose-mid); }
 .note svg { width: 1.3cqw; height: 1.3cqw; color: var(--rose-ink); flex: none; }
@@ -556,8 +633,8 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
   .scol .role { font-size: .82rem; }
   .cbar { padding: 2px 0; }
   .knot8 { width: 12px; height: 12px; box-shadow: 0 0 0 2.5px var(--surface); }
-  .knot8.half { border-width: 1px; }
-  .knot8.esq { border-width: 1.5px; }
+  .knot8.t1 { border-width: 1.5px; }
+  .gcap::before { width: 9px; height: 9px; }
   .gcap { font-size: .68rem; }
   .sfe { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
   .sfe .ic { width: 34px; height: 34px; }
@@ -639,6 +716,32 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
   .exit::before { display: none; }
   .exit b { font-size: .85rem; }
   .exit svg { width: 14px; height: 14px; }
+  .lg9, .gates9, .dest9 { grid-template-columns: 1fr; row-gap: 10px; }
+  .lg9 .c1, .lg9 .c2, .lg9 .c3, .lg9 .c4, #g-tela, #g-ctl, .gates9, #g-ok, #g-db, #g-err, .dest9 { grid-column: auto; grid-row: auto; margin-top: 0; }
+  .lg9 .c2, .lg9 .c3, .lg9 .c4 { margin-top: 8px; }
+  .fld9 span, .to9 span { font-size: .72rem; }
+  .fld9 b, .btn9, .to9 code, .gt9 h4 { font-size: .85rem; }
+  .fld9 b, .btn9 { padding: 6px 8px; }
+  .xf9 svg, .err9 b svg { width: 14px; height: 14px; }
+  .err9 { padding: 10px 12px; gap: 6px; }
+  .err9 b { font-size: .88rem; }
+  .err9 p { font-size: .82rem; }
+  .err9 code { font-size: .76rem; }
+  .to9 { padding: 8px; }
+  .vt10 { grid-template-columns: 1fr; row-gap: 10px; }
+  .vt10 .c1, .vt10 .c2, .vt10 .c3, .vt10 .c4, #v-db, #v-peca, .vits10, #v-wa { grid-column: auto; grid-row: auto; }
+  .vt10 .c2, .vt10 .c3, .vt10 .c4 { margin-top: 8px; }
+  .vits10 { gap: 10px; }
+  .tb10 { gap: 6px; }
+  .tb10 li { padding: 6px 8px; }
+  .tb10 b, .tb10 span, .ann10 li, .ann10 b, .vs10 code, .ext10 code { font-size: .76rem; }
+  .stage10 { grid-template-columns: 140px 1fr; gap: 12px; }
+  .peca10 { width: 140px; }
+  .vs10 { padding: 10px 12px; }
+  .ext10 { padding: 12px; gap: 8px; }
+  .ext10 h4 { font-size: .95rem; }
+  .ext10 p, .ext10 q { font-size: .82rem; }
+  .ext10 q { padding: 6px 8px; }
 }
 </style>
 </head>
@@ -744,7 +847,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
   <div>
     <p class="eyebrow">Visão geral</p>
     <h2>Onde cada peça roda</h2>
-    <p class="lede">Três lugares: <b>o aparelho de quem acessa</b>, <b>um contêiner no Render</b> e <b>os serviços de dados e IA</b>. Cada push na branch main troca o contêiner por um novo.</p>
+    <p class="lede">Três lugares: <b>o aparelho de quem acessa</b>, <b>um contêiner no Railway</b> e <b>os serviços de dados e IA</b>. Cada push na branch main troca o contêiner por um novo.</p>
   </div>
 
   <div class="dep" data-wires='[
@@ -767,7 +870,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
     </div>
 
     <div class="col">
-      <p class="colcap">No Render</p>
+      <p class="colcap">No Railway</p>
       <div class="stack" style="display:flex;flex-direction:column">
       <div class="gh" id="r-gh"><i data-lucide="github"></i><b>GitHub</b><span>branch main</span></div>
       <div class="box" id="r-box">
@@ -1051,7 +1154,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
             <li><code>AuthServico</code></li>
             <li><code>UsuarioDados</code></li>
           </ul>
-          <div class="subs"><span class="ok">pronto</span></div>
+          <div class="subs"><span><code>/login</code></span><span><code>/cadastro</code></span><span><code>/recuperar-senha</code></span></div>
         </div>
         <div class="place side" id="ss-ger">
           <div class="place-h"><span class="ic"><i data-lucide="clipboard-list"></i></span><div><h4>Área da gerente</h4><p>insumos, clientes e cadastros</p></div></div>
@@ -1059,7 +1162,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
             <li><code>Insumo e Cliente</code></li>
             <li><code>Matriz, Produto, Painel, Usuario</code></li>
           </ul>
-          <div class="subs"><span class="ok">insumos e clientes</span><span class="esq">matrizes, produtos, painel</span></div>
+          <div class="subs"><span><code>/gerente</code></span><span>4 cadastros e a moderação</span></div>
         </div>
       </div>
     </div>
@@ -1074,7 +1177,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
           <div class="stop-v"><b>MontadorServico · GradeServico</b><code>valida a grade</code></div>
           <div class="stop-v"><b>MatrizDados · BordadoDados</b><code>CAST(:grade AS jsonb)</code></div>
         </div>
-        <div class="subs"><span class="esq">esqueleto, ainda lança "Não implementado"</span></div>
+        <div class="subs"><span><code>/montador</code></span><span>grava matriz e bordado</span></div>
       </div>
     </div>
 
@@ -1088,7 +1191,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
             <li><code>HubServico · ComentarioServico</code></li>
             <li><code>HubDados · ComentarioDados</code></li>
           </ul>
-          <div class="subs"><span class="par">parcial</span></div>
+          <div class="subs"><span><code>/hub</code></span><span><code>/hub/curtir</code></span><span><code>/hub/comentar</code></span></div>
         </div>
         <div class="place side" id="ss-most">
           <div class="place-h"><span class="ic"><i data-lucide="store"></i></span><div><h4>Mostruário</h4><p>home e catálogo, lidos do banco</p></div></div>
@@ -1097,7 +1200,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
             <li><code>ProdutoServico</code></li>
             <li><code>ProdutoDados</code></li>
           </ul>
-          <div class="subs"><span class="ok">pronto</span></div>
+          <div class="subs"><span><code>/</code></span><span><code>/catalogo</code></span><span><code>/produto</code></span></div>
         </div>
       </div>
     </div>
@@ -1111,7 +1214,7 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
           <li><code>TutorialServico</code></li>
           <li><code>GeminiServico</code></li>
         </ul>
-        <div class="subs"><span class="esq">esqueleto</span></div>
+        <div class="subs"><span><code>/bordado/tutorial</code></span></div>
       </div>
     </div>
   </div>
@@ -1121,189 +1224,232 @@ code, .mono { font-family: var(--font-mono); font-size: .92em; }
     <div class="keys"><span><i></i>alimenta</span><span><i class="l"></i>consulta</span></div>
   </div>
 </section>
-<!-- 8 ESTADO -->
-<section class="slide slide--draw" id="estado" data-sec="Subsistemas" data-title="O que já existe">
+<!-- 8 PECAS -->
+<section class="slide slide--draw" id="pecas" data-sec="Subsistemas" data-title="As peças do projeto">
   <div>
     <p class="eyebrow">Subsistemas</p>
-    <h2>O que já funciona e o que é esqueleto</h2>
-    <p class="lede">Contagem feita no código atual, camada por camada. <b>Nó cheio é pronto</b>, meio nó é parcial e nó vazado é esqueleto.</p>
+    <h2>As peças do projeto, camada por camada</h2>
+    <p class="lede">Cada nó é uma classe. O tom do nó diz <b>para que ela serve</b>.</p>
   </div>
 
   <div class="st8">
     <div class="scols">
       <div class="scol">
         <p class="colcap">Controladores</p>
-        <p class="frac"><b>5/13</b><span>prontos</span></p>
-        <p class="role">Um por rota de <code>rotas.php</code>. Recebem o pedido e escolhem a resposta.</p>
-        <div class="cbar" role="img" aria-label="5 de 13 controladores prontos">
-          <span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span>
+        <p class="frac"><b>13</b><span>recebem o pedido; o acesso vem de <code>rotas.php</code></span></p>
+        <div class="cbar" role="img" aria-label="13 controladores: 4 abertos a visitantes, 3 pedem login, 6 só da gerente">
+          <span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 t3"></span><span class="knot8 t3"></span><span class="knot8 t3"></span><span class="knot8 t3"></span><span class="knot8 t3"></span><span class="knot8 t3"></span>
         </div>
-        <p class="gcap">Prontos</p>
-        <div class="chips8">
-          <span class="chip ok">Auth</span><span class="chip ok">Catalogo</span><span class="chip ok">Home</span><span class="chip ok">Insumo</span><span class="chip ok">Cliente</span>
-        </div>
-        <p class="gcap">Esqueleto</p>
-        <div class="chips8">
-          <span class="chip esq">Hub</span><span class="chip esq">Comentario</span><span class="chip esq">Montador</span><span class="chip esq">Tutorial</span><span class="chip esq">Matriz</span><span class="chip esq">Produto</span><span class="chip esq">Painel</span><span class="chip esq">Usuario</span>
-        </div>
+        <p class="gcap t1">Abertos a visitantes</p>
+        <div class="chips8"><span class="chip n">Home</span><span class="chip n">Catalogo</span><span class="chip n">Auth</span><span class="chip n">Hub</span></div>
+        <p class="gcap">Pedem login</p>
+        <div class="chips8"><span class="chip n">Comentario</span><span class="chip n">Montador</span><span class="chip n">Tutorial</span></div>
+        <p class="gcap t3">Só a gerente</p>
+        <div class="chips8"><span class="chip n">Painel</span><span class="chip n">Usuario</span><span class="chip n">Insumo</span><span class="chip n">Cliente</span><span class="chip n">Produto</span><span class="chip n">Matriz</span></div>
       </div>
 
       <div class="scol">
         <p class="colcap">Serviços</p>
-        <p class="frac"><b>4/11</b><span>prontos, 1 parcial</span></p>
-        <p class="role">Validam os campos e aplicam as regras de negócio.</p>
-        <div class="cbar" role="img" aria-label="4 de 11 serviços prontos e 1 parcial">
-          <span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 half"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span>
+        <p class="frac"><b>11</b><span>regras, sem <code>$_POST</code> nem sessão</span></p>
+        <div class="cbar" role="img" aria-label="11 serviços: 5 validam cadastros, 4 cuidam do bordado, 2 falam com a IA">
+          <span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 t3"></span><span class="knot8 t3"></span>
         </div>
-        <p class="gcap">Prontos</p>
-        <div class="chips8">
-          <span class="chip ok">AuthServico</span><span class="chip ok">ClienteServico</span><span class="chip ok">InsumoServico</span><span class="chip ok">ProdutoServico</span>
-        </div>
-        <p class="gcap">Parcial e esqueleto</p>
-        <div class="chips8">
-          <span class="chip par">HubServico</span><span class="chip esq">ComentarioServico</span><span class="chip esq">GeminiServico</span><span class="chip esq">GradeServico</span><span class="chip esq">MatrizServico</span><span class="chip esq">MontadorServico</span><span class="chip esq">TutorialServico</span>
-        </div>
+        <p class="gcap t1">Validam cadastros</p>
+        <div class="chips8"><span class="chip n">AuthServico</span><span class="chip n">ClienteServico</span><span class="chip n">InsumoServico</span><span class="chip n">ProdutoServico</span><span class="chip n">MatrizServico</span></div>
+        <p class="gcap">Cuidam do bordado</p>
+        <div class="chips8"><span class="chip n">MontadorServico</span><span class="chip n">GradeServico</span><span class="chip n">HubServico</span><span class="chip n">ComentarioServico</span></div>
+        <p class="gcap t3">Falam com a IA</p>
+        <div class="chips8"><span class="chip n">TutorialServico</span><span class="chip n">GeminiServico</span></div>
       </div>
 
       <div class="scol">
         <p class="colcap">Dados</p>
-        <p class="frac"><b>5/8</b><span>prontas</span></p>
-        <p class="role">SQL com parâmetros, e só isso.</p>
-        <div class="cbar" role="img" aria-label="5 de 8 classes de dados prontas">
-          <span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 esq"></span><span class="knot8 esq"></span><span class="knot8 esq"></span>
+        <p class="frac"><b>8</b><span>SQL sobre 10 tabelas; <code>sessoes</code> é do núcleo</span></p>
+        <div class="cbar" role="img" aria-label="8 classes de dados: 3 de pessoas e Hub, 2 do bordado, 3 da loja e do ateliê">
+          <span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8 t1"></span><span class="knot8"></span><span class="knot8"></span><span class="knot8 t3"></span><span class="knot8 t3"></span><span class="knot8 t3"></span>
         </div>
-        <p class="gcap">Prontas</p>
-        <div class="chips8">
-          <span class="chip ok">UsuarioDados</span><span class="chip ok">HubDados</span><span class="chip ok">InsumoDados</span><span class="chip ok">ClienteDados</span><span class="chip ok">ProdutoDados</span>
-        </div>
-        <p class="gcap">Esqueleto</p>
-        <div class="chips8">
-          <span class="chip esq">BordadoDados</span><span class="chip esq">ComentarioDados</span><span class="chip esq">MatrizDados</span>
-        </div>
+        <p class="gcap t1">Pessoas e o Hub</p>
+        <div class="chips8"><span class="chip n">UsuarioDados</span><span class="chip n">HubDados</span><span class="chip n">ComentarioDados</span></div>
+        <p class="gcap">O bordado</p>
+        <div class="chips8"><span class="chip n">BordadoDados</span><span class="chip n">MatrizDados</span></div>
+        <p class="gcap t3">A loja e o ateliê</p>
+        <div class="chips8"><span class="chip n">ProdutoDados</span><span class="chip n">InsumoDados</span><span class="chip n">ClienteDados</span></div>
       </div>
     </div>
 
     <div class="sfe">
       <span class="ic"><i data-lucide="smartphone"></i></span>
-      <div class="sfe-t"><h4>No navegador</h4><p>scripts de página que curtem, montam e pedem o tutorial sem recarregar</p></div>
+      <div class="sfe-t"><h4>No navegador: 9 scripts</h4><p>curtem, montam e pedem o tutorial sem recarregar a página</p></div>
       <div class="chips8">
-        <span class="chip ok">main.js</span><span class="chip ok">header.js</span><span class="chip ok">showcase.js</span>
-        <span class="chip esq">conversor.js</span><span class="chip esq">montador.js</span><span class="chip esq">hub.js</span><span class="chip esq">tutorial.js</span>
+        <span class="chip n">main.js</span><span class="chip n">header.js</span><span class="chip n">showcase.js</span><span class="chip n">dom.js</span><span class="chip n">scroll-reveal.js</span>
+        <span class="chip n">conversor.js</span><span class="chip n">montador.js</span><span class="chip n">hub.js</span><span class="chip n">tutorial.js</span>
       </div>
     </div>
   </div>
 
   <div class="footrow">
-    <p class="note"><i data-lucide="info"></i><span><b>Esqueleto não é vazio.</b> Os métodos já existem com a assinatura final; chamá-los hoje lança "Não implementado".</span></p>
+    <p class="note"><i data-lucide="info"></i><span><b>Por que tantas classes pequenas?</b> Cada uma tem um só trabalho. Trocar uma regra mexe no serviço; trocar uma tela não toca no SQL.</span></p>
   </div>
 </section>
 
 <!-- 9 LOGIN -->
-<section class="slide" id="login" data-sec="Contas" data-title="Entrar na conta">
-  <div><p class="eyebrow">Subsistema · Contas</p><h2>Entrar na conta</h2></div>
-  <div class="body">
-    <div class="copy">
-      <p>A pessoa digita só o nome de usuário. O controlador completa com <code>@example.com</code> e o serviço confere a senha com <code>password_verify</code>.</p>
-      <ul class="facts">
-        <li><b>Mensagem genérica:</b> não revela se o erro foi no usuário ou na senha.</li>
-        <li><b>Conta inativa</b> não entra, mesmo com a senha certa.</li>
-        <li><b>Cadastro</b> segue o mesmo caminho: valida, grava os hashes, faz login e leva ao montador.</li>
-      </ul>
+<section class="slide slide--draw" id="login" data-sec="Contas" data-title="Entrar na conta">
+  <div>
+    <p class="eyebrow">Subsistema · Contas</p>
+    <h2>Entrar na conta: três portões, uma só mensagem</h2>
+    <p class="lede">A pessoa digita só o nome de usuário. O serviço confere <b>três portões</b> em sequência; se qualquer um falhar, a resposta é <b>sempre a mesma</b>.</p>
+  </div>
+
+  <div class="lg9" data-wires='[
+    {"from":"#g-tela","to":"#g-ctl","kind":"people"},
+    {"from":"#g-ctl","to":"#g-g1","kind":"thread"},
+    {"from":"#g-g1","to":"#g-g2","kind":"thread"},
+    {"from":"#g-g2","to":"#g-g3","kind":"thread"},
+    {"from":"#g-g3","to":"#g-ok","kind":"thread"},
+    {"from":"#g-g1","to":"#g-db","kind":"loose","fromSide":"bottom","fromAt":0.2,"toSide":"right","toAt":0.35},
+    {"from":"#g-g1","to":"#g-err","kind":"no","fromSide":"bottom","fromAt":0.65,"toSide":"top","toAt":0.17},
+    {"from":"#g-g2","to":"#g-err","kind":"no","fromSide":"bottom","toSide":"top","toAt":0.5},
+    {"from":"#g-g3","to":"#g-err","kind":"no","fromSide":"bottom","toSide":"top","toAt":0.83},
+    {"from":"#g-ok","to":"#g-ger","kind":"thread","fromSide":"bottom","fromAt":0.27,"toSide":"top"},
+    {"from":"#g-ok","to":"#g-hub","kind":"thread","fromSide":"bottom","fromAt":0.73,"toSide":"top"}
+  ]'>
+    <p class="colcap c1"><span class="kcap">1</span>Na tela</p>
+    <div class="pc frm9" id="g-tela">
+      <div class="pc-h"><span class="ic"><i data-lucide="user"></i></span><h4>/login</h4></div>
+      <div class="fld9"><span>Usuário</span><b>maria<em>@example.com</em></b></div>
+      <div class="fld9"><span>Senha</span><b>••••••••</b></div>
+      <span class="btn9">Entrar</span>
     </div>
-    <figure class="fig"><script type="text/plain" class="src">
-sequenceDiagram
-  actor P as Pessoa
-  participant AC as AuthControlador
-  participant AS as AuthServico
-  participant UD as UsuarioDados
-  participant A as Auth e Sessao
-  P->>AC: POST /login com usuário e senha
-  AC->>AC: monta usuario@example.com
-  AC->>AS: autenticar(email, senha)
-  AS->>UD: buscarPorEmail(email)
-  UD-->>AS: linha da tabela usuarios
-  AS->>AS: password_verify e ativo = true
-  alt não confere
-    AS-->>AC: null
-    AC->>A: flash de erro e guardarVelhos
-    AC-->>P: volta para /login
-  else confere
-    AS-->>AC: usuário sem os hashes
-    AC->>A: Auth::entrar() troca o id da sessão
-    AC-->>P: gerente vai a /gerente, usuário vai a /hub
-  end
-</script><div class="mmd" aria-label="Sequência do login: controlador, serviço, dados e sessão"></div></figure>
+
+    <p class="colcap c2"><span class="kcap">2</span>Controlador</p>
+    <div class="pc" id="g-ctl">
+      <div class="pc-h"><span class="ic"><i data-lucide="cog"></i></span><h4>AuthControlador</h4></div>
+      <p>Completa o e-mail e chama o serviço.</p>
+      <div class="xf9"><code>maria</code><i data-lucide="chevron-right"></i><code>maria@example.com</code></div>
+      <code class="m">autenticar(email, senha)</code>
+    </div>
+
+    <p class="colcap c3"><span class="kcap">3</span>AuthServico: três portões</p>
+    <div class="gates9">
+      <div class="pc gt9" id="g-g1">
+        <div class="pc-h"><span class="ic gate"><i data-lucide="user"></i></span><h4>Usuário existe?</h4></div>
+        <code class="m">buscarPorEmail()</code>
+      </div>
+      <div class="pc gt9" id="g-g2">
+        <div class="pc-h"><span class="ic gate"><i data-lucide="key-round"></i></span><h4>Senha confere?</h4></div>
+        <code class="m">password_verify()</code>
+      </div>
+      <div class="pc gt9" id="g-g3">
+        <div class="pc-h"><span class="ic gate"><i data-lucide="shield-check"></i></span><h4>Conta ativa?</h4></div>
+        <code class="m">ativo = true</code>
+      </div>
+    </div>
+
+    <p class="colcap c4"><span class="kcap">4</span>Entrou</p>
+    <div class="pc ok9" id="g-ok">
+      <div class="pc-h"><span class="ic"><i data-lucide="check"></i></span><h4>Auth::entrar()</h4></div>
+      <p>Troca o id da sessão e guarda id, nome, e-mail e perfil. Os hashes ficam de fora.</p>
+      <code class="m">session_regenerate_id(true)</code>
+    </div>
+
+    <div class="pc db" id="g-db">
+      <div class="pc-h"><span class="ic"><i data-lucide="database"></i></span><h4>UsuarioDados</h4></div>
+      <p>Uma linha da tabela usuarios.</p>
+      <code class="m">WHERE email = :email</code>
+    </div>
+
+    <div class="err9" id="g-err">
+      <b><i data-lucide="x"></i>Qualquer portão falhou: o serviço devolve null</b>
+      <p>Mensagem única: <q>Usuário ou senha inválidos.</q> O usuário digitado volta preenchido (<code>guardarVelhos</code>) e a pessoa retorna a <code>/login</code>.</p>
+    </div>
+
+    <div class="dest9">
+      <div class="pc to9" id="g-ger"><span>gerente</span><code>/gerente</code></div>
+      <div class="pc to9" id="g-hub"><span>usuário</span><code>/hub</code></div>
+    </div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="info"></i><span><b>Por que a mensagem é a mesma?</b> Assim ninguém descobre se um usuário existe. O cadastro também termina em <code>Auth::entrar()</code>, mas vai para <code>/montador</code>.</span></p>
+    <div class="keys"><span><i class="p"></i>envia</span><span><i></i>segue</span><span><i class="l"></i>consulta</span><span><i class="n"></i>falha</span></div>
   </div>
 </section>
 
-<!-- 10 RECUPERAR -->
-<section class="slide" id="recuperar" data-sec="Contas" data-title="Recuperar a senha">
-  <div><p class="eyebrow">Subsistema · Contas</p><h2>Recuperar a senha em duas etapas</h2></div>
-  <div class="body">
-    <div class="copy">
-      <p>Sem envio de e-mail: a pessoa responde a pergunta de segurança escolhida no cadastro. O progresso fica guardado na sessão.</p>
-      <ul class="facts">
-        <li><b>Na sessão:</b> <code>recuperar_id</code>, <code>recuperar_pergunta</code> e <code>recuperar_tentativas</code>.</li>
-        <li><b>A resposta</b> é salva só como hash e comparada em minúsculas.</li>
-        <li><b>Na quinta tentativa errada</b>, tudo é apagado e o processo recomeça.</li>
+<!-- 10 MOSTRUARIO -->
+<section class="slide slide--draw" id="mostruario" data-sec="Mostruário" data-title="Vitrine e home">
+  <div>
+    <p class="eyebrow">Subsistema · Mostruário</p>
+    <h2>Vitrine e home: o produto é montado na hora</h2>
+    <p class="lede">Nenhum produto guarda imagem. Uma consulta traz as partes e a tela <b>desenha a peça a cada visita</b>: o mockup na cor escolhida, com a matriz por cima.</p>
+  </div>
+
+  <div class="vt10" data-wires='[
+    {"from":"#v-db","to":"#v-peca","kind":"thread"},
+    {"from":"#v-peca","to":"#v-home","kind":"thread","fromSide":"right","fromAt":0.25},
+    {"from":"#v-peca","to":"#v-cat","kind":"thread","fromSide":"right","fromAt":0.5},
+    {"from":"#v-peca","to":"#v-prod","kind":"thread","fromSide":"right","fromAt":0.75},
+    {"from":"#v-prod","to":"#v-wa","kind":"loose"}
+  ]'>
+    <p class="colcap c1"><span class="kcap">1</span>Do banco</p>
+    <div class="pc db" id="v-db">
+      <div class="pc-h"><span class="ic"><i data-lucide="database"></i></span><h4>ProdutoDados</h4></div>
+      <p>Uma consulta junta quatro tabelas. Só entram produtos ativos.</p>
+      <ul class="tb10">
+        <li><b>produtos</b><span>nome · preco_base · destaque</span></li>
+        <li><b>bordados</b><span>cor_peca · pos_x · pos_y · escala</span></li>
+        <li><b>categorias</b><span>mockup · slug</span></li>
+        <li><b>matrizes</b><span>svg</span></li>
       </ul>
     </div>
-    <figure class="fig"><script type="text/plain" class="src">
-stateDiagram-v2
-  direction LR
-  state "Informa o usuário" as Pedido
-  state "Responde a pergunta<br/>e cria nova senha" as Pergunta
-  state "Limite atingido" as Bloqueio
-  state "Volta ao login" as Login
-  [*] --> Pedido: GET /recuperar-senha
-  Pedido --> Pedido: usuário não existe
-  Pedido --> Pergunta: perguntaDe() acha o usuário
-  Pergunta --> Pergunta: erro, tentativa + 1
-  Pergunta --> Bloqueio: quinta tentativa
-  Bloqueio --> Pedido: recomeça
-  Pergunta --> Login: redefinirSenha() ok
-  Login --> [*]
-</script><div class="mmd" aria-label="Estados da recuperação de senha"></div></figure>
+
+    <p class="colcap c2"><span class="kcap">2</span>Montada na tela</p>
+    <div class="pc pz10" id="v-peca">
+      <div class="pc-h"><span class="ic"><i data-lucide="layout-template"></i></span><h4>peca_bordada.php</h4></div>
+      <div class="stage10">
+        <div class="peca10" style="color: var(--rose)">
+          <svg class="mock10" viewBox="0 0 400 500" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M95 190 L75 430 H325 L305 190 Z"/><path d="M150 190 C150 125 250 125 250 190"/><path d="M112 230 L97 415 H303 L288 230" stroke-width="5" stroke-dasharray="14 12"/></g></svg>
+          <span class="gx10"></span><span class="gy10"></span>
+          <svg class="heart10" viewBox="0 0 11 10" role="img" aria-label="Matriz de coração em ponto cruz posicionada na bolsa"></svg>
+        </div>
+        <ul class="ann10">
+          <li><b>mockup</b>bolsa.svg</li>
+          <li><b>cor_peca</b>rosa</li>
+          <li><b>pos_x · pos_y</b>50 · 62</li>
+          <li><b>escala</b>30%</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="colcap c3"><span class="kcap">3</span>Três vitrines</p>
+    <div class="vits10">
+      <div class="pc vs10" id="v-home">
+        <div class="pc-h"><span class="ic"><i data-lucide="store"></i></span><h4>/</h4><p>6 destaques, categorias e os mais curtidos do Hub</p></div>
+      </div>
+      <div class="pc vs10" id="v-cat">
+        <div class="pc-h"><span class="ic"><i data-lucide="clipboard-list"></i></span><h4>/catalogo</h4><p>filtro por slug, só <code>[a-z0-9-]</code></p></div>
+      </div>
+      <div class="pc vs10" id="v-prod">
+        <div class="pc-h"><span class="ic"><i data-lucide="eye"></i></span><h4>/produto</h4><p>preço e botão de orçamento</p></div>
+        <span class="no"><i data-lucide="x"></i>inativo ou inexistente: 404</span>
+      </div>
+    </div>
+
+    <p class="colcap c4">De fora</p>
+    <div class="ext10" id="v-wa">
+      <div class="pc-h"><span class="ic"><i data-lucide="message-circle"></i></span><h4>WhatsApp do ateliê</h4></div>
+      <p>Um link <code>wa.me</code> com a mensagem pronta. Sem API, sem formulário.</p>
+      <q>Olá! Quero um orçamento de: {nome do produto}</q>
+      <code class="m">link_whatsapp()</code>
+    </div>
+  </div>
+
+  <div class="footrow">
+    <p class="note"><i data-lucide="info"></i><span><b>Banco fora do ar não derruba a vitrine.</b> O controlador captura o erro, grava no log e mostra a página vazia.</span></p>
+    <div class="keys"><span><i></i>segue</span><span><i class="l"></i>link</span></div>
   </div>
 </section>
 
-<!-- 11 MOSTRUARIO -->
-<section class="slide" id="mostruario" data-sec="Mostruário" data-title="Vitrine e home">
-  <div><p class="eyebrow">Subsistema · Mostruário</p><h2>Vitrine e home</h2></div>
-  <div class="body">
-    <div class="copy">
-      <p>Um produto não guarda imagem. Ele aponta para um bordado do tipo produto, que junta uma matriz, uma categoria de peça, a cor do tecido e a posição. A tela desenha tudo isso na hora.</p>
-      <ul class="facts">
-        <li><b>Banco fora do ar</b> não derruba a home: o controlador registra o erro e mostra a página vazia.</li>
-        <li><b>Filtro por categoria</b> aceita só slugs simples, como <code>bolsa</code>.</li>
-        <li><b>Orçamento</b> abre o WhatsApp do ateliê com a mensagem pronta.</li>
-      </ul>
-    </div>
-    <figure class="fig"><script type="text/plain" class="src">
-flowchart LR
-  HC["HomeControlador<br/>index()"]:::ok
-  CC["CatalogoControlador<br/>listar() e produto()"]:::ok
-  PS["ProdutoServico<br/>catalogo, destaques,<br/>mostrar, categorias"]:::ok
-  HS["HubServico<br/>maisCurtidos()"]:::ok
-  PD["ProdutoDados"]:::ok
-  HD["HubDados"]:::ok
-  Q[("produtos JOIN bordados<br/>JOIN categorias<br/>JOIN matrizes")]
-  Q2[("bordados tipo hub<br/>e curtidas")]
-  T["Tela: peca_bordada<br/>mockup + SVG da matriz<br/>em pos_x, pos_y, escala"]
-  WA["Botão de orçamento<br/>link_whatsapp()"]
-  HC --> PS
-  HC -->|"seção Direto do Hub"| HS
-  CC --> PS
-  PS --> PD --> Q
-  HS --> HD --> Q2
-  CC -->|"Visao::render"| T
-  HC -->|"Visao::render"| T
-  T --> WA
-</script><div class="mmd" aria-label="Fluxo da vitrine: controladores, ProdutoServico, ProdutoDados e a tela peca_bordada"></div></figure>
-  </div>
-</section>
-
-<!-- 12 HUB ESTRUTURA -->
+<!-- 11 HUB ESTRUTURA -->
 <section class="slide" id="hub" data-sec="Hub" data-title="O Hub social">
   <div><p class="eyebrow">Subsistema · Hub</p><h2>O Hub: feed, curtidas e comentários</h2></div>
   <div class="body">
@@ -1345,7 +1491,7 @@ flowchart LR
   </div>
 </section>
 
-<!-- 13 CURTIR -->
+<!-- 12 CURTIR -->
 <section class="slide" id="curtir" data-sec="Hub" data-title="Curtir sem recarregar">
   <div><p class="eyebrow">Subsistema · Hub</p><h2>Curtir sem recarregar a página</h2></div>
   <div class="body">
@@ -1383,7 +1529,7 @@ sequenceDiagram
   </div>
 </section>
 
-<!-- 14 CONVERSOR -->
+<!-- 13 CONVERSOR -->
 <section class="slide slide--wide" id="conversor" data-sec="Montador" data-title="De imagem a matriz">
   <div><p class="eyebrow">Subsistema · Conversor e montador</p><h2>De imagem a matriz de bordado</h2></div>
   <div class="body">
@@ -1411,7 +1557,7 @@ flowchart LR
   </div>
 </section>
 
-<!-- 15 MONTADOR -->
+<!-- 14 MONTADOR -->
 <section class="slide slide--wide" id="montador" data-sec="Montador" data-title="Salvar no montador">
   <div><p class="eyebrow">Subsistema · Conversor e montador</p><h2>Um montador, três destinos</h2></div>
   <div class="body">
@@ -1438,7 +1584,7 @@ flowchart LR
   </div>
 </section>
 
-<!-- 16 TUTORIAL -->
+<!-- 15 TUTORIAL -->
 <section class="slide" id="tutorial" data-sec="Tutorial IA" data-title="Tutorial com Gemini">
   <div><p class="eyebrow">Subsistema · Tutorial com IA</p><h2>O tutorial de bordado à mão</h2></div>
   <div class="body">
@@ -1485,7 +1631,7 @@ sequenceDiagram
   </div>
 </section>
 
-<!-- 17 GERENTE -->
+<!-- 16 GERENTE -->
 <section class="slide slide--wide" id="gerente" data-sec="Gerente" data-title="Área da gerente">
   <div><p class="eyebrow">Subsistema · Área da gerente</p><h2>Área da gerente: o mesmo molde em todos os cadastros</h2></div>
   <div class="body">
@@ -1504,7 +1650,7 @@ flowchart LR
   </div>
 </section>
 
-<!-- 18 PRG -->
+<!-- 17 PRG -->
 <section class="slide" id="prg" data-sec="Gerente" data-title="Salvar um cadastro">
   <div><p class="eyebrow">Subsistema · Área da gerente</p><h2>Salvar um cadastro sem perder o que foi digitado</h2></div>
   <div class="body">
@@ -1540,7 +1686,7 @@ sequenceDiagram
   </div>
 </section>
 
-<!-- 19 BANCO -->
+<!-- 18 BANCO -->
 <section class="slide" id="banco" data-sec="Dados" data-title="O banco de dados">
   <div><p class="eyebrow">Dados</p><h2>O banco: o bordado no centro</h2></div>
   <div class="body">
@@ -1611,7 +1757,7 @@ erDiagram
   </div>
 </section>
 
-<!-- 20 ROTAS -->
+<!-- 19 ROTAS -->
 <section class="slide slide--wide" id="rotas" data-sec="Interface" data-title="Mapa de rotas">
   <div><p class="eyebrow">Interface</p><h2>Mapa de rotas por nível de acesso</h2></div>
   <div class="body">
@@ -1655,7 +1801,7 @@ erDiagram
   </div>
 </section>
 
-<!-- 21 FRONT -->
+<!-- 20 FRONT -->
 <section class="slide" id="frontend" data-sec="Interface" data-title="O que roda no navegador">
   <div><p class="eyebrow">Interface</p><h2>Telas no servidor, scripts no navegador</h2></div>
   <div class="body">
@@ -1689,7 +1835,7 @@ flowchart LR
   </div>
 </section>
 
-<!-- 22 SEGURANCA -->
+<!-- 21 SEGURANCA -->
 <section class="slide slide--wide" id="seguranca" data-sec="Segurança" data-title="Camadas de defesa">
   <div><p class="eyebrow">Segurança</p><h2>Onde cada proteção acontece</h2></div>
   <div class="body">
@@ -1701,7 +1847,7 @@ flowchart LR
     </div>
     <div class="shield">
       <div class="st"><span class="n">1</span><h3>Cookie e transporte</h3><span class="where">Sessao::iniciar</span>
-        <ul><li>HTTPS no Render</li><li>Cookie HttpOnly e SameSite=Lax</li><li>Secure quando o proxy diz HTTPS</li></ul></div>
+        <ul><li>HTTPS no Railway</li><li>Cookie HttpOnly e SameSite=Lax</li><li>Secure quando o proxy diz HTTPS</li></ul></div>
       <div class="st"><span class="n">2</span><h3>Portaria</h3><span class="where">Roteador · Csrf</span>
         <ul><li>CSRF em todo POST, com hash_equals</li><li>Acesso público, login ou gerente</li><li>Rota só por caminho exato</li></ul></div>
       <div class="st"><span class="n">3</span><h3>Identidade</h3><span class="where">Auth · AuthServico</span>
@@ -1721,7 +1867,7 @@ flowchart LR
 
   <nav class="controls" aria-label="Navegação entre slides">
     <button class="ctrl" id="prev" type="button" aria-label="Slide anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-    <span class="count" id="count">ponto 01 de 22</span>
+    <span class="count" id="count">ponto 01 de 21</span>
     <div class="rail"><i id="bar"></i></div>
     <span class="hint">Use as setas do teclado</span>
     <button class="ctrl" id="next" type="button" aria-label="Próximo slide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -1775,6 +1921,7 @@ flowchart LR
       }
     }
     document.getElementById('stitch').innerHTML = s;
+    document.querySelectorAll('svg.heart10').forEach(function (el) { el.innerHTML = s; });
     document.getElementById('gridJson').innerHTML =
       '{ <b>"largura"</b>: 11, <b>"altura"</b>: 10,\n  <b>"paleta"</b>: ["#691818", "#d9a7a0"],\n  <b>"pontos"</b>: "' + grade.pontos.slice(0, 22) + '..." }';
   })();

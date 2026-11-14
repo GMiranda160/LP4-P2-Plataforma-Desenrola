@@ -9,3 +9,14 @@ cacert.pem
 *.log
 .DS_Store
 Thumbs.db
+
+# Chave local do Gemini (AI Studio)
+chave-gemini.local.txt
+
+# Chave local do Supabase (service role)
+chave-supabase.local.txt
+
+# PNGs grandes das pecas base (ficam no Supabase Storage; nao commitar)
+public/assets/img/mockups/toalha-rosto.png
+public/assets/img/mockups/toalha-banho.png
+public/assets/img/mockups/avental.png

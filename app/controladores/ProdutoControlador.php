@@ -1,39 +1,89 @@
 <?php
 /**
  * Camada: Controlador. Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: gestão de produtos. As telas são de Arthur.
- * Enquanto a lógica não estiver pronta, enviar dados de exemplo no formato do contrato da tela.
+ * Responsabilidade: gestão de produtos (mostruário). As telas são de Arthur.
+ * Toda rota é só da gerente. Produto nasce de uma combinação do montador
+ * (modo produto) e pode ser anunciado/desligado pelo toggle de ativo.
  * Veja INSTRUCOES_GUILHERME.md, seção 14.
  */
 class ProdutoControlador
 {
-    /** TODO(Guilherme): mostrar produtos/lista com $titulo e $produtos. */
+    public function __construct(private ProdutoServico $servico = new ProdutoServico()) {}
+
+    /** GET /gerente/produtos: lista tudo, inclusive inativos. */
     public function listar(): void
     {
-        throw new RuntimeException('Não implementado: ProdutoControlador::listar');
+        Visao::render('produtos/lista', [
+            'titulo' => 'Produtos',
+            'produtos' => $this->servico->todos(),
+        ], 'gerente');
     }
 
-    /** TODO(Guilherme): mostrar produtos/form com $titulo, $produto e $combinacoes. */
+    /** GET /gerente/produtos/form: novo produto (com ?bordado= a combinação já vem marcada), ou edição de ?id=. */
     public function form(): void
     {
-        throw new RuntimeException('Não implementado: ProdutoControlador::form');
+        $id = (int) ($_GET['id'] ?? 0);
+        $produto = $id > 0 ? $this->servico->buscar($id) : null;
+
+        if ($id > 0 && $produto === null) {
+            Sessao::flash('erro', 'Produto não encontrado.');
+            Resposta::redirecionar('/gerente/produtos');
+        }
+
+        $velhos = Sessao::tirarVelhos();
+        $combinacoes = $this->servico->combinacoes($id);
+
+        Visao::render('produtos/form', [
+            'titulo' => $produto ? 'Editar produto' : 'Novo produto',
+            // Vindo do montador, a combinação recém-criada chega marcada.
+            'produto' => $velhos ? $velhos + ['id' => $id] : ($produto ?? ['bordado_id' => (int) ($_GET['bordado'] ?? 0), 'ativo' => true]),
+            'combinacoes' => $combinacoes,
+        ], 'gerente');
     }
 
-    /** TODO(Guilherme): chamar o serviço e voltar para /gerente/produtos. */
+    /** POST /gerente/produtos/salvar: cria ou atualiza. */
     public function salvar(): void
     {
-        throw new RuntimeException('Não implementado: ProdutoControlador::salvar');
+        $id = (int) ($_POST['id'] ?? 0);
+        $resultado = $this->servico->salvar($_POST);
+
+        if ($resultado['erros']) {
+            Sessao::flash('erro', implode(' ', $resultado['erros']));
+            Sessao::guardarVelhos($_POST);
+            Resposta::redirecionar('/gerente/produtos/form' . ($id > 0 ? '?id=' . $id : ''));
+        }
+
+        Sessao::flash('sucesso', $id > 0 ? 'Produto atualizado.' : 'Produto cadastrado.');
+        Resposta::redirecionar('/gerente/produtos');
     }
 
-    /** TODO(Guilherme): excluir pelo id do $_POST. */
+    /** POST /gerente/produtos/excluir: exclui pelo id do POST. */
     public function excluir(): void
     {
-        throw new RuntimeException('Não implementado: ProdutoControlador::excluir');
+        $id = (int) ($_POST['id'] ?? 0);
+
+        if ($id > 0) {
+            $this->servico->excluir($id);
+            Sessao::flash('sucesso', 'Produto excluído.');
+        } else {
+            Sessao::flash('erro', 'Produto não encontrado.');
+        }
+
+        Resposta::redirecionar('/gerente/produtos');
     }
 
-    /** TODO(Guilherme): inverter o campo ativo. */
+    /** POST /gerente/produtos/ativar: inverte ativo (toggle de visibilidade). */
     public function ativar(): void
     {
-        throw new RuntimeException('Não implementado: ProdutoControlador::ativar');
+        $id = (int) ($_POST['id'] ?? 0);
+        $ativo = $id > 0 ? $this->servico->ativar($id) : null;
+
+        if ($ativo === null) {
+            Sessao::flash('erro', 'Produto não encontrado.');
+        } else {
+            Sessao::flash('sucesso', $ativo ? 'Produto visível no catálogo.' : 'Produto ocultado do catálogo.');
+        }
+
+        Resposta::redirecionar('/gerente/produtos');
     }
 }

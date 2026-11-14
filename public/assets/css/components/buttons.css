@@ -57,6 +57,19 @@
   letter-spacing: 0.1em;
 }
 
+/* Botão só com ícone: alvo quadrado de 2,35rem, ícone de 1,1rem, nome só para leitores de tela. */
+.btn--icon {
+  width: 2.35rem;
+  min-width: 0;
+  height: 2.35rem;
+  padding: 0;
+}
+
+.btn--icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 .link-button {
   padding: 0;
   border: 0;

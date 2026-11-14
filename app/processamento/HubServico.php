@@ -80,9 +80,8 @@ class HubServico
             return null;
         }
 
-        $grade = json_decode((string) $bordado['grade'], true);
-        $bordado['paleta'] = is_array($grade['paleta'] ?? null) ? array_values($grade['paleta']) : [];
-        unset($bordado['grade']);
+        $paleta = json_decode((string) $bordado['paleta'], true);
+        $bordado['paleta'] = is_array($paleta) ? array_values($paleta) : [];
 
         return $bordado;
     }
@@ -129,12 +128,17 @@ class HubServico
         }
 
         try {
-            $this->dados->excluir($id);
+            $foto = $this->dados->excluir($id);
         } catch (PDOException $e) {
             if ($e->getCode() === '23503') {
                 return 'Este bordado está em um produto do mostruário. Exclua o produto antes.';
             }
             throw $e;
+        }
+
+        // A foto da peça enviada pela pessoa só servia a este bordado.
+        if ($foto !== null) {
+            (new StorageServico())->remover($foto);
         }
 
         return null;

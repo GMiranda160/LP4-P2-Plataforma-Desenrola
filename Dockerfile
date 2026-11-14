@@ -1,7 +1,7 @@
 #
 # Arquivo: Dockerfile
 # Dono: Guilherme. Só Guilherme altera este arquivo.
-# Responsabilidade: imagem Docker publicada pelo Railway (ou Render), com FrankenPHP e PHP 8.4.
+# Responsabilidade: imagem Docker publicada pelo Railway, com FrankenPHP e PHP 8.4.
 #
 # Como funciona: a imagem FrankenPHP embute o Caddy e o PHP no mesmo processo.
 # O Caddy serve os arquivos estáticos de public/ e manda o restante para o index.php.

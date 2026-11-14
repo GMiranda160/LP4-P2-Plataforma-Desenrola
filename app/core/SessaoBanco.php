@@ -6,7 +6,7 @@ declare(strict_types=1);
  * Camada: Core. Dono: Guilherme. Só Guilherme altera este arquivo.
  * Responsabilidade: handler de sessão do PHP que grava na tabela sessoes.
  *
- * Por que existe: o disco do servidor não é durável. No Railway e no Render,
+ * Por que existe: o disco do servidor não é durável. No Railway,
  * a cada deploy ou reinício os arquivos de sessão somem e o visitante é
  * deslogado. A tabela sessoes no Supabase resolve isso.
  *

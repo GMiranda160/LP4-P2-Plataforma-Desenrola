@@ -28,6 +28,80 @@
   color: var(--color-ink);
 }
 
+/* Botões e links dentro de um campo ficam do tamanho do texto, não da largura da coluna. */
+.form__field > .btn {
+  align-self: flex-start;
+}
+
+/* Campo de checkbox: caixa e rótulo na mesma linha, alinhados à esquerda. */
+.form__field:has(> input[type="checkbox"]) {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.form__field > input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: var(--color-wine-700);
+  cursor: pointer;
+}
+
+.form__field:has(> input[type="checkbox"]) label {
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Seletor de cor: amostra visível com a mesma altura dos outros campos. */
+.text-field[type="color"] {
+  height: 2.75rem;
+  padding: 0.3rem;
+  cursor: pointer;
+}
+
+.text-field[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.text-field[type="color"]::-webkit-color-swatch {
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-sm) - 2px);
+}
+
+.text-field[type="color"]::-moz-color-swatch {
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-sm) - 2px);
+}
+
+/* Campo de arquivo: o botão nativo ganha a cara dos botões do site. */
+.text-field[type="file"] {
+  padding: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+
+.text-field[type="file"]::file-selector-button {
+  margin-right: 0.75rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sand-100);
+  color: var(--color-wine-700);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.text-field[type="file"]:hover::file-selector-button {
+  background-color: var(--color-sand-200);
+}
+
 .form__actions {
   display: flex;
   flex-wrap: wrap;
@@ -50,6 +124,22 @@
   color: var(--color-ink);
   font-family: var(--font-body);
   transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+/* Seletor: seta própria com o mesmo respiro do texto, em vez da nativa colada na borda. */
+select.text-field {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.6rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23691818' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 1rem;
+  cursor: pointer;
+}
+
+select.text-field::-ms-expand {
+  display: none;
 }
 
 .text-field:focus {
@@ -161,4 +251,23 @@
   .form__grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Grupo de botões no fim da navegação de etapas (ex.: Baixar imagem + Salvar). */
+.step-nav__fim {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Etiqueta "CPF" ou "CNPJ" ao lado do rótulo, preenchida pela máscara (mascara.js). */
+.mascara__tipo:not(:empty) {
+  margin-left: var(--space-2);
+  padding: 0.05rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sand-100);
+  color: var(--color-wine-700);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }

@@ -35,7 +35,7 @@ $quantidade = static fn ($valor): string => rtrim(rtrim(number_format((float) $v
           <th>Quantidade</th>
           <th>Custo</th>
           <th>Situação</th>
-          <th>Ações</th>
+          <th class="table__acao-head">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -52,13 +52,17 @@ $quantidade = static fn ($valor): string => rtrim(rtrim(number_format((float) $v
                 <span class="badge badge--ok">Ok</span>
               <?php endif; ?>
             </td>
-            <td class="table__actions">
-              <a class="btn btn--ghost btn--sm" href="/gerente/insumos/form?id=<?= (int) $i['id'] ?>">Editar</a>
+            <td class="table__actions table__actions--centro">
+              <a class="btn btn--ghost btn--icon" href="/gerente/insumos/form?id=<?= (int) $i['id'] ?>" aria-label="Editar insumo" title="Editar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.85 0 0 1 4 4L8 20l-5 1 1-5L17 3Z"/></svg>
+              </a>
               <form method="post" action="/gerente/insumos/excluir"
                     onsubmit="return confirm('Tem certeza que deseja excluir este insumo?')">
                 <?= Csrf::campo() ?>
                 <input type="hidden" name="id" value="<?= (int) $i['id'] ?>">
-                <button class="btn btn--ghost btn--sm" type="submit">Excluir</button>
+                <button class="btn btn--ghost btn--icon" type="submit" aria-label="Excluir insumo" title="Excluir">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </button>
               </form>
             </td>
           </tr>

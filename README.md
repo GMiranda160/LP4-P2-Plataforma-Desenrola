@@ -51,14 +51,14 @@ Valem para todas as pessoas do grupo e para qualquer IA usada no projeto:
 |---|---|
 | **Banco** | PostgreSQL no Supabase, com autorização do professor no lugar do MySQL |
 | **Grupo** | Três integrantes, com autorização do professor |
-| **Hospedagem** | Render, com deploy automático a partir do GitHub e PHP em Docker |
+| **Hospedagem** | Railway, com deploy automático a partir do GitHub e PHP em Docker |
 | **Sessão PHP** | Fica no banco, na tabela `sessoes`, porque arquivos do container não são duráveis |
-| **Arquivos** | Sem upload. Matrizes ficam no banco como grade de pontos e SVG gerado no servidor |
+| **Arquivos** | Supabase Storage (bucket `mostruario`): SVG e grade das matrizes em `matrizes/`, fotos das peças base em `pecas/` e `base/`. O banco guarda só o caminho (e a paleta da matriz). Foto da peça do usuário fica só no navegador |
 | **IA** | Gemini, com cada tutorial salvo no banco e um texto reserva para falhas |
 | **Contas** | Todo e-mail do sistema usa `@example.com`; a pessoa digita só o prefixo no formulário |
 | **Divisão** | Cada arquivo tem um único dono, e Guilherme entrega os arquivos comentados |
 
-O Render executa PHP por Docker. Por isso, o projeto tem um `Dockerfile` na raiz.
+O Railway executa PHP por Docker. Por isso, o projeto tem um `Dockerfile` na raiz.
 
 ## 2. Requisitos do enunciado
 
@@ -79,7 +79,9 @@ O Render executa PHP por Docker. Por isso, o projeto tem um `Dockerfile` na raiz
 | Entrega no Teams | ZIP ou RAR do código, backup do banco e link do GitHub |
 
 Fora do escopo: os módulos de ERP da ERS (pedidos, agenda, pagamentos e relatórios), pagamento
-on-line, envio de e-mail e upload de arquivos para o servidor.
+on-line e envio de e-mail. Upload de arquivos: apenas a imagem final montada no montador
+(a enviar para o Supabase Storage quando a migração de produtos base for aprovada);
+qualquer outro upload fica fora.
 
 ## 3. Tecnologias
 
@@ -88,7 +90,7 @@ on-line, envio de e-mail e upload de arquivos para o servidor.
 | Interface | HTML gerado por PHP, CSS puro, JavaScript com ES Modules |
 | Servidor | PHP 8.5 com FrankenPHP em Docker |
 | Banco | PostgreSQL no Supabase, acessado por PDO |
-| Hospedagem | Render, com deploy pelo GitHub |
+| Hospedagem | Railway, com deploy pelo GitHub |
 | IA | API do Gemini, chamada por cURL no PHP |
 | Versionamento | Git e GitHub, branch `main` |
 
@@ -381,7 +383,7 @@ preenche a interface.
 **Conversor.** A pessoa escolhe um PNG, JPG ou WebP e o navegador faz a conversão em um
 `<canvas>`:
 
-1. Reduz a imagem para 32, 48 ou 64 pontos de largura.
+1. Reduz a imagem para 64, 128 ou 256 pontos de largura.
 2. Ignora os pixels transparentes.
 3. Reduz a imagem para 4 a 16 cores, como linhas de bordado.
 4. Mostra a matriz na hora, com controles de tamanho e quantidade de cores.
@@ -406,8 +408,9 @@ pelo navegador, porque SVG pode carregar script.
 O mesmo montador atende a gerente, com `/montador?modo=matriz` para criar matriz padrão e
 `/montador?modo=produto` para criar a combinação usada em um produto.
 
-Vantagens: não há upload, tudo entra no backup do banco, e a resolução baixa reduz o risco de
-imagem inadequada no telão. Mesmo assim, a gerente pode ocultar qualquer post.
+Vantagens: a foto da peça não sai do navegador de quem monta; a imagem final (quando o upload
+no Supabase Storage for habilitado) guarda só o caminho no banco e acompanha o backup; e a gerente
+pode ocultar qualquer post mesmo assim.
 
 ## 10. IA com Gemini
 
@@ -505,7 +508,7 @@ Cada documento de instruções pode ser colado inteiro em uma IA generativa como
 
 ## 13. Como rodar no seu computador
 
-Requisitos: Git e PHP 8.4 ou mais novo. O Docker só é necessário para reproduzir o ambiente do Render.
+Requisitos: Git e PHP 8.4 ou mais novo. O Docker só é necessário para reproduzir o ambiente do Railway.
 
 1. Clone o repositório:
 
@@ -605,17 +608,21 @@ com suas próprias mãos.
 
 ## 15. Publicação
 
-**Variáveis de ambiente no Render:**
-`APP_ENV`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`, `GEMINI_API_KEY`, `GEMINI_MODEL`.
+**Variáveis de ambiente no Railway:**
+`APP_ENV`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`, `GEMINI_API_KEY`, `GEMINI_MODEL`,
+`GEMINI_FALLBACK_MODEL` (opcional, mas recomendado). O Railway injeta a variável `PORT` sozinho;
+não crie `PORT`.
 
 **Conexão com o Supabase:** use o **Transaction pooler**, na porta `6543`. A conexão direta usa
 IPv6 por padrão, e o pooler também funciona por IPv4. Esse modo não aceita prepared statements no
 servidor, por isso a conexão usa `PDO::ATTR_EMULATE_PREPARES`.
 
-**Deploy:** Guilherme cria um **Web Service** no [Render](https://render.com/), liga o repositório
-do GitHub e escolhe o ambiente Docker. O Render publica a imagem a cada push na `main`.
+**Deploy:** Guilherme cria um **serviço** no [Railway](https://railway.com/) a partir do repositório
+do GitHub. O Railway detecta o `Dockerfile` na raiz e publica a imagem a cada push na `main`. As
+variáveis ficam na aba **Variables** do serviço; o `.env` não sobe para o repositório nem para a
+imagem.
 
-**Plano B para a apresentação:** se o Render falhar ou ficar lento, rode o projeto em um notebook e use o mesmo
+**Plano B para a apresentação:** se o Railway falhar ou ficar lento, rode o projeto em um notebook e use o mesmo
 banco do Supabase. Todos entram pelo IP do notebook na mesma rede:
 
 ```bash

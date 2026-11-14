@@ -7,7 +7,7 @@ declare(strict_types=1);
  * Responsabilidade: receber os pedidos de matrizes, chamar MatrizServico e escolher a tela
  * do painel (layout gerente). As telas são de Arthur. Todas as rotas são só da gerente.
  * Matriz nova nasce no montador (/montador?modo=matriz); aqui só se edita e exclui.
- * Matrizes padrão podem ser editadas e excluídas; as criadas por usuários, só excluídas (moderação).
+ * A gerente pode editar e excluir qualquer matriz (moderação); a grade e o SVG não mudam.
  * Veja INSTRUCOES_GUILHERME.md, seção 14.
  */
 class MatrizControlador
@@ -36,11 +36,6 @@ class MatrizControlador
 
         if ($matriz === null) {
             Sessao::flash('erro', 'Matriz não encontrada. Para criar uma nova, use o montador.');
-            Resposta::redirecionar('/gerente/matrizes');
-        }
-
-        if (!$matriz['padrao']) {
-            Sessao::flash('erro', 'Matrizes criadas por usuários não podem ser editadas, apenas excluídas.');
             Resposta::redirecionar('/gerente/matrizes');
         }
 

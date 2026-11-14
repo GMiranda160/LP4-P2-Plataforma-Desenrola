@@ -1,14 +1,25 @@
 /**
  * Entrada principal dos scripts da plataforma.
  * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Inicializa o menu móvel, as animações de rolagem e a vitrine da home.
+ * Inicializa o menu móvel, as animações de rolagem, a vitrine da home e as máscaras
+ * de reais (data-moeda) e de CPF/CNPJ, telefone e CEP (data-mascara).
  */
 
 import { queryAll } from './utils/dom.js';
 import { initHeader } from './components/header.js';
 import { initScrollReveal } from './utils/scroll-reveal.js';
 import { initShowcase } from './components/showcase.js';
+import { initMontador } from './pages/montador.js';
+import { initTutorial } from './pages/tutorial.js';
+import { initToasts } from './components/toast.js';
+import { initMoeda } from './components/moeda.js';
+import { initMascara } from './components/mascara.js';
 
 initHeader();
 initScrollReveal();
 queryAll('[data-showcase]').forEach(initShowcase);
+queryAll('[data-montador]').forEach(initMontador);
+queryAll('[data-tutorial]').forEach(initTutorial);
+initToasts();
+queryAll('[data-moeda]').forEach(initMoeda);
+queryAll('[data-mascara]').forEach(initMascara);

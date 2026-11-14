@@ -28,6 +28,15 @@
   text-transform: uppercase;
   color: var(--color-ink-soft);
   border-bottom: 2px solid var(--color-sand-200);
+  white-space: nowrap;
+}
+
+/*
+ * As células não quebram linha: CPF, telefone, datas e preços ficam inteiros.
+ * Quando a tabela não cabe, ela rola para o lado dentro do .table-wrap (a página não vaza).
+ */
+.table td {
+  white-space: nowrap;
 }
 
 .table tbody tr + tr td {
@@ -38,10 +47,38 @@
   background-color: var(--color-sand-50);
 }
 
+/* Tabela toda centralizada (matrizes do ateliê e criadas por usuários). */
+.table--centrada th,
+.table--centrada td {
+  text-align: center;
+}
+
 .table__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.table__actions .btn {
+  min-width: 5.5rem;
+}
+
+.table__actions .btn--icon {
+  min-width: 0;
+}
+
+/* Espaço entre os botões, já que a célula não é mais flex */
+.table__actions a + form,
+.table__actions form + form {
+  margin-left: var(--space-2);
+}
+
+/* Cabeçalho da célula de ações centralizada (usada na tabela de matrizes). */
+.table th.table__acao-head {
+  text-align: center;
+}
+
+.table__actions--centro {
+  text-align: center;
 }
 
 .table__actions form {

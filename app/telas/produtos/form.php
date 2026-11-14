@@ -38,7 +38,7 @@
 
     <div class="form__field">
       <label for="preco_base">Preço base</label>
-      <input class="text-field" type="number" min="0" step="0.01" id="preco_base"
+      <input class="text-field" type="number" min="0" step="0.01" id="preco_base" data-moeda
              name="preco_base" value="<?= e($produto['preco_base'] ?? '') ?>" required>
     </div>
   </div>

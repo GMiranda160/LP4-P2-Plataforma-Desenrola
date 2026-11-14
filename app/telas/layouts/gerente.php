@@ -64,6 +64,7 @@ $ativo = static function (string $rota) use ($caminho): string {
       <a href="/gerente/usuarios"<?= $ativo('/gerente/usuarios') ?>>Usuários</a>
       <a href="/gerente/insumos"<?= $ativo('/gerente/insumos') ?>>Insumos</a>
       <a href="/gerente/clientes"<?= $ativo('/gerente/clientes') ?>>Clientes</a>
+      <a href="/gerente/pecas"<?= $ativo('/gerente/pecas') ?>>Peças</a>
       <a href="/gerente/matrizes"<?= $ativo('/gerente/matrizes') ?>>Matrizes</a>
       <a href="/gerente/produtos"<?= $ativo('/gerente/produtos') ?>>Produtos</a>
       <a href="/hub"<?= $ativo('/hub') ?>>Hub</a>
@@ -75,6 +76,6 @@ $ativo = static function (string $rota) use ($caminho): string {
     </main>
   </div>
 
-  <script type="module" src="/assets/js/main.js"></script>
+  <script type="module" src="/assets/js/main.js?v=<?= (int) (@filemtime(RAIZ . '/public/assets/js/main.js') ?: 1) ?>"></script>
 </body>
 </html>

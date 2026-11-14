@@ -172,8 +172,8 @@ Ativar ou desativar: POST para `/gerente/produtos/ativar`, com `id`.
 - Cada item de `$matrizesUsuarios` (criadas por usuários, as `$limiteUsuarios` mais recentes): os
   mesmos campos, mais `autor` (pode ser null, se a conta foi excluída) e `criado_em`.
 - Mostra dois grupos. **Padrão do ateliê:** miniatura, nome, categoria, tamanho, pontos, tempo,
-  editar e excluir. **Criadas por usuários:** miniatura, nome, autor, tamanho, pontos, data e só
-  excluir. A gerente não edita matriz de usuário.
+  editar e excluir. **Criadas por usuários:** miniatura, nome, autor, tamanho, pontos, data,
+  editar e excluir. A gerente pode editar qualquer matriz (a grade e o SVG não mudam).
 - O botão **Nova matriz** leva para `/montador?modo=matriz`.
 
 Mostre a miniatura sempre em uma tag `img`:

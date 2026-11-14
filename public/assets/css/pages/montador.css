@@ -1,11 +1,545 @@
 /*
  * Arquivo: montador.css
  * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: estilos do conversor e do montador.
- *
- * TODO(Guilherme):
- * 1. Trazer de produto.css o que for do fluxo em etapas, como .stepper, .matrix-grid e .swatch.
- * 2. Criar .peca, .peca__mockup e .peca__matriz, se não ficarem em um componente.
- * 3. Usar touch-action: none na área de arraste.
- * Veja INSTRUCOES_GUILHERME.md, seção 7.
+ * Responsabilidade: estilos do conversor e do montador (fluxo em etapas, matrizes,
+ * prévia da peça e arraste). Os estilos de .stepper, .step-nav, .text-field e .chip
+ * ficam nos componentes compartilhados (components/forms.css).
+ * Veja INSTRUCOES_GUILHERME.md, seções 6 e 7.
  */
+
+.montador {
+  max-width: 720px;
+}
+
+.montador__etapa {
+  display: none;
+}
+
+.montador__etapa.is-active {
+  display: block;
+}
+
+.montador__titulo {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-ink);
+}
+
+.montador__subtitulo {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.montador__erro {
+  margin: 0 0 var(--space-4);
+}
+
+/* Matrizes ---------------------------------------------------------------- */
+
+.matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.matrix-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.matrix-card:hover {
+  transform: translateY(-2px);
+}
+
+.matrix-card input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.matrix-card:has(input:checked) {
+  border-color: var(--color-wine-700);
+  box-shadow: 0 0 0 3px rgba(105, 24, 24, 0.18);
+}
+
+.matrix-card:has(input:focus-visible) {
+  outline: 2px solid var(--color-wine-700);
+  outline-offset: 2px;
+}
+
+.matrix-card__img {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: var(--color-sand-50);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.matrix-card__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.matrix-card__nome {
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.matrix-card__meta {
+  font-size: 0.7rem;
+  color: var(--color-ink-soft);
+}
+
+/* Conversor de imagem ------------------------------------------------------ */
+
+.montador__ou {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+  color: var(--color-ink-soft);
+  font-size: 0.82rem;
+}
+
+.montador__ou::before,
+.montador__ou::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--color-border);
+}
+
+.montador__conversor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-50);
+}
+
+.montador__arquivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.montador__upload {
+  display: block;
+  padding: var(--space-4);
+  border: 1px dashed var(--color-wine-500);
+  border-radius: var(--radius-md);
+  color: var(--color-wine-700);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.montador__upload:hover {
+  background-color: rgba(105, 24, 24, 0.06);
+}
+
+.montador__arquivo:focus-visible + .montador__upload-texto {
+  outline: 2px solid var(--color-wine-700);
+}
+
+.montador__opcoes {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.montador__grade {
+  display: none;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1;
+  image-rendering: pixelated;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+}
+
+.montador__grade.is-visivel {
+  display: block;
+}
+
+.montador__status {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
+  min-height: 1.2em;
+}
+
+.montador__limpar {
+  display: none;
+  align-self: flex-start;
+}
+
+.montador__limpar.is-visivel {
+  display: inline-flex;
+}
+
+/* Peça e cor do tecido ------------------------------------------------------ */
+
+.categorias-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.categoria-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 96px;
+  padding: var(--space-3) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.categoria-mini input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.categoria-mini:has(input:checked) {
+  border-color: var(--color-wine-700);
+  box-shadow: 0 0 0 3px rgba(105, 24, 24, 0.18);
+}
+
+.categoria-mini:has(input:focus-visible) {
+  outline: 2px solid var(--color-wine-700);
+  outline-offset: 2px;
+}
+
+.categoria-mini__img {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 72px;
+}
+
+.categoria-mini__img svg {
+  width: 100%;
+  height: 100%;
+}
+
+.categoria-mini__nome {
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.swatch {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--color-border);
+  background-color: var(--swatch, #fff);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.swatch:hover {
+  transform: scale(1.12);
+}
+
+.swatch.is-selected {
+  border-color: var(--color-wine-700);
+  box-shadow: 0 0 0 3px rgba(105, 24, 24, 0.28);
+}
+
+.montador__cor-linha {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
+}
+
+.montador__cor {
+  width: 3rem;
+  height: 2.2rem;
+  padding: 0.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+  cursor: pointer;
+}
+
+/* Área de posicionamento ----------------------------------------------------- */
+
+.montador__area {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-sand-100);
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.montador__area:active {
+  cursor: grabbing;
+}
+
+.montador__mockup {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.montador__mockup svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Caixa de transformação: contorno pontilhado com alças de tamanho e de giro. */
+.montador__area {
+  cursor: crosshair;
+}
+
+.montador__caixa {
+  --alca: 12px;
+  --giro: 0deg;
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%) rotate(var(--giro));
+  transform-origin: center;
+  outline: 1.5px dashed var(--color-wine-700);
+  outline-offset: 3px;
+  cursor: move;
+  touch-action: none;
+}
+
+.montador__caixa[hidden] {
+  display: none;
+}
+
+.montador__caixa:focus-visible,
+.montador__caixa.is-ativa {
+  outline-style: solid;
+}
+
+.montador__peca {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.montador__alca {
+  position: absolute;
+  width: var(--alca);
+  height: var(--alca);
+  border: 1.5px solid var(--color-wine-700);
+  border-radius: 2px;
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.montador__alca--no { top: calc(var(--alca) / -2 - 3px); left: calc(var(--alca) / -2 - 3px); cursor: nwse-resize; }
+.montador__alca--ne { top: calc(var(--alca) / -2 - 3px); right: calc(var(--alca) / -2 - 3px); cursor: nesw-resize; }
+.montador__alca--so { bottom: calc(var(--alca) / -2 - 3px); left: calc(var(--alca) / -2 - 3px); cursor: nesw-resize; }
+.montador__alca--se { bottom: calc(var(--alca) / -2 - 3px); right: calc(var(--alca) / -2 - 3px); cursor: nwse-resize; }
+
+/* Alça de giro: bolinha acima do centro, ligada à caixa por uma haste. */
+.montador__alca--girar {
+  top: calc(var(--alca) * -2.75);
+  left: 50%;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  cursor: grab;
+}
+
+.montador__alca--girar::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1.5px;
+  height: calc(var(--alca) * 1.5 - 3px);
+  background-color: var(--color-wine-700);
+  transform: translateX(-50%);
+}
+
+.montador__caixa.is-ativa .montador__alca--girar {
+  cursor: grabbing;
+}
+
+/* Telas de toque: alças maiores para o dedo. */
+@media (pointer: coarse) {
+  .montador__caixa {
+    --alca: 20px;
+  }
+}
+
+.montador__controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.montador__posicao {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .matrix-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .montador__controles {
+    gap: var(--space-4);
+  }
+}
+
+/* Montador v2: peca base com foto real e foto do usuario --------------------- */
+
+.montador__arquivo-peca {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.montador__arquivo-peca:focus-visible + .montador__upload-texto {
+  outline: 2px solid var(--color-wine-700);
+}
+
+.montador__cores-bloco.is-oculto,
+.montador__upload-foto[hidden],
+.montador__foto-nota[hidden],
+.montador__foto-aviso[hidden] {
+  display: none;
+}
+
+.categoria-mini__img--foto img {
+  width: 64px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.categoria-mini__img--upload {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 72px;
+  border: 1px dashed var(--color-wine-500);
+  border-radius: var(--radius-md);
+  color: var(--color-wine-500);
+}
+
+.categoria-mini__img--upload svg {
+  width: 30px;
+  height: 30px;
+}
+
+.montador__mockup-foto {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.montador__foto-nota,
+.montador__foto-aviso {
+  margin-top: var(--space-2);
+  color: var(--color-ink-soft);
+}
+
+.montador__upload-foto {
+  margin-top: var(--space-3);
+}
+
+/* Prévia da foto enviada pela pessoa (etapa 2). */
+.categoria-mini__foto-usuario {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.categoria-mini__foto-usuario[hidden],
+.categoria-mini__img--upload svg[hidden],
+.montador__foto-preview[hidden] {
+  display: none;
+}
+
+.montador__foto-preview {
+  display: block;
+  max-width: min(100%, 280px);
+  max-height: 320px;
+  margin-top: var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  object-fit: contain;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tinta sobre a foto do produto (multiplicacao + mascara da propria foto) ------ */
+.montador__tinta {
+  position: absolute;
+  inset: 0;
+  background-color: #f3ded9;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.swatch:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.swatch:disabled:hover {
+  transform: none;
+}

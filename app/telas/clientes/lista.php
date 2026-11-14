@@ -32,7 +32,7 @@
           <th>E-mail</th>
           <th>Telefone</th>
           <th>Cadastrado em</th>
-          <th>Ações</th>
+          <th class="table__acao-head">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -43,13 +43,17 @@
             <td><?= e($c['email']) ?></td>
             <td><?= e($c['telefone']) ?></td>
             <td><?= e(data_br($c['criado_em'])) ?></td>
-            <td class="table__actions">
-              <a class="btn btn--ghost btn--sm" href="/gerente/clientes/form?id=<?= (int) $c['id'] ?>">Editar</a>
+            <td class="table__actions table__actions--centro">
+              <a class="btn btn--ghost btn--icon" href="/gerente/clientes/form?id=<?= (int) $c['id'] ?>" aria-label="Editar cliente" title="Editar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.85 0 0 1 4 4L8 20l-5 1 1-5L17 3Z"/></svg>
+              </a>
               <form method="post" action="/gerente/clientes/excluir"
                     onsubmit="return confirm('Tem certeza que deseja excluir este cliente?')">
                 <?= Csrf::campo() ?>
                 <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
-                <button class="btn btn--ghost btn--sm" type="submit">Excluir</button>
+                <button class="btn btn--ghost btn--icon" type="submit" aria-label="Excluir cliente" title="Excluir">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </button>
               </form>
             </td>
           </tr>

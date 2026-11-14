@@ -74,10 +74,16 @@ CREATE TABLE IF NOT EXISTS matrizes (
   nome text NOT NULL,
   descricao text,
   categoria text NOT NULL DEFAULT 'Geral',
-  grade jsonb NOT NULL,
-  svg text NOT NULL,
-  largura int NOT NULL CHECK (largura BETWEEN 8 AND 64),
-  altura int NOT NULL CHECK (altura BETWEEN 8 AND 64),
+  -- Os arquivos ficam no Storage (bucket mostruario): aqui só o caminho e a paleta.
+  -- grade e svg são da versão antiga e ficam NULL nas matrizes novas.
+  svg_path text,
+  grade_path text,
+  paleta jsonb NOT NULL DEFAULT '[]'::jsonb,
+  grade jsonb,
+  svg text,
+  CONSTRAINT matrizes_arquivo_check CHECK (svg_path IS NOT NULL OR svg IS NOT NULL),
+  largura int NOT NULL CHECK (largura BETWEEN 8 AND 1024),
+  altura int NOT NULL CHECK (altura BETWEEN 8 AND 1024),
   total_pontos int NOT NULL CHECK (total_pontos > 0),
   tempo_medio_min int NOT NULL DEFAULT 30 CHECK (tempo_medio_min > 0),
   padrao boolean NOT NULL DEFAULT false,
@@ -86,6 +92,16 @@ CREATE TABLE IF NOT EXISTS matrizes (
 );
 
 -- Matriz aplicada numa peça. tipo=hub é o feed; tipo=produto alimenta o mostruário.
+-- Peças base com foto real, escolhidas no montador. A foto fica no Storage.
+CREATE TABLE IF NOT EXISTS pecas (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  nome text NOT NULL,
+  categoria_id bigint NOT NULL REFERENCES categorias (id),
+  imagem_path text NOT NULL,
+  ativo boolean NOT NULL DEFAULT true,
+  criado_em timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS bordados (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   titulo text NOT NULL,
@@ -96,6 +112,10 @@ CREATE TABLE IF NOT EXISTS bordados (
   cor_peca text NOT NULL,
   pos_x int NOT NULL CHECK (pos_x BETWEEN 0 AND 100),
   pos_y int NOT NULL CHECK (pos_y BETWEEN 0 AND 100),
+  -- Peça base escolhida, ou foto da própria peça no Storage (fotos/...). As duas podem ser NULL.
+  peca_id bigint REFERENCES pecas (id) ON DELETE SET NULL,
+  foto_path text,
+  rotacao int NOT NULL DEFAULT 0 CHECK (rotacao BETWEEN -180 AND 180),
   escala int NOT NULL CHECK (escala BETWEEN 10 AND 90),
   tipo text NOT NULL DEFAULT 'hub' CHECK (tipo IN ('hub', 'produto')),
   oculto boolean NOT NULL DEFAULT false,

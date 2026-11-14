@@ -9,20 +9,22 @@ declare(strict_types=1);
 class ProdutoDados
 {
     /**
-     * Consulta completa usada no catálogo, na home e na página do produto.
-     * Filtra só produtos ativos. Passe $categoria (slug) para filtrar, ou null para todos.
+     * Consulta usada no catálogo, na home e na página do produto.
+     * Filtra por produtos ativos ($apenasAtivos = true); a gerente passa false para ver tudo.
      *
      * @return array<int, array<string, mixed>>
      */
-    public function listar(?string $categoria = null): array
+    public function listar(?string $categoria = null, bool $apenasAtivos = true): array
     {
         $sql = 'SELECT p.*, c.nome AS categoria, c.slug, c.mockup,
-                       b.cor_peca, b.pos_x, b.pos_y, b.escala, m.svg
+                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura
                 FROM produtos p
                 JOIN bordados b ON b.id = p.bordado_id
                 JOIN categorias c ON c.id = b.categoria_id
                 JOIN matrizes m ON m.id = b.matriz_id
-                WHERE p.ativo'
+                LEFT JOIN pecas pc ON pc.id = b.peca_id
+                WHERE'
+            . ($apenasAtivos ? ' p.ativo' : ' 1=1')
             . ($categoria !== null ? ' AND c.slug = :categoria' : '')
             . ' ORDER BY p.criado_em DESC';
 
@@ -41,11 +43,12 @@ class ProdutoDados
     public function destaques(int $limite = 6): array
     {
         $sql = 'SELECT p.*, c.nome AS categoria, c.slug, c.mockup,
-                       b.cor_peca, b.pos_x, b.pos_y, b.escala, m.svg
+                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura
                 FROM produtos p
                 JOIN bordados b ON b.id = p.bordado_id
                 JOIN categorias c ON c.id = b.categoria_id
                 JOIN matrizes m ON m.id = b.matriz_id
+                LEFT JOIN pecas pc ON pc.id = b.peca_id
                 WHERE p.ativo AND p.destaque
                 ORDER BY p.criado_em DESC
                 LIMIT :limite';
@@ -61,11 +64,12 @@ class ProdutoDados
     public function buscarAtivo(int $id): ?array
     {
         $sql = 'SELECT p.*, c.nome AS categoria, c.slug, c.mockup,
-                       b.cor_peca, b.pos_x, b.pos_y, b.escala, m.svg, b.descricao AS bordado_descricao
+                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura, b.descricao AS bordado_descricao
                 FROM produtos p
                 JOIN bordados b ON b.id = p.bordado_id
                 JOIN categorias c ON c.id = b.categoria_id
                 JOIN matrizes m ON m.id = b.matriz_id
+                LEFT JOIN pecas pc ON pc.id = b.peca_id
                 WHERE p.ativo AND p.id = :id';
 
         $consulta = Conexao::pdo()->prepare($sql);
@@ -77,12 +81,118 @@ class ProdutoDados
         return $produto === false ? null : $produto;
     }
 
+    /** Um produto pelo id, para a tela de edição da gerente. Null se não existir. */
+    public function buscar(int $id): ?array
+    {
+        $consulta = Conexao::pdo()->prepare('SELECT * FROM produtos WHERE id = :id');
+        $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+        $consulta->execute();
+
+        $produto = $consulta->fetch();
+
+        return $produto === false ? null : $produto;
+    }
+
+    /**
+     * Combinações de bordado disponíveis para virar produto (tipo='produto' sem produto vinculado),
+     * mais a combinação já vinculada a um produto (edição), se $atualId > 0.
+     */
+    public function combinacoes(int $atualId = 0): array
+    {
+        $sql = "SELECT b.id, b.titulo
+                FROM bordados b
+                WHERE b.tipo = 'produto'
+                  AND (NOT EXISTS (SELECT 1 FROM produtos p WHERE p.bordado_id = b.id)
+                       OR b.id = :atual)
+                ORDER BY b.id DESC";
+
+        $consulta = Conexao::pdo()->prepare($sql);
+        $consulta->bindValue(':atual', $atualId, PDO::PARAM_INT);
+        $consulta->execute();
+
+        return $consulta->fetchAll();
+    }
+
+    /** Grava um produto novo e devolve o id. Bordado_id duplicado estoura SQLSTATE 23505 (tratado no serviço). */
+    public function inserir(array $d): int
+    {
+        $sql = 'INSERT INTO produtos (bordado_id, nome, descricao, preco_base, destaque, ativo)
+                VALUES (:bordado_id, :nome, :descricao, :preco_base, :destaque, :ativo)
+                RETURNING id';
+
+        $consulta = Conexao::pdo()->prepare($sql);
+        $consulta->bindValue(':bordado_id', (int) $d['bordado_id'], PDO::PARAM_INT);
+        $consulta->bindValue(':nome', $d['nome']);
+        $consulta->bindValue(':descricao', $d['descricao'] ?? null);
+        $consulta->bindValue(':preco_base', $d['preco_base']);
+        $consulta->bindValue(':destaque', !empty($d['destaque']) ? 't' : 'f');
+        $consulta->bindValue(':ativo', !empty($d['ativo']) ? 't' : 'f');
+        $consulta->execute();
+
+        return (int) $consulta->fetchColumn();
+    }
+
+    /** Atualiza um produto existente. */
+    public function atualizar(int $id, array $d): void
+    {
+        $sql = 'UPDATE produtos
+                SET bordado_id = :bordado_id, nome = :nome, descricao = :descricao,
+                    preco_base = :preco_base, destaque = :destaque, ativo = :ativo
+                WHERE id = :id';
+
+        $consulta = Conexao::pdo()->prepare($sql);
+        $consulta->bindValue(':bordado_id', (int) $d['bordado_id'], PDO::PARAM_INT);
+        $consulta->bindValue(':nome', $d['nome']);
+        $consulta->bindValue(':descricao', $d['descricao'] ?? null);
+        $consulta->bindValue(':preco_base', $d['preco_base']);
+        $consulta->bindValue(':destaque', !empty($d['destaque']) ? 't' : 'f');
+        $consulta->bindValue(':ativo', !empty($d['ativo']) ? 't' : 'f');
+        $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+        $consulta->execute();
+    }
+
+    /** Exclui o produto. O bordado permanece (vira combinação disponível de novo). */
+    public function excluir(int $id): void
+    {
+        $consulta = Conexao::pdo()->prepare('DELETE FROM produtos WHERE id = :id');
+        $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+        $consulta->execute();
+    }
+
+    /** Inverte o ativo. Devolve o novo estado (true/false), ou null se não existe. */
+    public function alternarAtivo(int $id): ?bool
+    {
+        $consulta = Conexao::pdo()->prepare('UPDATE produtos SET ativo = NOT ativo WHERE id = :id RETURNING ativo');
+        $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+        $consulta->execute();
+
+        $linha = $consulta->fetch();
+
+        return $linha === false ? null : filter_var($linha['ativo'], FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /** Categorias para o CRUD (id + slug + nome), usadas no montador para derivar a peça. */
+    public function categoriasIds(): array
+    {
+        return Conexao::pdo()->query('SELECT id, slug, nome FROM categorias ORDER BY nome')->fetchAll();
+    }
+
     /** Todas as categorias, para o filtro do catálogo e os atalhos da home. */
     public function categorias(): array
     {
         $consulta = Conexao::pdo()->query('SELECT id, nome, slug, mockup FROM categorias ORDER BY nome');
 
         return $consulta === false ? [] : $consulta->fetchAll();
+    }
+
+    /** Verdadeiro se a categoria existe. Usada pelo montador antes de gravar o bordado. */
+    public function existe(int $id): bool
+    {
+        $consulta = Conexao::pdo()->prepare('SELECT 1 FROM categorias WHERE id = :id');
+        $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+        $consulta->execute();
+
+        return (bool) $consulta->fetchColumn();
     }
 
     /** Total de produtos, usado no painel. */

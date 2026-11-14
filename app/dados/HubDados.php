@@ -13,8 +13,9 @@ class HubDados
      * Campos do card do Hub, iguais ao contrato de hub/_card.php.
      * Usa :usuario para calcular "curtiu"; visitante passa 0.
      */
-    private const CAMPOS_CARD = 'b.id, b.titulo, b.cor_peca, b.pos_x, b.pos_y, b.escala, b.oculto, b.criado_em,
-                       u.nome AS autor, c.nome AS categoria, c.mockup, m.svg,
+    private const CAMPOS_CARD = 'b.id, b.titulo, b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, b.oculto, b.criado_em,
+                       COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, 
+                       u.nome AS autor, c.nome AS categoria, c.mockup, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura,
                        (SELECT count(*) FROM curtidas x WHERE x.bordado_id = b.id) AS curtidas,
                        (SELECT count(*) FROM comentarios x
                          WHERE x.bordado_id = b.id AND NOT x.oculto) AS comentarios,
@@ -26,7 +27,8 @@ class HubDados
     private const JUNCOES = 'FROM bordados b
                 JOIN usuarios u ON u.id = b.autor_id
                 JOIN categorias c ON c.id = b.categoria_id
-                JOIN matrizes m ON m.id = b.matriz_id';
+                JOIN matrizes m ON m.id = b.matriz_id
+                LEFT JOIN pecas pc ON pc.id = b.peca_id';
 
     /**
      * Uma página do feed: posts públicos do Hub, não ocultos.
@@ -82,7 +84,7 @@ class HubDados
     {
         $sql = 'SELECT ' . self::CAMPOS_CARD . ',
                        b.descricao, b.autor_id, b.tipo, b.tutorial_ia,
-                       m.largura, m.altura, m.total_pontos, m.grade
+                       m.largura, m.altura, m.total_pontos, m.paleta
                 ' . self::JUNCOES . '
                 WHERE b.id = :id';
 
@@ -139,12 +141,19 @@ class HubDados
         return (int) $consulta->fetchColumn();
     }
 
-    /** Exclui o bordado. Curtidas e comentários saem junto (ON DELETE CASCADE). */
-    public function excluir(int $id): void
+    /**
+     * Exclui o bordado e devolve o caminho da foto da peça no Storage (ou null), para o serviço apagar.
+     * Curtidas e comentários saem junto (ON DELETE CASCADE).
+     */
+    public function excluir(int $id): ?string
     {
-        $consulta = Conexao::pdo()->prepare('DELETE FROM bordados WHERE id = :id');
+        $consulta = Conexao::pdo()->prepare('DELETE FROM bordados WHERE id = :id RETURNING foto_path');
         $consulta->bindValue(':id', $id, PDO::PARAM_INT);
         $consulta->execute();
+
+        $foto = $consulta->fetchColumn();
+
+        return is_string($foto) && $foto !== '' ? $foto : null;
     }
 
     /** Inverte bordados.oculto. */

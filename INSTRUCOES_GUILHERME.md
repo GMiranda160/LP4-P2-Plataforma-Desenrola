@@ -33,16 +33,16 @@ As autorizações do professor para PostgreSQL e grupo de três já foram dadas.
 
 ## 2. Primeiros passos, nesta ordem
 
-### 2.1 Testar o deploy no Render
+### 2.1 Testar o deploy no Railway
 
 Faça isto **antes** de reorganizar qualquer arquivo. O Dockerfile abaixo é adaptado do guia de PHP
 com FrankenPHP, e **ainda não foi testado neste projeto**.
 
 - [ ] Criar um repositório de teste com o Dockerfile, o Caddyfile e um `public/index.php`.
-- [ ] Criar um **Web Service** gratuito no [Render](https://render.com/), com o repositório do
-  GitHub e ambiente Docker.
+- [ ] Criar um **serviço** no [Railway](https://railway.com/), a partir do repositório do
+  GitHub; o Railway detecta o `Dockerfile` na raiz.
 - [ ] Cadastrar as variáveis de ambiente do README, seção 15.
-- [ ] Confirmar nos logs que o serviço abriu a porta informada pelo Render.
+- [ ] Confirmar nos logs que o serviço abriu a porta informada pelo Railway (variável `PORT`).
 - [ ] Confirmar a conexão com o Supabase por `pdo_pgsql`.
 - [ ] Confirmar que as variáveis de ambiente chegam ao PHP por `getenv()`.
 - [ ] Confirmar que um push na `main` dispara um novo deploy.
@@ -84,15 +84,15 @@ Modelo.png
 database/backup.sql
 ```
 
-### 2.2 Limites do plano gratuito
+### 2.2 Limites de uso e custo
 
-- O serviço dorme depois de 15 minutos sem acesso e leva cerca de 1 minuto para acordar.
-- Cada conta tem 750 horas gratuitas por mês.
+- O Railway trabalha com créditos (trial inicial e planos pagos depois): acompanhe o uso no painel
+  para não estourar o crédito, principalmente com a turma inteira no site.
+- Não há o sono de 15 minutos do free do Render; o que limita é o crédito e o número de réplicas.
 - O disco não é persistente, e por isso as sessões ficam no banco.
-- Uma instância atende todo o tráfego. Fontes de terceiros citam 512 MB de RAM e 0,1 de CPU, então
-  valide o desempenho no teste de carga.
+- Uma instância atende todo o tráfego, então valide o desempenho no teste de carga.
 
-Se o site ficar lento com a turma, use um plano pago por um mês ou o plano B do notebook.
+Se o site ficar lento com a turma ou o crédito acabar, use um plano pago por um mês ou o plano B do notebook.
 
 ### 2.3 Criar o repositório
 
@@ -226,7 +226,7 @@ O usuário do pooler tem o formato `postgres.<ref-do-projeto>`. Copie host, port
 
 ### `SessaoBanco`
 
-Sessão em arquivo não serve aqui, pois o disco do Render é apagado a cada deploy ou reinício.
+Sessão em arquivo não serve aqui, pois o disco do serviço é apagado a cada deploy ou reinício.
 
 ```php
 <?php
@@ -487,8 +487,8 @@ CREATE TABLE matrizes (
   categoria text NOT NULL DEFAULT 'Geral',
   grade jsonb NOT NULL,
   svg text NOT NULL,
-  largura int NOT NULL CHECK (largura BETWEEN 8 AND 64),
-  altura int NOT NULL CHECK (altura BETWEEN 8 AND 64),
+  largura int NOT NULL CHECK (largura BETWEEN 8 AND 256),
+  altura int NOT NULL CHECK (altura BETWEEN 8 AND 256),
   total_pontos int NOT NULL CHECK (total_pontos > 0),
   tempo_medio_min int NOT NULL DEFAULT 30 CHECK (tempo_medio_min > 0),
   padrao boolean NOT NULL DEFAULT false,
@@ -613,7 +613,7 @@ Nunca confie no navegador.
 class GradeServico
 {
     private const MIN = 8;
-    private const MAX = 64;
+    private const MAX = 256;
     private const MAX_CORES = 16;
 
     /** Devolve a grade validada e lança InvalidArgumentException se for inválida. */
@@ -721,7 +721,8 @@ No `MontadorServico`:
 
 1. Validar título, categoria, cor e posição.
 2. Se vier `grade_json`, validar, gerar SVG e chamar `MatrizDados::inserir`.
-3. Se vier `matriz_id`, aceitar só matriz padrão ou do próprio autor.
+3. Se vier `matriz_id`, aceitar qualquer matriz cadastrada (visibilidade geral).
+   Matriz criada por gerente (avulsa ou junto do bordado) nasce como padrao = 't'.
 4. Em `modo=matriz`, exigir gerente, salvar com `padrao = 't'` e encerrar.
 5. Em `modo=produto`, exigir gerente, com `tipo = 'produto'`.
 6. Nos demais casos, salvar com `tipo = 'hub'`.
@@ -884,7 +885,7 @@ curtidas e paginação.
 **Carga da demonstração**
 
 - [ ] 20 ou mais celulares cadastrando, montando e curtindo ao mesmo tempo
-- [ ] Monitorar conexões e erros no Supabase e nos logs do Render
+- [ ] Monitorar conexões e erros no Supabase e nos logs do Railway
 - [ ] Testar o erro 429 do Gemini e o texto reserva
 - [ ] Medir o primeiro acesso depois de o site ficar parado
 - [ ] Testar o plano B em notebook
@@ -928,7 +929,7 @@ classes seguem o padrão de `InsumoDados`, `InsumoServico` e `InsumoControlador`
 | Área | Regras |
 |---|---|
 | Produtos | Preço > 0; combinação do tipo `produto`; cada combinação em um só produto; `/gerente/produtos/ativar` inverte `ativo` |
-| Matrizes | Nome obrigatório; tempo médio > 0; não excluir matriz usada em `bordados`; gerente edita só matriz padrão, e as de usuários só exclui |
+| Matrizes | Nome obrigatório; tempo médio > 0; não excluir matriz usada em `bordados`; gerente edita e exclui qualquer matriz (moderação); a grade e o SVG não mudam |
 | Hub | Post oculto só abre para a gerente; autor ou gerente pode excluir |
 
 Mensagens: `Produto cadastrado com sucesso!`, `Esta combinação já está em outro produto.` e

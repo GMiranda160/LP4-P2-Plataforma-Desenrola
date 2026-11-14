@@ -18,9 +18,11 @@
   <?php foreach ($totais as $t): ?>
     <li>
       <a class="painel-card" href="<?= e($t['link']) ?>">
-        <span class="painel-card__total">
-          <?= $t['total'] === null ? 'Em breve' : e(number_format($t['total'], 0, ',', '.')) ?>
-        </span>
+        <?php if ($t['total'] === null): ?>
+          <span class="painel-card__total painel-card__total--breve">Em breve</span>
+        <?php else: ?>
+          <span class="painel-card__total"><?= e(number_format($t['total'], 0, ',', '.')) ?></span>
+        <?php endif; ?>
         <span class="painel-card__rotulo"><?= e($t['rotulo']) ?></span>
       </a>
     </li>

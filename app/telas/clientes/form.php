@@ -24,7 +24,7 @@
 
     <div class="form__field">
       <label for="cpf_cnpj">CPF ou CNPJ</label>
-      <input class="text-field" id="cpf_cnpj" name="cpf_cnpj"
+      <input class="text-field" id="cpf_cnpj" name="cpf_cnpj" data-mascara="documento" maxlength="18"
              value="<?= e($cliente['cpf_cnpj'] ?? '') ?>" required>
     </div>
 
@@ -36,7 +36,7 @@
 
     <div class="form__field">
       <label for="telefone">Telefone</label>
-      <input class="text-field" id="telefone" name="telefone"
+      <input class="text-field" id="telefone" name="telefone" type="tel" data-mascara="telefone" maxlength="15"
              value="<?= e($cliente['telefone'] ?? '') ?>" required>
     </div>
 
@@ -48,7 +48,7 @@
 
     <div class="form__field">
       <label for="cep">CEP</label>
-      <input class="text-field" id="cep" name="cep"
+      <input class="text-field" id="cep" name="cep" data-mascara="cep" maxlength="9"
              value="<?= e($cliente['cep'] ?? '') ?>">
     </div>
   </div>

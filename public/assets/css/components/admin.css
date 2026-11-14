@@ -63,8 +63,53 @@
   font-weight: 600;
 }
 
+/* O miolo pode encolher: sem isso, uma tabela larga estica a grade e a página vaza para o lado. */
+.admin-layout > main {
+  min-width: 0;
+}
+
+/* Busca e texto de ajuda acima das listas: respiro antes da tabela (ou do estado vazio). */
+.admin-layout > main > form[method="get"] {
+  margin-bottom: var(--space-5);
+}
+
+.admin-layout > main > .field-hint {
+  margin: 0 0 var(--space-4);
+}
+
+.admin-topbar__actions .btn {
+  white-space: nowrap;
+}
+
 @media (max-width: 900px) {
   .admin-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    margin-block: var(--space-4);
+  }
+
+  /* Menu vira uma faixa horizontal com rolagem, em vez de ocupar uma tela inteira. */
+  .admin-nav {
+    flex-direction: row;
+    gap: var(--space-1);
+    padding: var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-topbar .brand__text small {
+    display: none;
   }
 }

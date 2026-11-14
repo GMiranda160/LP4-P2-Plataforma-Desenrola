@@ -34,14 +34,21 @@
   background-color: var(--color-sand-100);
 }
 
-.product-card__media img {
+/* Vale para as fotos de produto, não para a matriz bordada sobreposta (.peca__matriz). */
+.product-card__media > img:not(.peca__matriz) {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform var(--transition-slow);
 }
 
-.product-card:hover .product-card__media img {
+/* Fotos de produto: zoom lento dentro do media. */
+.product-card:hover .product-card__media > img:not(.peca__matriz) {
+  transform: scale(1.04);
+}
+
+/* Matriz e mockup são uma única imagem: inflam juntos, com a transição da peça (.peca). */
+.product-card:hover .peca {
   transform: scale(1.04);
 }
 

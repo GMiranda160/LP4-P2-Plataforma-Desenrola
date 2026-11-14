@@ -225,6 +225,8 @@
   aspect-ratio: 4 / 5;
   overflow: hidden;
   background-color: var(--color-sand-100);
+  /* Zoom suave aplicado junto nas peças (.peca) nos cards de produto */
+  transition: transform var(--transition-slow);
 }
 
 .peca__mockup {
@@ -240,10 +242,36 @@
   height: 100%;
 }
 
+/* Foto real da peça (peça base ou foto enviada), no lugar do desenho do mockup. */
+.peca__foto {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Cor da peça sobre a foto: multiplica só onde a foto tem a peça (máscara com a própria foto). */
+.peca__tinta {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 .peca__matriz {
   position: absolute;
-  transform: translate(-50%, -50%);
   image-rendering: pixelated;
+  /* A centralização é calculada no servidor (ver parciais/peca_bordada.php).
+     O transform vem só do style inline, para a rotação em volta do centro. */
+  transform-origin: center;
+  height: auto;
+  object-fit: contain;
 }
 
 /* Diferenciais / sobre --------------------------------------------------- */
@@ -281,8 +309,10 @@
 /* Faixa de chamada final ------------------------------------------------- */
 
 .cta-band {
-  background-image: linear-gradient(120deg, var(--color-wine-900), var(--color-wine-700));
-  color: var(--color-rose-100);
+  background-color: var(--color-sand-100);
+  border-top: 1px solid var(--color-sand-200);
+  border-bottom: 1px solid var(--color-sand-200);
+  color: var(--color-ink);
 }
 
 .cta-band__inner {
@@ -296,24 +326,15 @@
 .cta-band .eyebrow {
   display: block;
   margin-bottom: 0.85rem;
-  color: var(--color-rose-300);
+  color: var(--color-wine-500);
 }
 
 .cta-band h2 {
-  color: var(--color-sand-50);
+  color: var(--color-wine-700);
 }
 
 .cta-band .lead {
   max-width: 52ch;
   margin-top: 0.9rem;
-  color: rgba(243, 222, 217, 0.82);
-}
-
-.cta-band .btn--primary {
-  background-color: var(--color-sand-50);
-  color: var(--color-wine-900);
-}
-
-.cta-band .btn--primary:hover {
-  background-color: var(--color-white);
+  color: var(--color-ink-soft);
 }

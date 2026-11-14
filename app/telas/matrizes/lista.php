@@ -8,7 +8,7 @@
  * Campos de $matrizesUsuarios: os mesmos, mais autor (pode ser null) e criado_em
  * Responsabilidade: listar matrizes em dois grupos.
  *   1. Padrão do ateliê: miniatura, nome, categoria, tamanho, pontos, tempo, editar e excluir.
- *   2. Criadas por usuários: miniatura, nome, autor, tamanho, pontos, data e só excluir (moderação).
+ *   2. Criadas por usuários: miniatura, nome, autor, tamanho, pontos, data, editar e excluir (moderação).
  * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
@@ -26,7 +26,7 @@
     <p class="empty-state">Nenhuma matriz padrão cadastrada.</p>
   <?php else: ?>
     <div class="table-wrap">
-      <table class="table">
+      <table class="table table--centrada">
         <thead>
           <tr>
             <th>Miniatura</th>
@@ -35,7 +35,7 @@
             <th>Tamanho</th>
             <th>Pontos</th>
             <th>Tempo</th>
-            <th>Ações</th>
+            <th class="table__acao-head">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -49,13 +49,17 @@
               <td><?= e($m['largura']) ?> x <?= e($m['altura']) ?></td>
               <td><?= e($m['total_pontos']) ?></td>
               <td><?= e($m['tempo_medio_min']) ?> min</td>
-              <td class="table__actions">
-                <a class="btn btn--ghost btn--sm" href="/gerente/matrizes/form?id=<?= (int) $m['id'] ?>">Editar</a>
+              <td class="table__actions table__actions--centro">
+                <a class="btn btn--ghost btn--icon" href="/gerente/matrizes/form?id=<?= (int) $m['id'] ?>" aria-label="Editar matriz" title="Editar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.85 0 0 1 4 4L8 20l-5 1 1-5L17 3Z"/></svg>
+                </a>
                 <form method="post" action="/gerente/matrizes/excluir"
                       onsubmit="return confirm('Tem certeza que deseja excluir esta matriz?')">
                   <?= Csrf::campo() ?>
                   <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
-                  <button class="btn btn--ghost btn--sm" type="submit">Excluir</button>
+                  <button class="btn btn--ghost btn--icon" type="submit" aria-label="Excluir matriz" title="Excluir">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                  </button>
                 </form>
               </td>
             </tr>
@@ -79,7 +83,7 @@
     <p class="empty-state">Nenhum usuário criou matrizes ainda.</p>
   <?php else: ?>
     <div class="table-wrap">
-      <table class="table">
+      <table class="table table--centrada">
         <thead>
           <tr>
             <th>Miniatura</th>
@@ -88,7 +92,7 @@
             <th>Tamanho</th>
             <th>Pontos</th>
             <th>Criada em</th>
-            <th>Ações</th>
+            <th class="table__acao-head">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -102,12 +106,17 @@
               <td><?= e($m['largura']) ?> x <?= e($m['altura']) ?></td>
               <td><?= e($m['total_pontos']) ?></td>
               <td><?= e(data_br(substr((string) $m['criado_em'], 0, 10))) ?></td>
-              <td class="table__actions">
+              <td class="table__actions table__actions--centro">
+                <a class="btn btn--ghost btn--icon" href="/gerente/matrizes/form?id=<?= (int) $m['id'] ?>" aria-label="Editar matriz" title="Editar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.85 0 0 1 4 4L8 20l-5 1 1-5L17 3Z"/></svg>
+                </a>
                 <form method="post" action="/gerente/matrizes/excluir"
                       onsubmit="return confirm('Tem certeza que deseja excluir esta matriz?')">
                   <?= Csrf::campo() ?>
                   <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
-                  <button class="btn btn--ghost btn--sm" type="submit">Excluir</button>
+                  <button class="btn btn--ghost btn--icon" type="submit" aria-label="Excluir matriz" title="Excluir">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                  </button>
                 </form>
               </td>
             </tr>

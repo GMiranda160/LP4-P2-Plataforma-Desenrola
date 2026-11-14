@@ -4,7 +4,7 @@ Este documento passa o trabalho para outro agente. Leia tudo antes de editar.
 
 ## 1. O que é
 
-`docs/APRESENTACAO_ARQUITETURA.html` é uma apresentação em 22 slides horizontais (16:9) que explica
+`docs/APRESENTACAO_ARQUITETURA.html` é uma apresentação em 21 slides horizontais (16:9) que explica
 a arquitetura da plataforma Desenrola: camadas, subsistemas, classes, banco, rotas e segurança.
 É um único arquivo HTML, sem build, aberto direto no navegador.
 
@@ -25,6 +25,9 @@ genérica) por desenhos próprios em HTML, CSS e JS, com uma identidade visual �
 6. Todo texto em **português do Brasil**, frases curtas e diretas.
 7. Escopo: **só a plataforma Desenrola**. Nada sobre divisão da equipe, prazos ou entrega.
 8. Há alterações em `app/` e `public/` no `git status` que não são deste trabalho. Não toque nelas.
+9. **Nada temporal.** A apresentação descreve o projeto final. Nada de "pronto", "parcial",
+   "esqueleto", "ainda", "hoje" ou "não implementado". Mostre o que cada peça faz, não em que
+   estágio ela está.
 
 ## 3. Status dos slides
 
@@ -32,26 +35,25 @@ genérica) por desenhos próprios em HTML, CSS e JS, com uma identidade visual �
 |---|---|---|---|
 | 01 | `capa` | Capa com coração em ponto cruz | Original, aceito |
 | 02 | `contexto` | Quem usa e com quem conversa | **Refeito** (escada de perfis, bastidor, serviços) |
-| 03 | `implantacao` | Onde cada peça roda | **Refeito** (aparelho, contêiner Render, serviços) |
+| 03 | `implantacao` | Onde cada peça roda | **Refeito** (aparelho, contêiner Railway, serviços) |
 | 04 | `camadas` | Camadas MVC2 | **Refeito** (exemplo "salvar insumo" atravessando 5 camadas) |
 | 05 | `requisicao` | Caminho de uma requisição | **Refeito** (linha do tempo com 11 passos e 3 portões) |
 | 06 | `nucleo` | Núcleo (core) | **Refeito** (linha do pedido com 2 portões em losango, faixa da memória até o banco) |
-| 07 | `subsistemas` | Seis subsistemas | **Refeito e corrigido** (4 colunas, montador no centro, IA ao lado do Hub) |
-| 08 | `estado` | O que já existe | HTML próprio antigo, revisar no estilo novo |
-| 09 | `login` | Entrar na conta | Pendente, Mermaid |
-| 10 | `recuperar` | Recuperar senha | Pendente, Mermaid |
-| 11 | `mostruario` | Vitrine e home | Pendente, Mermaid |
-| 12 | `hub` | Hub: feed, curtidas, comentários | Pendente, Mermaid |
-| 13 | `curtir` | Curtir sem recarregar | Pendente, Mermaid |
-| 14 | `conversor` | De imagem a matriz | Pendente, Mermaid |
-| 15 | `montador` | Um montador, três destinos | Pendente, Mermaid |
-| 16 | `tutorial` | Tutorial com Gemini | Pendente, Mermaid |
-| 17 | `gerente` | Área da gerente | Pendente, Mermaid |
-| 18 | `prg` | Salvar sem perder o digitado | Pendente, Mermaid |
-| 19 | `banco` | Banco de dados | Pendente, Mermaid |
-| 20 | `rotas` | Mapa de rotas | HTML próprio antigo, revisar no estilo novo |
-| 21 | `frontend` | Telas e scripts | Pendente, Mermaid |
-| 22 | `seguranca` | Camadas de defesa | HTML próprio antigo, revisar no estilo novo |
+| 07 | `subsistemas` | Seis subsistemas | **Refeito e corrigido** (4 colunas, montador no centro, IA ao lado do Hub; chips mostram as rotas) |
+| 08 | `pecas` | As peças do projeto | **Refeito** (um nó por classe em cada camada; três tons separam o papel de cada grupo) |
+| 09 | `login` | Entrar na conta | **Refeito** (tela, controlador, 3 portões no serviço, uma saída de erro única) |
+| 10 | `mostruario` | Vitrine e home | **Refeito** (ProdutoDados, peça desenhada com o coração da capa, 3 vitrines, WhatsApp) |
+| 11 | `hub` | Hub: feed, curtidas, comentários | Pendente, Mermaid |
+| 12 | `curtir` | Curtir sem recarregar | Pendente, Mermaid |
+| 13 | `conversor` | De imagem a matriz | Pendente, Mermaid |
+| 14 | `montador` | Um montador, três destinos | Pendente, Mermaid |
+| 15 | `tutorial` | Tutorial com Gemini | Pendente, Mermaid |
+| 16 | `gerente` | Área da gerente | Pendente, Mermaid |
+| 17 | `prg` | Salvar sem perder o digitado | Pendente, Mermaid |
+| 18 | `banco` | Banco de dados | Pendente, Mermaid |
+| 19 | `rotas` | Mapa de rotas | HTML próprio antigo, revisar no estilo novo |
+| 20 | `frontend` | Telas e scripts | Pendente, Mermaid |
+| 21 | `seguranca` | Camadas de defesa | HTML próprio antigo, revisar no estilo novo |
 
 O conteúdo técnico de cada slide pendente já está correto dentro do próprio slide (o texto e o
 código Mermaid em `<script type="text/plain" class="src">`). Use isso como fonte, e confira no código
@@ -150,7 +152,7 @@ conteúdo, mais os rótulos em HTML.
 ```
 
 - `from` e `to`: seletores **dentro do palco**.
-- `kind`: `thread`, `people` ou `loose`.
+- `kind`: `thread`, `people`, `loose` ou `no` (falha, tracejado em `--no`; legenda `<i class="n">`).
 - `label` (opcional): rótulo no meio da linha. `code: true` usa fonte mono. `at` é a posição de 0 a 1
   (padrão 0.55).
 - Âncoras: se o alvo está bem acima ou abaixo (diferença vertical maior que 1,5 vez a horizontal), a
@@ -213,7 +215,9 @@ Para ligações simples dentro de uma grade fixa, CSS basta (setas com `::after`
 
 ## 9. Como conferir
 
-1. Abra `file:///.../Desenrola/docs/APRESENTACAO_ARQUITETURA.html` no navegador embutido.
+1. O navegador embutido mostra `file:///` só como captura estática, sem JS. Rode `preview_start`
+   com o nome `slides` (`.claude/launch.json`, servidor Python na pasta `docs`, porta 8765) e abra
+   `http://localhost:8765/APRESENTACAO_ARQUITETURA.html`.
 2. Emule 1440 por 860 (`resize_window`).
 3. Espere uns 3 segundos (fontes, ícones), clique em "próximo" até o slide, espere **2 segundos**
    e tire a captura. Captura antes disso pega a animação de entrada e o slide parece desbotado.
@@ -254,33 +258,35 @@ Sugestões, não obrigações. Apresente a proposta ao usuário antes de fazer.
 - **06 Núcleo:** feito. Use como referência de "desenho que explica": grade de 5 colunas e 4
   linhas com posições explícitas (`.nuc`, `.pc`), portões com ícone em losango (`.ic.gate`),
   saídas de erro tracejadas em `--no` (`.pc .no`), controlador tracejado (`.pc.ctl`) e banco
-  com textura de bastidor (`.pc.db`). Essas classes podem ser reaproveitadas nos slides 09, 10 e 18.
+  com textura de bastidor (`.pc.db`). Essas classes podem ser reaproveitadas nos slides 09 e 17.
 - **07 Subsistemas:** feito. Não volte para 3 colunas com 3 cartões empilhados.
-- **08 Estado:** barras de progresso costuradas por camada, com os chips pronto, parcial, esqueleto.
-- **09 e 10 Contas:** login como trilha curta com portões (usuário existe, senha confere, conta
-  ativa); recuperação como dois passos com contador de tentativas de 1 a 5.
-- **11 Mostruário:** um produto "desmontado": matriz + peça + cor + posição formando o cartão da
-  vitrine, com o botão de WhatsApp no fim.
-- **12 e 13 Hub:** um cartão de post de verdade com coração, contador e comentários, e as setas
+- **08 Peças:** feito. Controladores por nível de acesso, serviços pela regra que cuidam, dados
+  pela área das tabelas. Tons `.knot8.t1` (claro), `.knot8` (vinho) e `.knot8.t3` (bastidor).
+- **09 Contas:** feito (login com três portões). O slide de recuperação de senha foi removido a
+  pedido do usuário; não o recrie.
+- **10 Mostruário:** feito. A peça é desenhada com o mockup real `bolsa.svg` e o coração da capa
+  (`svg.heart10`, preenchido pela mesma função `desenhar()` da capa).
+- **11 e 12 Hub:** um cartão de post de verdade com coração, contador e comentários, e as setas
   saindo de cada botão para a rota que ele chama; o curtir como interruptor (INSERT ou DELETE).
-- **14 Conversor:** a mesma imagem passando por 5 estados visuais (foto, grade reduzida,
+- **13 Conversor:** a mesma imagem passando por 5 estados visuais (foto, grade reduzida,
   transparência, poucas cores, JSON), com a fronteira navegador e servidor marcada.
-- **15 Montador:** quatro etapas do formulário e uma bifurcação em três destinos pelo `modo`.
-- **16 Tutorial:** três trilhos lado a lado (cache, IA, reserva) saindo do mesmo pedido.
-- **17 e 18 Gerente:** quatro fichas de cadastro idênticas com as regras de cada uma; o PRG como
+- **14 Montador:** quatro etapas do formulário e uma bifurcação em três destinos pelo `modo`.
+- **15 Tutorial:** três trilhos lado a lado (cache, IA, reserva) saindo do mesmo pedido.
+- **16 e 17 Gerente:** quatro fichas de cadastro idênticas com as regras de cada uma; o PRG como
   ida e volta entre formulário e lista.
-- **19 Banco:** `bordados` no centro como bastidor, as outras tabelas em volta com as chaves.
-- **20 Rotas, 21 Front-end, 22 Segurança:** trazer para o molde novo (lede, colcap, footrow,
+- **18 Banco:** `bordados` no centro como bastidor, as outras tabelas em volta com as chaves.
+- **19 Rotas, 20 Front-end, 21 Segurança:** trazer para o molde novo (lede, colcap, footrow,
   cores por papel).
 
 ## 11. Fatos do código usados nos slides
 
-- 13 controladores (5 prontos), 11 serviços (4 prontos, 1 parcial), 8 classes de dados (5 prontas).
-- Prontos: core, autenticação, catálogo, home, cadastros de insumos e clientes.
-- Esqueleto: Hub, comentários, montador, matrizes, produtos da gerente, painel, tutorial.
-- 10 tabelas no Supabase, todas com RLS.
+- 13 controladores, 11 serviços, 8 classes de dados, 9 scripts em `public/assets/js`.
+- Controladores: abertos a visitantes (Home, Catalogo, Auth, Hub), pedem login (Comentario,
+  Montador, Tutorial), só a gerente (Painel, Usuario, Insumo, Cliente, Produto, Matriz).
+- 10 tabelas no Supabase, todas com RLS. A tabela `sessoes` é usada pelo `SessaoBanco` do núcleo.
 
-Se o código mudar, atualize esses números no slide 08 e em qualquer outro que os cite.
+Se o código mudar (classe nova, rota nova), atualize esses números no slide 08 e em qualquer
+outro que os cite.
 
 ## 12. Erros já cometidos (não repetir)
 
