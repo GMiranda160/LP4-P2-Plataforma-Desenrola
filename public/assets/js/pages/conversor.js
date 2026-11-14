@@ -14,6 +14,7 @@ const ALFA_MINIMO = 128;
 const LADO_MINIMO = 8;
 const LADO_MAXIMO = 1024;
 const AMOSTRA_MAXIMA = 60000;
+const VAZIO = -1;
 
 /**
  * Converte um arquivo de imagem em grade de pontos para ponto cruz.
@@ -49,14 +50,10 @@ export async function converterImagem(arquivo, { largura = LARGURA_PADRAO, cores
     throw new Error('A imagem é estreita demais. Use uma imagem mais próxima de um quadrado ou um tamanho maior.');
   }
 
-  const canvas = document.createElement('canvas');
-  canvas.width = largura;
-  canvas.height = altura;
-
-  const contexto = canvas.getContext('2d', { willReadFrequently: true });
-  contexto.drawImage(bitmap, 0, 0, largura, altura);
+  const canvas = reduzirImagem(bitmap, largura, altura);
   bitmap.close();
 
+  const contexto = canvas.getContext('2d', { willReadFrequently: true });
   const { data } = contexto.getImageData(0, 0, largura, altura);
 
   // Marca como vazio todo pixel com alfa abaixo do mínimo.
@@ -83,16 +80,109 @@ export async function converterImagem(arquivo, { largura = LARGURA_PADRAO, cores
   const passo = Math.max(1, Math.floor(opacosLista.length / AMOSTRA_MAXIMA));
   const amostra = passo === 1 ? opacosLista : opacosLista.filter((_, i) => i % passo === 0);
   const paleta = reduzirCores(amostra, cores);
-  const indices = pixels.map((pixel) => (pixel === null ? null : corMaisProxima(paleta, pixel)));
-  const pontos = indices.map((indice) => (indice === null ? '.' : indice.toString(16))).join('');
+  const brutos = Int8Array.from(pixels, (pixel) => (pixel === null ? VAZIO : corMaisProxima(paleta, pixel)));
+  let indices = limparPontosSoltos(brutos, largura, altura);
+  let total = indices.reduce((soma, indice) => soma + (indice === VAZIO ? 0 : 1), 0);
+
+  // Imagem minúscula em que a limpeza apagaria tudo: fica com a grade sem limpeza.
+  if (total === 0) {
+    indices = brutos;
+    total = opacos;
+  }
+
+  let pontos = '';
+  for (const indice of indices) {
+    pontos += indice === VAZIO ? '.' : indice.toString(16);
+  }
 
   return {
     largura,
     altura,
     paleta: paleta.map(paraHex),
     pontos,
-    totalPontos: opacos,
+    totalPontos: total,
   };
+}
+
+/**
+ * Reduz a imagem para largura x altura com boa qualidade.
+ * Um drawImage direto de 3000 px para 256 px pula pixels da original e deixa a borda
+ * tremida. Aqui a imagem cai pela metade a cada passo, com suavização alta, até o tamanho final.
+ */
+function reduzirImagem(bitmap, largura, altura) {
+  let origem = bitmap;
+  let w = bitmap.width;
+  let h = bitmap.height;
+
+  while (w / 2 >= largura && h / 2 >= altura) {
+    w = Math.round(w / 2);
+    h = Math.round(h / 2);
+    origem = desenharEm(origem, w, h);
+  }
+
+  return desenharEm(origem, largura, altura);
+}
+
+function desenharEm(origem, largura, altura) {
+  const canvas = document.createElement('canvas');
+  canvas.width = largura;
+  canvas.height = altura;
+
+  const contexto = canvas.getContext('2d', { willReadFrequently: true });
+  contexto.imageSmoothingEnabled = true;
+  contexto.imageSmoothingQuality = 'high';
+  contexto.drawImage(origem, 0, 0, largura, altura);
+
+  return canvas;
+}
+
+/**
+ * Tira pontos soltos: um ponto que quase não tem vizinho da mesma cor (0 ou 1 dos 8 vizinhos)
+ * passa a ter a cor da maioria em volta, quando essa maioria tem pelo menos 5 vizinhos.
+ * Vazio conta como uma "cor", então pontinho perdido fora do contorno some e buraco
+ * dentro do desenho é preenchido. Lê da grade original e escreve numa cópia, numa passada só.
+ */
+function limparPontosSoltos(indices, largura, altura) {
+  const saida = indices.slice();
+  const contagem = new Int8Array(17); // 16 cores + vazio (posição 16)
+
+  for (let y = 0; y < altura; y++) {
+    for (let x = 0; x < largura; x++) {
+      contagem.fill(0);
+
+      for (let dy = -1; dy <= 1; dy++) {
+        const ny = y + dy;
+        if (ny < 0 || ny >= altura) continue;
+
+        for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx;
+          if ((dx === 0 && dy === 0) || nx < 0 || nx >= largura) continue;
+
+          const vizinho = indices[ny * largura + nx];
+          contagem[vizinho === VAZIO ? 16 : vizinho]++;
+        }
+      }
+
+      const atual = indices[y * largura + x];
+      if (contagem[atual === VAZIO ? 16 : atual] > 1) continue;
+
+      let maioria = -1;
+      let maior = 0;
+
+      for (let c = 0; c < contagem.length; c++) {
+        if (contagem[c] > maior) {
+          maior = contagem[c];
+          maioria = c;
+        }
+      }
+
+      if (maior >= 5) {
+        saida[y * largura + x] = maioria === 16 ? VAZIO : maioria;
+      }
+    }
+  }
+
+  return saida;
 }
 
 /**

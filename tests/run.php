@@ -166,7 +166,9 @@ teste('gerarSvg: monta um path por cor usada', function () use ($grade, $jsonVal
 
     verdadeiro(str_contains($svg, '<svg xmlns'), 'faltou a tag svg');
     verdadeiro(str_contains($svg, 'viewBox="0 0 8 8"'), 'viewBox incorreto');
-    verdadeiro(str_contains($svg, 'crispEdges'), 'faltou shape-rendering');
+    // Borda suave: sem crispEdges, e um contorno da mesma cor para não abrir fresta entre cores.
+    verdadeiro(!str_contains($svg, 'crispEdges'), 'crispEdges deixa a borda serrilhada');
+    verdadeiro(str_contains($svg, 'stroke="#ff0000"'), 'faltou o contorno na mesma cor');
     igual(2, substr_count($svg, '<path'), 'deveria ter um path por cor');
     verdadeiro(str_contains($svg, 'fill="#ff0000"'), 'faltou a cor #ff0000');
     verdadeiro(str_contains($svg, 'fill="#00ff00"'), 'faltou a cor #00ff00');

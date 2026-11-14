@@ -30,8 +30,14 @@ export function initShowcase(root) {
   let velocidade = 0;
   let animando = false;
   let pausado = false;
+  let estatico = false;
 
   const velocidadeBase = 0.8;
+
+  // Poucos itens: se o grupo inteiro cabe na vitrine, não há o que rolar. A vitrine fica
+  // parada e centralizada, sem a cópia do loop, sem setas e sem o botão de pausa.
+  const cabeInteiro = () => grupos[0].scrollWidth - gap <= viewport.clientWidth;
+  const podeAnimar = () => !estatico && !reducaoAtiva() && !telaPequena.matches;
 
   const passo = () => {
     offset += velocidade;
@@ -47,7 +53,7 @@ export function initShowcase(root) {
   };
 
   const iniciar = () => {
-    if (reducaoAtiva() || telaPequena.matches) {
+    if (!podeAnimar()) {
       return;
     }
 
@@ -122,8 +128,9 @@ export function initShowcase(root) {
   });
 
   const aoMudarMidia = () => {
-    if (reducaoAtiva() || telaPequena.matches) {
+    if (!podeAnimar()) {
       parar();
+      offset = 0;
       track.style.transform = '';
       return;
     }
@@ -132,9 +139,29 @@ export function initShowcase(root) {
     iniciar();
   };
 
+  const verificarTamanho = () => {
+    // A cópia do loop fica escondida no modo parado, então mede sempre pelo primeiro grupo.
+    const cabe = cabeInteiro();
+
+    if (cabe === estatico) {
+      return;
+    }
+
+    estatico = cabe;
+    root.classList.toggle('showcase--estatico', estatico);
+    aoMudarMidia();
+  };
+
   on(reduzMovimento, 'change', aoMudarMidia);
   on(telaPequena, 'change', aoMudarMidia);
 
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(verificarTamanho).observe(viewport);
+  } else {
+    on(window, 'resize', verificarTamanho);
+  }
+
   atualizarToggle();
+  verificarTamanho();
   iniciar();
 }

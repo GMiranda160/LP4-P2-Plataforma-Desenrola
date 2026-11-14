@@ -242,8 +242,12 @@
   height: 100%;
 }
 
-/* Foto real da peça (peça base ou foto enviada), no lugar do desenho do mockup. */
+/* Foto real da peça (peça base ou foto enviada), no lugar do desenho do mockup.
+   Absoluta: dentro do grid, height: 100% não resolve e a foto saía na altura natural
+   (ampliada e cortada), desalinhada da máscara da tinta, que usa contain na caixa toda. */
 .peca__foto {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -266,7 +270,8 @@
 
 .peca__matriz {
   position: absolute;
-  image-rendering: pixelated;
+  /* Sem image-rendering: pixelated. A matriz é SVG (vetor), e com ele a matriz girada
+     era rasterizada com degraus. */
   /* A centralização é calculada no servidor (ver parciais/peca_bordada.php).
      O transform vem só do style inline, para a rotação em volta do centro. */
   transform-origin: center;

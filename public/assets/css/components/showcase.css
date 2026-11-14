@@ -174,6 +174,29 @@
   min-width: 220px;
 }
 
+/* Poucos itens (cabem todos na vitrine): parada e centralizada, sem a cópia do loop.
+   A classe é ligada em js/components/showcase.js. */
+.showcase--estatico .showcase__viewport {
+  mask-image: none;
+}
+
+.showcase--estatico .showcase__track {
+  width: auto;
+  justify-content: center;
+  transform: none !important;
+}
+
+.showcase--estatico .showcase__group {
+  padding-right: 0;
+}
+
+.showcase--estatico .showcase__group[aria-hidden='true'],
+.showcase--estatico .showcase__edge,
+.showcase--estatico .showcase__toggle,
+.showcase--estatico .showcase__hint {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .showcase__viewport {
     overflow-x: auto;

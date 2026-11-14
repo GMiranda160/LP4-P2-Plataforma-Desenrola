@@ -373,7 +373,9 @@ export function initMontador(root) {
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(giro);
-      ctx.imageSmoothingEnabled = false;
+      // Suavização ligada: a matriz é SVG e, girada, sem suavização a borda saía em degraus.
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(matriz, -w / 2, -h / 2, w, h);
       ctx.restore();
     } catch {

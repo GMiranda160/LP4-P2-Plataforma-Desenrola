@@ -98,15 +98,23 @@ class GradeServico
             }
         }
 
+        // Sem shape-rendering="crispEdges": com ele a borda não tem antialiasing e, em escala
+        // fracionada ou girada, os degraus saem desiguais. Sem ele, cada cor ganha borda suave,
+        // mas duas cores vizinhas deixariam uma fresta clara entre si. O contorno fino na mesma
+        // cor (0,15 de ponto) cobre essa fresta e quase não muda o tamanho do desenho.
         $svg = sprintf(
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" shape-rendering="crispEdges">',
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d">',
             $g['largura'],
             $g['altura']
         );
 
         foreach ($caminhos as $i => $caminho) {
             if ($caminho !== '') {
-                $svg .= sprintf('<path fill="%s" d="%s"/>', $g['paleta'][$i], $caminho);
+                $svg .= sprintf(
+                    '<path fill="%1$s" stroke="%1$s" stroke-width=".15" stroke-linejoin="miter" d="%2$s"/>',
+                    $g['paleta'][$i],
+                    $caminho
+                );
             }
         }
 

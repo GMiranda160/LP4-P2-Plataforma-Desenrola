@@ -364,7 +364,7 @@
   width: 100%;
   height: auto;
   max-width: none;
-  image-rendering: pixelated;
+  /* Sem pixelated: a matriz é SVG, e girada ela saía com degraus (ver .peca__matriz). */
   pointer-events: none;
 }
 
@@ -479,7 +479,11 @@
   height: 30px;
 }
 
+/* Absoluta pelo mesmo motivo de .peca__foto: no grid, height: 100% não resolve e a foto
+   saía ampliada, fora da máscara da tinta e diferente da montagem baixada. */
 .montador__mockup-foto {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
