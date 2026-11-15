@@ -17,7 +17,7 @@ class ProdutoDados
     public function listar(?string $categoria = null, bool $apenasAtivos = true): array
     {
         $sql = 'SELECT p.*, c.nome AS categoria, c.slug, c.mockup,
-                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura
+                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura, p.foto_path AS foto_produto
                 FROM produtos p
                 JOIN bordados b ON b.id = p.bordado_id
                 JOIN categorias c ON c.id = b.categoria_id
@@ -43,7 +43,7 @@ class ProdutoDados
     public function destaques(int $limite = 6): array
     {
         $sql = 'SELECT p.*, c.nome AS categoria, c.slug, c.mockup,
-                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura
+                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura, p.foto_path AS foto_produto
                 FROM produtos p
                 JOIN bordados b ON b.id = p.bordado_id
                 JOIN categorias c ON c.id = b.categoria_id
@@ -64,7 +64,7 @@ class ProdutoDados
     public function buscarAtivo(int $id): ?array
     {
         $sql = 'SELECT p.*, c.nome AS categoria, c.slug, c.mockup,
-                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura, b.descricao AS bordado_descricao
+                       b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura, p.foto_path AS foto_produto, b.descricao AS bordado_descricao
                 FROM produtos p
                 JOIN bordados b ON b.id = p.bordado_id
                 JOIN categorias c ON c.id = b.categoria_id
@@ -116,8 +116,8 @@ class ProdutoDados
     /** Grava um produto novo e devolve o id. Bordado_id duplicado estoura SQLSTATE 23505 (tratado no serviço). */
     public function inserir(array $d): int
     {
-        $sql = 'INSERT INTO produtos (bordado_id, nome, descricao, preco_base, destaque, ativo)
-                VALUES (:bordado_id, :nome, :descricao, :preco_base, :destaque, :ativo)
+        $sql = 'INSERT INTO produtos (bordado_id, nome, descricao, preco_base, destaque, ativo, foto_path)
+                VALUES (:bordado_id, :nome, :descricao, :preco_base, :destaque, :ativo, :foto)
                 RETURNING id';
 
         $consulta = Conexao::pdo()->prepare($sql);
@@ -127,6 +127,7 @@ class ProdutoDados
         $consulta->bindValue(':preco_base', $d['preco_base']);
         $consulta->bindValue(':destaque', !empty($d['destaque']) ? 't' : 'f');
         $consulta->bindValue(':ativo', !empty($d['ativo']) ? 't' : 'f');
+        $consulta->bindValue(':foto', $d['foto_path'] ?? null);
         $consulta->execute();
 
         return (int) $consulta->fetchColumn();
@@ -137,7 +138,7 @@ class ProdutoDados
     {
         $sql = 'UPDATE produtos
                 SET bordado_id = :bordado_id, nome = :nome, descricao = :descricao,
-                    preco_base = :preco_base, destaque = :destaque, ativo = :ativo
+                    preco_base = :preco_base, destaque = :destaque, ativo = :ativo, foto_path = :foto
                 WHERE id = :id';
 
         $consulta = Conexao::pdo()->prepare($sql);
@@ -147,16 +148,21 @@ class ProdutoDados
         $consulta->bindValue(':preco_base', $d['preco_base']);
         $consulta->bindValue(':destaque', !empty($d['destaque']) ? 't' : 'f');
         $consulta->bindValue(':ativo', !empty($d['ativo']) ? 't' : 'f');
+        $consulta->bindValue(':foto', $d['foto_path'] ?? null);
         $consulta->bindValue(':id', $id, PDO::PARAM_INT);
         $consulta->execute();
     }
 
-    /** Exclui o produto. O bordado permanece (vira combinação disponível de novo). */
-    public function excluir(int $id): void
+    /** Exclui o produto e devolve o foto_path gravado (null se não havia), para o serviço apagar o arquivo. O bordado permanece (vira combinação disponível de novo). */
+    public function excluir(int $id): ?string
     {
-        $consulta = Conexao::pdo()->prepare('DELETE FROM produtos WHERE id = :id');
+        $consulta = Conexao::pdo()->prepare('DELETE FROM produtos WHERE id = :id RETURNING foto_path');
         $consulta->bindValue(':id', $id, PDO::PARAM_INT);
         $consulta->execute();
+
+        $caminho = $consulta->fetchColumn();
+
+        return $caminho === false || $caminho === null ? null : (string) $caminho;
     }
 
     /** Inverte o ativo. Devolve o novo estado (true/false), ou null se não existe. */
@@ -190,6 +196,24 @@ class ProdutoDados
     {
         $consulta = Conexao::pdo()->prepare('SELECT 1 FROM categorias WHERE id = :id');
         $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+        $consulta->execute();
+
+        return (bool) $consulta->fetchColumn();
+    }
+
+    /** True se a combinação existe, é tipo='produto' e não está em outro produto (o de edição não conta). */
+    public function combinacaoDisponivel(int $bordadoId, int $produtoId): bool
+    {
+        $consulta = Conexao::pdo()->prepare(
+            "SELECT 1
+             FROM bordados b
+             WHERE b.id = :id AND b.tipo = 'produto'
+               AND NOT EXISTS (SELECT 1 FROM produtos p
+                               WHERE p.bordado_id = b.id AND p.id <> :atual)
+             LIMIT 1"
+        );
+        $consulta->bindValue(':id', $bordadoId, PDO::PARAM_INT);
+        $consulta->bindValue(':atual', $produtoId, PDO::PARAM_INT);
         $consulta->execute();
 
         return (bool) $consulta->fetchColumn();

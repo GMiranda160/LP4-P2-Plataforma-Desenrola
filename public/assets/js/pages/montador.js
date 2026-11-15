@@ -2,7 +2,8 @@
  * Arquivo: montador.js
  * Dono: Guilherme. Só Guilherme altera este arquivo.
  * Responsabilidade: controlar as quatro etapas do montador (matriz, peça, posição e publicar),
- * converter a imagem no navegador via conversor.js e posicionar a matriz na peça com uma caixa de
+ * converter a imagem no navegador via conversor.js, mostrar o bloco da matriz nova na etapa
+ * Publicar quando uma imagem foi convertida e posicionar a matriz na peça com uma caixa de
  * transformação (mover, redimensionar pelos cantos e girar pela alça de cima) com Pointer Events.
  * Veja INSTRUCOES_GUILHERME.md, seções 6 e 7.
  */
@@ -41,7 +42,12 @@ export function initMontador(root) {
   const categoriaId = query('[data-categoria]', form);
   const tinta = query('[data-tinta]', root);
   const amostraCores = queryAll('.swatch[data-cor]', root);
+  const corLivre = query('[data-cor-livre]', root);
   const titulo = query('[data-titulo]', form);
+  const finalWrapper = query('[data-final]', form);
+  const finalAparecer = queryAll('[data-final-aparecer]', form);
+  const blocoMatriz = query('[data-bloco-matriz]', form);
+  const nomeMatriz = query('[data-nome-matriz]', form);
   const pecaIdCampo = query('[data-peca-id]', form);
   const fotoPecaCampo = query('[data-foto-peca]', form);
   const baixar = query('[data-baixar]', root);
@@ -118,6 +124,15 @@ export function initMontador(root) {
     return radiosMatriz.find((radio) => radio.checked) ?? null;
   }
 
+  /** Mostra ou esconde o bloco da matriz nova na etapa Publicar, conforme haja imagem convertida. */
+  function atualizarBlocoMatriz() {
+    // Sem o bloco (modo matriz) o layout fica sempre em uma coluna.
+    const visivel = Boolean(gradeJson && gradeJson.value) && Boolean(blocoMatriz);
+    if (blocoMatriz) blocoMatriz.hidden = !visivel;
+    finalAparecer.forEach((el) => { el.hidden = !visivel; });
+    if (finalWrapper) finalWrapper.classList.toggle('montador__final--duplo', visivel);
+  }
+
   function gradeSelecionada() {
     return gradeJson?.value ? gradeConvertida : null;
   }
@@ -146,13 +161,13 @@ export function initMontador(root) {
     if (status) status.textContent = manterSelecao ? status.textContent : '';
     canvas?.classList.remove('is-visivel');
     limpar?.classList.remove('is-visivel');
+    atualizarBlocoMatriz();
     atualizarPreviewMatriz();
   }
 
-  async function converterSelecao() {
-    const arquivoAtual = arquivo?.files?.[0];
-
-    if (!arquivoAtual) return;
+  /** Converte um Blob: arquivo do disco, arrastado, colado ou baixado de um link. */
+  async function converterBlob(imagem) {
+    if (!imagem) return;
 
     status.textContent = 'Convertendo a imagem...';
     esconderErro();
@@ -160,13 +175,14 @@ export function initMontador(root) {
     try {
       const larguraPx = Number(largura?.value || 256);
       const coresQtd = Number(cores?.value || 8);
-      const grade = await converterImagem(arquivoAtual, { largura: larguraPx, cores: coresQtd });
+      const grade = await converterImagem(imagem, { largura: larguraPx, cores: coresQtd });
 
       // Limpa a matriz existente escolhida: agora a imagem é a fonte.
       radiosMatriz.forEach((radio) => { radio.checked = false; });
 
       gradeConvertida = { ...grade, preview: '' };
       if (gradeJson) gradeJson.value = JSON.stringify({ largura: grade.largura, altura: grade.altura, paleta: grade.paleta, pontos: grade.pontos });
+      atualizarBlocoMatriz();
 
       if (canvas) {
         desenharGrade(canvas, grade);
@@ -182,6 +198,11 @@ export function initMontador(root) {
       limparImagem({ manterSelecao: false });
       mostrarErro(erro instanceof Error ? erro.message : 'Não consegui converter a imagem.');
     }
+  }
+
+  /** Imagem escolhida no input de arquivo da etapa 1. */
+  function converterSelecao() {
+    return converterBlob(arquivo?.files?.[0]);
   }
 
   /** A categoria do bordado vem da peça escolhida (data-categoria-id, cadastrado em /gerente/pecas). */
@@ -243,6 +264,9 @@ export function initMontador(root) {
       botao.setAttribute('aria-pressed', selecionada ? 'true' : 'false');
     });
 
+    // A bolinha universal acompanha a cor vigente (mesmo escolhendo um swatch da paleta).
+    if (corLivre) corLivre.value = limpa;
+
     atualizarTinta();
   }
 
@@ -285,6 +309,12 @@ export function initMontador(root) {
       botao.disabled = modo === 'foto';
       botao.setAttribute('aria-disabled', modo === 'foto' ? 'true' : 'false');
     });
+
+    // A bolinha universal também fica fora quando a peça é a foto da pessoa.
+    if (corLivre) {
+      corLivre.disabled = modo === 'foto';
+      corLivre.closest('.swatch--livre')?.setAttribute('aria-disabled', modo === 'foto' ? 'true' : 'false');
+    }
 
     fotoLinha?.toggleAttribute('hidden', modo !== 'foto');
     fotoNota?.toggleAttribute('hidden', false);
@@ -551,7 +581,16 @@ export function initMontador(root) {
     }
 
     if (etapa === 'publicar') {
-      if (titulo && titulo.value.trim() !== '') return true;
+      if (titulo && titulo.value.trim() !== '') {
+        if (blocoMatriz && !blocoMatriz.hidden && nomeMatriz && nomeMatriz.value.trim() === '') {
+          mostrarErro('Dê um nome para a matriz.');
+          nomeMatriz.focus();
+          return false;
+        }
+
+        return true;
+      }
+
       mostrarErro('Informe o título.');
       titulo?.focus();
       return false;
@@ -597,6 +636,22 @@ export function initMontador(root) {
 
   on(query('[data-foto-abrir]', root), 'click', () => enquadrador.abrir());
 
+  // Etapa 1: o próprio quadro de upload abre o popup (arquivo local, link, arrastar ou Ctrl+V).
+  // preventDefault segura o seletor nativo do <label>; sem JavaScript ele continua abrindo.
+  const quadroImagem = query('[data-conv-abrir]', root);
+  const abrirConversor = () => enquadrador.abrir({ modo: 'original', aoUsar: converterBlob });
+
+  on(quadroImagem, 'click', (evento) => {
+    evento.preventDefault();
+    abrirConversor();
+  });
+
+  on(quadroImagem, 'keydown', (evento) => {
+    if (evento.key !== 'Enter' && evento.key !== ' ') return;
+    evento.preventDefault();
+    abrirConversor();
+  });
+
   // Escolher "Minha foto" sem foto ainda já abre o popup.
   radiosBase.forEach((radio) => on(radio, 'change', () => {
     if (radio.checked && radio.value === 'foto' && !fotoDoUsuario) enquadrador.abrir();
@@ -604,6 +659,9 @@ export function initMontador(root) {
 
   // Eventos: paleta de cores da peça (multiplica sobre a foto).
   amostraCores.forEach((botao) => on(botao, 'click', () => definirCorSimples(botao.dataset.cor)));
+
+  // Eventos: bolinha de cor universal (aceita qualquer cor, não só a paleta).
+  on(corLivre, 'input', () => definirCorSimples(corLivre.value));
 
   // Eventos: posição.
   // Caixa de transformação: mover pelo corpo, redimensionar pelos cantos, girar pela alça de cima.
@@ -684,5 +742,6 @@ export function initMontador(root) {
   definirCorSimples('#f3ded9');
   renderizarPosicao();
   atualizarPreviewMatriz();
+  atualizarBlocoMatriz();
   irPara(0);
 }

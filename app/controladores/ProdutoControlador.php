@@ -31,7 +31,9 @@ class ProdutoControlador
         }
 
         $velhos = Sessao::tirarVelhos();
-        $combinacoes = $this->servico->combinacoes($id);
+        // A combinação já vinculada a este produto precisa entrar na lista, senão o
+        // select fica vazio na edição (e a validação recusa salvar).
+        $combinacoes = $this->servico->combinacoes($produto ? (int) ($produto['bordado_id'] ?? 0) : 0);
 
         Visao::render('produtos/form', [
             'titulo' => $produto ? 'Editar produto' : 'Novo produto',
@@ -64,7 +66,7 @@ class ProdutoControlador
     public function salvar(): void
     {
         $id = (int) ($_POST['id'] ?? 0);
-        $resultado = $this->servico->salvar($_POST);
+        $resultado = $this->servico->salvar($_POST, $_FILES['foto'] ?? null, !empty($_POST['remover_foto']));
 
         if ($resultado['erros']) {
             Sessao::flash('erro', implode(' ', $resultado['erros']));

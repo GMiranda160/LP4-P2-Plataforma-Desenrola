@@ -6,62 +6,240 @@
  */
 
 .product-detail {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 2rem;
-  align-items: start;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  max-width: 62vw;
+  margin-inline: auto;
+}
+
+/* Volta para o catálogo, com os filtros do referer (se veio de lá). */
+.product-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  font-size: var(--font-md);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.product-voltar:hover,
+.product-voltar:focus-visible {
+  color: var(--color-wine-700);
+}
+
+.product-voltar svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  transition: transform var(--transition);
+}
+
+.product-voltar:hover svg {
+  transform: translateX(-0.25rem);
 }
 
 .product-detail__media {
   background: var(--color-sand-100);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  /* Altura proporcional ao viewport: a peça inteira cabe na tela sem rolar. */
+  height: min(72vh, 640px);
+  width: auto;
+  max-width: 100%;
   aspect-ratio: 4 / 5;
+  flex: 0 0 auto;
   box-shadow: var(--shadow-sm);
 }
 
+/* Vale para a peça e a foto do produto; a matriz (.peca__matriz) tem tamanho próprio. */
 .product-detail__media svg,
-.product-detail__media img {
+.product-detail__media .peca__foto {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.product-detail__info {
+.product-detail__media .peca__foto--produto {
+  object-fit: cover;
+}
+
+/* A foto própria do produto preenche a moldura (a regra acima força contain). */
+.product-detail__media .peca__foto--produto {
+  object-fit: cover;
+}
+
+.product-detail__panel {
+  /* Painel com costura aparente, como as bordas de um bordado. */
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.9rem;
+  width: min(100%, 34rem);
+  flex-shrink: 1;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 2px dashed rgba(105, 24, 24, 0.45);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-sand-50);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Categoria do produto (tipo de item), com ícone de etiqueta. */
+.product-detail__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: var(--font-2xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-wine-500);
+}
+
+.product-detail__eyebrow svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .product-detail__name {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  color: var(--color-ink);
+  font-size: var(--font-6xl);
+  line-height: 1.05;
+  color: var(--color-wine-900);
 }
 
 .product-detail__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
   margin: 0;
-  font-family: var(--font-body);
-  font-size: 1.1rem;
+  font-family: var(--font-display);
+  font-size: var(--font-3xl);
   color: var(--color-wine-700);
 }
 
-.product-detail__desc {
-  margin: 0 0 0.5rem;
+.product-detail__price-label {
   font-family: var(--font-body);
+  font-size: var(--font-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--color-ink-soft);
-  line-height: 1.5;
+}
+
+/* Descrição em caixa própria, como uma ficha do produto. */
+.product-detail__descricao {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border: 1px dashed var(--color-sand-200);
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-100);
+}
+
+.product-detail__descricao-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: var(--font-2xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.product-detail__descricao p {
+  margin: 0;
+  color: var(--color-ink-soft);
+  line-height: 1.6;
+}
+
+.product-detail__whatsapp {
+  justify-content: center;
+}
+
+/* Seletor de cor ao vivo: prévia na peça; a cor vai na mensagem do WhatsApp, nada é gravado. */
+.product-detail__cores {
+  margin: 0;
+  padding: 0.85rem 0 0;
+  border: 0;
+  border-top: 1px dashed var(--color-sand-200);
+}
+
+.product-detail__cores-titulo {
+  padding: 0;
+  margin-bottom: 0.6rem;
+  font-size: var(--font-2xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.product-detail__cores-titulo span {
+  opacity: 0.75;
+  letter-spacing: 0.06em;
+}
+
+.product-detail__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.product-detail__swatch {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  border: 1px solid rgba(46, 35, 33, 0.28);
+  background-color: var(--swatch);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.product-detail__swatch:hover {
+  transform: scale(1.15);
+}
+
+.product-detail__swatch.is-active,
+.product-detail__swatch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-sand-50), 0 0 0 4px var(--color-wine-700);
+}
+
+.product-detail__cor-livre {
+  position: relative;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  border: 1px dashed rgba(46, 35, 33, 0.4);
+  background: conic-gradient(from 45deg, #d94f4f, #d9b44f, #4f8f5f, #4f6f9f, #7a4f9f, #d94f8f, #d94f4f);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.product-detail__cor-livre:focus-within {
+  box-shadow: 0 0 0 2px var(--color-sand-50), 0 0 0 4px var(--color-wine-700);
+}
+
+.product-detail__cor-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 
 @media (max-width: 720px) {
   .product-detail {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    justify-content: center;
     gap: 1.25rem;
   }
 
   .product-detail__name {
-    font-size: 1.25rem;
+    font-size: var(--font-5xl);
   }
 }

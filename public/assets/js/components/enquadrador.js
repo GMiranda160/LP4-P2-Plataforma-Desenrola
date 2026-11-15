@@ -15,16 +15,40 @@ import { query, on } from '../utils/dom.js';
 // Saída em 4:5, a proporção da peça (.peca e .montador__area).
 const SAIDA_LARGURA = 1280;
 const SAIDA_ALTURA = 1600;
-const TAMANHO_MAXIMO = 10 * 1024 * 1024;
 const TIPOS = ['image/png', 'image/jpeg', 'image/webp'];
+
+/**
+ * Dois modos de uso:
+ *  enquadrar: foto da peça, recortada em 4:5 e devolvida como JPEG em data URL.
+ *  original: imagem da matriz, devolvida crua (sem moldura, sem JPEG), para o conversor.
+ */
+const MODOS = {
+  enquadrar: {
+    titulo: 'Foto da sua peça',
+    origem: 'Envie uma foto da peça, de frente e com boa luz.',
+    ajuste: 'Arraste para enquadrar a peça e use o zoom para aproximar ou afastar.',
+    limite: 10 * 1024 * 1024,
+    dica: 'ou arraste a imagem para cá · PNG, JPEG ou WebP até 10 MB',
+    usar: 'Usar esta foto',
+  },
+  original: {
+    titulo: 'Imagem para virar matriz',
+    origem: 'Escolha o desenho que vai virar matriz de pontos.',
+    ajuste: '',
+    limite: 5 * 1024 * 1024,
+    dica: 'ou arraste a imagem para cá · PNG, JPEG ou WebP até 5 MB',
+    usar: 'Converter esta imagem',
+  },
+};
 const ZOOM_MAXIMO = 4; // 4x além de preencher a moldura
 const PASSO_TECLADO = 12; // px por seta
 
 /**
- * Liga o popup. aoConfirmar recebe o data URL JPEG 4:5 da foto enquadrada.
+ * Liga o popup. No modo padrão, aoConfirmar recebe o data URL JPEG 4:5 da foto enquadrada.
+ * No modo 'original', o Blob cru vai para o aoUsar informado na abertura.
  * Devolve { abrir }.
  */
-export function criarEnquadrador(dialogo, { aoConfirmar }) {
+export function criarEnquadrador(dialogo, { aoConfirmar } = {}) {
   if (!dialogo) return { abrir() {} };
 
   const origem = query('[data-enq-origem]', dialogo);
@@ -38,6 +62,18 @@ export function criarEnquadrador(dialogo, { aoConfirmar }) {
   const imagem = query('[data-enq-img]', dialogo);
   const zoom = query('[data-enq-zoom]', dialogo);
   const subtitulo = query('[data-enq-sub]', dialogo);
+  const titulo = query('.enquadrador__titulo', dialogo);
+  const botaoUsar = query('[data-enq-usar]', dialogo);
+  const dicaArquivo = query('.enquadrador__dica', soltar);
+
+  // Modo da abertura atual e para quem vai a imagem no modo original.
+  let modoAtual = 'enquadrar';
+  let aoUsarAtual = null;
+  let blobAtual = null;
+
+  function config() {
+    return MODOS[modoAtual] ?? MODOS.enquadrar;
+  }
 
   // Estado do enquadramento, independente do tamanho da tela:
   // z = 1 preenche a moldura (cover); cx, cy = ponto da imagem que fica no centro da moldura.
@@ -174,6 +210,20 @@ export function criarEnquadrador(dialogo, { aoConfirmar }) {
     cx = img.naturalWidth / 2;
     cy = img.naturalHeight / 2;
     mostrarErro('');
+
+    // Modo original: entrega o arquivo inteiro, sem moldura e sem JPEG.
+    if (modoAtual === 'original') {
+      const entregar = aoUsarAtual;
+      const blob = blobAtual;
+      dialogo.close();
+
+      if (blob && typeof entregar === 'function') {
+        entregar(blob);
+      }
+
+      return;
+    }
+
     mostrarEtapa('ajuste');
   }
 
@@ -185,10 +235,14 @@ export function criarEnquadrador(dialogo, { aoConfirmar }) {
       return;
     }
 
-    if (!TIPOS.includes(file.type) || file.size > TAMANHO_MAXIMO) {
-      mostrarErro('Escolha uma imagem PNG, JPEG ou WebP de até 10 MB.');
+    const limite = config().limite;
+
+    if (!TIPOS.includes(file.type) || file.size > limite) {
+      mostrarErro(`Escolha uma imagem PNG, JPEG ou WebP de até ${limite / 1024 / 1024} MB.`);
       return;
     }
+
+    blobAtual = file;
 
     try {
       await carregarSrc(URL.createObjectURL(file));
@@ -217,7 +271,15 @@ export function criarEnquadrador(dialogo, { aoConfirmar }) {
         throw new Error(corpo?.erro || 'Não consegui baixar a imagem desse link.');
       }
 
-      await carregarSrc(URL.createObjectURL(await resposta.blob()));
+      const blob = await resposta.blob();
+      const limite = config().limite;
+
+      if (blob.size > limite) {
+        throw new Error(`A imagem desse link tem mais de ${limite / 1024 / 1024} MB. Escolha uma menor.`);
+      }
+
+      blobAtual = blob;
+      await carregarSrc(URL.createObjectURL(blob));
     } catch (e) {
       mostrarErro(e.message || 'Não consegui baixar a imagem desse link.');
     } finally {
@@ -382,10 +444,28 @@ export function criarEnquadrador(dialogo, { aoConfirmar }) {
   });
 
   return {
-    abrir() {
+    /**
+     * Abre o popup. Sem opções, é a foto da peça (enquadramento 4:5).
+     * No modo 'original', entrega o Blob para aoUsar, sem passar pelo enquadramento.
+     */
+    abrir({ modo = 'enquadrar', aoUsar = null } = {}) {
+      modoAtual = modo in MODOS ? modo : 'enquadrar';
+      aoUsarAtual = typeof aoUsar === 'function' ? aoUsar : null;
+
+      const cfg = config();
+
+      if (titulo) titulo.textContent = cfg.titulo;
+      if (botaoUsar) botaoUsar.textContent = cfg.usar;
+      if (dicaArquivo) dicaArquivo.textContent = cfg.dica;
+      if (subtitulo) {
+        subtitulo.dataset.origem = cfg.origem;
+        subtitulo.dataset.ajuste = cfg.ajuste;
+      }
+      if (arquivo) arquivo.value = '';
+
       mostrarErro('');
       dialogo.showModal();
-      mostrarEtapa(fonte ? 'ajuste' : 'origem');
+      mostrarEtapa(modoAtual === 'original' || !fonte ? 'origem' : 'ajuste');
     },
   };
 }

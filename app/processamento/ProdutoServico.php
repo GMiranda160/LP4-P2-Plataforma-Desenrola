@@ -5,9 +5,19 @@ declare(strict_types=1);
 /**
  * Camada: Processamento. Dono: Guilherme. Só Guilherme altera este arquivo.
  * Responsabilidade: regras dos produtos do mostruário. Sem SQL e sem HTML.
+ * Foto do produto: PNG, JPEG ou WebP de até 2 MB, enviada para a pasta produtos/ do
+ * bucket; o banco guarda só o caminho em produtos.foto_path. Sem foto, a página usa
+ * a renderização da peça bordada.
  */
 class ProdutoServico
 {
+    private const FOTO_MAX = 2 * 1024 * 1024;
+    private const TIPOS = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/webp' => 'webp'];
+    // Fotos de produto ficam em produtos/. As originais (base/ e pecas/) nunca são apagadas daqui.
+    private const PASTA = 'produtos';
+
+    public function __construct(private StorageServico $storage = new StorageServico()) {}
+
     /** Todos os produtos para a gerente, inclusive inativos. */
     public function todos(): array
     {
@@ -66,9 +76,11 @@ class ProdutoServico
 
     /**
      * Valida e grava (cria ou atualiza) um produto a partir do POST da tela de form.
-     * Devolve ['erros' => [...], 'id' => int|null]. Bordado_id duplicado é convertido em erro amigável.
+     * $foto é o item de $_FILES (ou null); $removerFoto apaga a foto atual (se houver) e
+     * devolve o produto à renderização da peça. Devolve ['erros' => [...], 'id' => int|null].
+     * Bordado_id duplicado é convertido em erro amigável.
      */
-    public function salvar(array $post): array
+    public function salvar(array $post, ?array $foto = null, bool $removerFoto = false): array
     {
         $id = (int) ($post['id'] ?? 0);
         $bordadoId = (int) ($post['bordado_id'] ?? 0);
@@ -78,9 +90,15 @@ class ProdutoServico
         $preco = is_numeric($precoBruto) ? (float) $precoBruto : 0;
         $erros = [];
 
+        $atual = $id > 0 ? (new ProdutoDados())->buscar($id) : null;
+
+        if ($id > 0 && $atual === null) {
+            return ['erros' => ['Produto não encontrado.'], 'id' => null];
+        }
+
         if ($bordadoId <= 0) {
             $erros[] = 'Escolha a combinação de bordado.';
-        } elseif (!$this->combinacaoValida($bordadoId, $id)) {
+        } elseif (!(new ProdutoDados())->combinacaoDisponivel($bordadoId, $id)) {
             $erros[] = 'Combinação inválida ou já usada por outro produto.';
         }
 
@@ -98,8 +116,36 @@ class ProdutoServico
             $erros[] = 'Preço base inválido.';
         }
 
+        $temFoto = $foto !== null && ($foto['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+        $extensao = null;
+
+        if ($temFoto) {
+            [$extensao, $erroFoto] = $this->conferirFoto($foto);
+            if ($erroFoto !== null) {
+                $erros[] = $erroFoto;
+            }
+        }
+
         if ($erros) {
             return ['erros' => $erros, 'id' => null];
+        }
+
+        $fotoAtual = (string) ($atual['foto_path'] ?? '');
+        // Sem foto nova e sem pedido de remoção, a atual se mantém.
+        $caminho = $removerFoto ? '' : $fotoAtual;
+
+        if ($temFoto) {
+            $novo = StorageServico::novoCaminho(self::PASTA, (string) $extensao);
+
+            try {
+                $this->storage->enviar($novo, (string) file_get_contents($foto['tmp_name']), (string) $this->tipoReal($foto));
+            } catch (RuntimeException $erro) {
+                error_log($erro->getMessage());
+
+                return ['erros' => ['Não consegui guardar a foto agora. Tente de novo em instantes.'], 'id' => null];
+            }
+
+            $caminho = $novo;
         }
 
         $dados = [
@@ -109,31 +155,44 @@ class ProdutoServico
             'preco_base' => number_format($preco, 2, '.', ''),
             'destaque' => !empty($post['destaque']),
             'ativo' => !empty($post['ativo']),
+            'foto_path' => $caminho !== '' ? $caminho : null,
         ];
 
         try {
             if ($id > 0) {
                 (new ProdutoDados())->atualizar($id, $dados);
-
-                return ['erros' => [], 'id' => $id];
+                $novoId = $id;
+            } else {
+                $novoId = (new ProdutoDados())->inserir($dados);
+            }
+        } catch (PDOException $erro) {
+            if ($temFoto) {
+                $this->storage->remover($caminho);
             }
 
-            $novoId = (new ProdutoDados())->inserir($dados);
-
-            return ['erros' => [], 'id' => $novoId];
-        } catch (PDOException $erro) {
             if (($erro->getCode() ?? '') === '23505') {
                 return ['erros' => ['Essa combinação já está vinculada a outro produto.'], 'id' => null];
             }
 
             throw $erro;
         }
+
+        // Foto trocada ou removida: a antiga sai do bucket.
+        if ($fotoAtual !== '' && $fotoAtual !== $caminho && str_starts_with($fotoAtual, self::PASTA . '/')) {
+            $this->storage->remover($fotoAtual);
+        }
+
+        return ['erros' => [], 'id' => $novoId];
     }
 
-    /** Exclui o produto. $id deve existir. */
+    /** Exclui o produto e a foto dele (se houver). $id deve existir. */
     public function excluir(int $id): void
     {
-        (new ProdutoDados())->excluir($id);
+        $caminho = (new ProdutoDados())->excluir($id);
+
+        if ($caminho !== null && $caminho !== '' && str_starts_with($caminho, self::PASTA . '/')) {
+            $this->storage->remover($caminho);
+        }
     }
 
     /** Inverte o ativo. Devolve o novo estado, ou null se não existe. */
@@ -142,22 +201,34 @@ class ProdutoServico
         return (new ProdutoDados())->alternarAtivo($id);
     }
 
-    /** A combinação existe, é tipo='produto' e não está vinculada a outro produto (exceto o de edição). */
-    private function combinacaoValida(int $bordadoId, int $produtoId): bool
+    /** Devolve [extensão, null] para foto válida ou [null, mensagem de erro]. */
+    private function conferirFoto(array $foto): array
     {
-        $consulta = Conexao::pdo()->prepare(
-            "SELECT 1
-             FROM bordados b
-             WHERE b.id = :id AND b.tipo = 'produto'
-               AND NOT EXISTS (SELECT 1 FROM produtos p
-                               WHERE p.bordado_id = b.id AND p.id <> :atual)
-             LIMIT 1"
-        );
-        $consulta->bindValue(':id', $bordadoId, PDO::PARAM_INT);
-        $consulta->bindValue(':atual', $produtoId, PDO::PARAM_INT);
-        $consulta->execute();
+        $erro = (int) ($foto['error'] ?? UPLOAD_ERR_NO_FILE);
 
-        return (bool) $consulta->fetchColumn();
+        if ($erro === UPLOAD_ERR_INI_SIZE || $erro === UPLOAD_ERR_FORM_SIZE || (int) ($foto['size'] ?? 0) > self::FOTO_MAX) {
+            return [null, 'A foto deve ter no máximo 2 MB.'];
+        }
+
+        if ($erro !== UPLOAD_ERR_OK || !is_uploaded_file((string) ($foto['tmp_name'] ?? ''))) {
+            return [null, 'Não recebi a foto. Tente enviar de novo.'];
+        }
+
+        $tipo = $this->tipoReal($foto);
+
+        if (!isset(self::TIPOS[$tipo])) {
+            return [null, 'A foto deve ser PNG, JPEG ou WebP.'];
+        }
+
+        return [self::TIPOS[$tipo], null];
+    }
+
+    /** Tipo do arquivo lido do conteúdo, não do nome nem do que o navegador disse. */
+    private function tipoReal(array $foto): ?string
+    {
+        $info = @getimagesize((string) ($foto['tmp_name'] ?? ''));
+
+        return is_array($info) ? (string) ($info['mime'] ?? '') : null;
     }
 
     /**

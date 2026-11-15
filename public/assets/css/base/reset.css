@@ -88,6 +88,41 @@ p {
   border-radius: 4px;
 }
 
+/* ==========================================================================
+   Barra de rolagem: vinho sobre areia, fina, arredondada, sempre da marca
+   ========================================================================== */
+
+/* Firefox e o padrão moderno */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-wine-700) var(--color-sand-100);
+}
+
+/* Chromium / WebKit */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-sand-100);
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-wine-700);
+  border: 2px solid var(--color-sand-100);
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-wine-900);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

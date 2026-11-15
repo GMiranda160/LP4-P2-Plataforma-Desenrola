@@ -9,6 +9,7 @@ declare(strict_types=1);
  * Convenção de nomes:
  * - render('home/index') carrega app/telas/home/index.php.
  * - parcial('peca_bordada') carrega app/telas/parciais/peca_bordada.php.
+ * - guia('home') carrega app/telas/guia/home.php.
  * - O nome só aceita letras, números, "-", "_" e "/"; "../" é recusado.
  *
  * O layout recebe $titulo e $conteudo já prontos. A tela não imprime o
@@ -54,6 +55,17 @@ class Visao
     public static function parcial(string $nome, array $dados = []): void
     {
         $arquivo = self::resolver(RAIZ . '/app/telas/parciais', $nome);
+
+        (function () use ($arquivo, $dados): void {
+            extract($dados, EXTR_SKIP);
+            require $arquivo;
+        })();
+    }
+
+    /** Inclui um guia (app/telas/guia) direto na saída, com as $dados como variáveis. */
+    public static function guia(string $nome, array $dados = []): void
+    {
+        $arquivo = self::resolver(RAIZ . '/app/telas/guia', $nome);
 
         (function () use ($arquivo, $dados): void {
             extract($dados, EXTR_SKIP);

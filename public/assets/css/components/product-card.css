@@ -60,7 +60,7 @@
   border-radius: var(--radius-pill);
   background-color: rgba(251, 247, 244, 0.92);
   color: var(--color-wine-700);
-  font-size: 0.6rem;
+  font-size: var(--font-2xs);
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -75,7 +75,7 @@
 }
 
 .product-card__category {
-  font-size: 0.65rem;
+  font-size: var(--font-2xs);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-wine-500);
@@ -84,7 +84,7 @@
 
 .product-card__name {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: var(--font-3xl);
   line-height: 1.2;
   color: var(--color-wine-900);
   /* Reserva duas linhas para o nome não deslocar preço e botão. */
@@ -101,7 +101,7 @@
 }
 
 .product-card__description {
-  font-size: 0.88rem;
+  font-size: var(--font-lg);
   color: var(--color-ink-soft);
   min-height: 3.2em;
 }
@@ -111,12 +111,12 @@
   align-items: baseline;
   gap: 0.4rem;
   margin-top: 0.5rem;
-  font-size: 1rem;
+  font-size: var(--font-xl);
   color: var(--color-ink);
 }
 
 .product-card__price-label {
-  font-size: 0.7rem;
+  font-size: var(--font-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-ink-soft);
@@ -124,7 +124,7 @@
 
 .product-card__price strong {
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: var(--font-3xl);
   font-weight: 600;
   color: var(--color-wine-900);
 }

@@ -16,12 +16,27 @@
  *   foto_tingir verdadeiro para peça base (a cor_peca tinge a foto); falso para foto da pessoa
  *   largura  largura da matriz em pontos (opcional, usada para centralizar sem transform)
  *   altura   altura da matriz em pontos (opcional)
+ *   foto_produto  caminho no Storage da foto PRÓPRIA do produto (opcional). Quando presente,
+ *                 substitui tudo: a foto preenche a moldura (cover), sem peça nem bordado por cima.
  *
  * A peça é 4:5. A centralização é calculada em PHP: metade da largura da matriz (em % da
  * largura da peça) e metade da altura da matriz (em % da altura da peça), sem usar transform.
  * Se os dados da matriz não vierem, supõe matriz quadrada. A rotação é um rotate em volta
  * do centro do próprio bordado, então não muda a centralização.
  */
+
+$fotoProduto = trim((string) ($item['foto_produto'] ?? ''));
+
+if ($fotoProduto !== '') {
+    // Foto própria do produto: preenche a moldura, sem tinta nem matriz por cima.
+    ?>
+<div class="peca peca--produto">
+  <img class="peca__foto peca__foto--produto" src="<?= e(StorageServico::urlPublica($fotoProduto)) ?>"
+       alt="<?= e((string) ($item['nome'] ?? 'Produto')) ?>" loading="lazy">
+</div>
+<?php
+    return;
+}
 
 $fotoPeca = (string) ($item['foto_peca'] ?? '');
 $fotoUrl = $fotoPeca !== '' ? StorageServico::urlPublica($fotoPeca) : '';

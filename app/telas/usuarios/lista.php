@@ -8,6 +8,8 @@
  *
  * TODO(Eduardo):
  * 1. Mostrar busca e tabela, sem ações de edição.
+ * 2. Não adicionar botão de voltar no .page-head: o layout gerente.php já exibe o botão
+ *    contextual no topo da tela ("Voltar para o Painel"), junto com o "Voltar para o site" da topbar.
  * Veja INSTRUCOES_EDUARDO.md, seção 4.
  */
 ?>

@@ -53,7 +53,7 @@ Valem para todas as pessoas do grupo e para qualquer IA usada no projeto:
 | **Grupo** | Três integrantes, com autorização do professor |
 | **Hospedagem** | Railway, com deploy automático a partir do GitHub e PHP em Docker |
 | **Sessão PHP** | Fica no banco, na tabela `sessoes`, porque arquivos do container não são duráveis |
-| **Arquivos** | Supabase Storage (bucket `mostruario`): SVG e grade das matrizes em `matrizes/`, fotos das peças base em `pecas/` e `base/`. O banco guarda só o caminho (e a paleta da matriz). Foto da peça do usuário fica só no navegador |
+| **Arquivos** | Supabase Storage (bucket `mostruario`): SVG e grade das matrizes em `matrizes/`, fotos das peças base em `pecas/` e `base/`, foto da própria peça enviada no montador em `fotos/` e foto do produto em `produtos/`. O banco guarda só o caminho (e a paleta da matriz) |
 | **IA** | Gemini, com cada tutorial salvo no banco e um texto reserva para falhas |
 | **Contas** | Todo e-mail do sistema usa `@example.com`; a pessoa digita só o prefixo no formulário |
 | **Divisão** | Cada arquivo tem um único dono, e Guilherme entrega os arquivos comentados |
@@ -65,7 +65,7 @@ O Railway executa PHP por Docker. Por isso, o projeto tem um `Dockerfile` na rai
 | Exigência | Como atendemos |
 |---|---|
 | Front-end em HTML, CSS e JS | Telas PHP geram o HTML, com o CSS e o JS atuais reaproveitados |
-| Back-end em PHP | PHP 8.5 com arquitetura MVC2 |
+| Back-end em PHP | PHP 8.2 ou mais novo, com produção em 8.4, e arquitetura MVC2 |
 | Método POST | Todo formulário e toda ação que altera dados usa POST |
 | Variáveis de sessão | `$_SESSION` guarda login, perfil e mensagens, com armazenamento no banco |
 | Banco de dados | PostgreSQL no Supabase, autorizado pelo professor |
@@ -79,16 +79,15 @@ O Railway executa PHP por Docker. Por isso, o projeto tem um `Dockerfile` na rai
 | Entrega no Teams | ZIP ou RAR do código, backup do banco e link do GitHub |
 
 Fora do escopo: os módulos de ERP da ERS (pedidos, agenda, pagamentos e relatórios), pagamento
-on-line e envio de e-mail. Upload de arquivos: apenas a imagem final montada no montador
-(a enviar para o Supabase Storage quando a migração de produtos base for aprovada);
-qualquer outro upload fica fora.
+on-line e envio de e-mail. Upload de arquivos: só as fotos listadas em **Arquivos** (peça do
+montador, peças base e produtos), sempre para o Supabase Storage; qualquer outro upload fica fora.
 
 ## 3. Tecnologias
 
 | Camada | Tecnologia |
 |---|---|
 | Interface | HTML gerado por PHP, CSS puro, JavaScript com ES Modules |
-| Servidor | PHP 8.5 com FrankenPHP em Docker |
+| Servidor | PHP 8.2 ou mais novo (produção em 8.4), com FrankenPHP em Docker |
 | Banco | PostgreSQL no Supabase, acessado por PDO |
 | Hospedagem | Railway, com deploy pelo GitHub |
 | IA | API do Gemini, chamada por cURL no PHP |
@@ -186,6 +185,7 @@ Só o dono altera o arquivo.
 │
 ├── database/
 │   └── schema.sql, seed.sql, backup.sql           [G]
+│       (schema.sql já reúne todas as migrações)
 │
 ├── public/                                        raiz do site
 │   ├── index.php                                  [G]
@@ -319,8 +319,9 @@ cabeçalho, mantendo as demais linhas). Arquivo entregue não tem `TODO` do pró
 
 ## 7. Banco de dados
 
-O SQL completo fica em `database/schema.sql`, criado a partir de
-[INSTRUCOES_GUILHERME.md](INSTRUCOES_GUILHERME.md).
+O SQL completo fica em um único arquivo, `database/schema.sql`, e os dados iniciais (categorias,
+peças base e contas de gerente) em `database/seed.sql`. Para montar um banco do zero, rode os dois
+nessa ordem no SQL Editor do Supabase.
 
 | Tabela | Finalidade | Campos principais |
 |---|---|---|
@@ -329,9 +330,10 @@ O SQL completo fica em `database/schema.sql`, criado a partir de
 | `clientes` | Clientes do ateliê | nome, cpf_cnpj, email, telefone, endereco, cep |
 | `insumos` | Materiais e estoque | tipo, nome, cor_hex, quantidade, unidade, custo_unitario, fornecedor |
 | `categorias` | Tipos de peça | nome, slug, mockup |
-| `matrizes` | Desenhos de bordado | nome, grade, svg, largura, altura, total_pontos, padrao, autor_id |
-| `bordados` | Matriz aplicada na peça | titulo, autor_id, matriz_id, categoria_id, cor_peca, pos_x, pos_y, escala, tipo, oculto, tutorial_ia |
-| `produtos` | Itens do mostruário | bordado_id, nome, descricao, preco_base, destaque, ativo |
+| `matrizes` | Desenhos de bordado | nome, svg_path, grade_path, paleta, largura, altura, total_pontos, padrao, autor_id |
+| `pecas` | Peças base com foto real | nome, categoria_id, imagem_path, ativo |
+| `bordados` | Matriz aplicada na peça | titulo, autor_id, matriz_id, categoria_id, peca_id, foto_path, cor_peca, pos_x, pos_y, escala, rotacao, tipo, oculto, tutorial_ia |
+| `produtos` | Itens do mostruário | bordado_id, nome, descricao, preco_base, destaque, ativo, foto_path |
 | `curtidas` | Likes do Hub | usuario_id, bordado_id, chave primária nos dois campos |
 | `comentarios` | Comentários do Hub | bordado_id, usuario_id, texto, oculto |
 
@@ -341,6 +343,7 @@ Relações:
 usuarios 1──N bordados N──1 matrizes
 usuarios 1──N matrizes
 categorias 1──N bordados
+categorias 1──N pecas 1──N bordados
 bordados 1──0..1 produtos
 usuarios N──N bordados (por curtidas)
 usuarios 1──N comentarios N──1 bordados
@@ -365,6 +368,7 @@ preenche a interface.
 | Login | POST | `/bordado/excluir` | G | E |
 | Login | GET | `/montador`, inclusive `?modo=matriz` e `?modo=produto` | G | G |
 | Login | POST | `/montador/salvar`, `/bordado/tutorial` | G | G |
+| Login | GET | `/montador/imagem?url=` (baixa a imagem de um link colado) | G | G |
 | Gerente | GET | `/gerente` | G | G |
 | Gerente | GET | `/gerente/usuarios` | E | E |
 | Gerente | GET | `/gerente/insumos`, `/gerente/insumos/form` | A | A |
@@ -375,6 +379,8 @@ preenche a interface.
 | Gerente | POST | `/gerente/produtos/salvar`, `/excluir`, `/ativar` | G | A |
 | Gerente | GET | `/gerente/matrizes`, `/gerente/matrizes/form` | G | A |
 | Gerente | POST | `/gerente/matrizes/salvar`, `/gerente/matrizes/excluir` | G | A |
+| Gerente | GET | `/gerente/pecas`, `/gerente/pecas/form` | G | G |
+| Gerente | POST | `/gerente/pecas/salvar`, `/gerente/pecas/excluir` | G | G |
 | Gerente | POST | `/gerente/hub/ocultar` | G | E |
 | Gerente | POST | `/gerente/hub/comentario/ocultar` | E | E |
 
@@ -383,7 +389,7 @@ preenche a interface.
 **Conversor.** A pessoa escolhe um PNG, JPG ou WebP e o navegador faz a conversão em um
 `<canvas>`:
 
-1. Reduz a imagem para 64, 128 ou 256 pontos de largura.
+1. Reduz a imagem para 256, 512 ou 1024 pontos de largura.
 2. Ignora os pixels transparentes.
 3. Reduz a imagem para 4 a 16 cores, como linhas de bordado.
 4. Mostra a matriz na hora, com controles de tamanho e quantidade de cores.
@@ -403,14 +409,14 @@ pelo navegador, porque SVG pode carregar script.
 1. **Matriz:** escolher uma matriz padrão ou enviar uma imagem.
 2. **Peça:** escolher toalha, bolsa, avental ou personalizado, e a cor.
 3. **Posição:** arrastar e redimensionar, com mouse ou toque.
-4. **Publicar:** informar título e descrição.
+4. **Publicar:** informar título e descrição; se uma imagem for enviada, informar também nome e descrição da matriz (ela é criada junto com o bordado, na mesma transação).
 
 O mesmo montador atende a gerente, com `/montador?modo=matriz` para criar matriz padrão e
 `/montador?modo=produto` para criar a combinação usada em um produto.
 
-Vantagens: a foto da peça não sai do navegador de quem monta; a imagem final (quando o upload
-no Supabase Storage for habilitado) guarda só o caminho no banco e acompanha o backup; e a gerente
-pode ocultar qualquer post mesmo assim.
+Vantagens: a imagem convertida em matriz nunca sai do navegador (só a grade); a foto da própria
+peça, quando enviada, vai para o Supabase Storage e o banco guarda só o caminho; e a gerente pode
+ocultar qualquer post.
 
 ## 10. IA com Gemini
 
@@ -508,7 +514,8 @@ Cada documento de instruções pode ser colado inteiro em uma IA generativa como
 
 ## 13. Como rodar no seu computador
 
-Requisitos: Git e PHP 8.4 ou mais novo. O Docker só é necessário para reproduzir o ambiente do Railway.
+Requisitos: Git e PHP 8.2 ou mais novo. O Docker só é necessário para reproduzir o ambiente do Railway,
+que usa PHP 8.4.
 
 1. Clone o repositório:
 
@@ -530,7 +537,7 @@ cp .env.example .env
 O `rodar-local.bat` procura o PHP mais novo instalado, inclusive o do winget, mesmo que um PHP
 antigo como o do XAMPP venha antes no PATH. Ele liga `pdo_pgsql`, `pgsql`, `curl`, `mbstring` e
 `openssl` só durante a execução, avisa se faltar algo e abre <http://localhost:8000>. Ele não instala
-nada. Se nenhum PHP 8.4 ou mais novo existir, mostra o comando para instalar.
+nada. Se nenhum PHP 8.2 ou mais novo existir, mostra o comando para instalar.
 
 Instale o PHP no Windows com:
 

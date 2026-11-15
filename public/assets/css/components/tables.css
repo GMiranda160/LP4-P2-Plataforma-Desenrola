@@ -12,7 +12,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: var(--font-lg);
 }
 
 .table th,
@@ -23,7 +23,7 @@
 }
 
 .table thead th {
-  font-size: 0.7rem;
+  font-size: var(--font-xs);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-ink-soft);

@@ -22,13 +22,13 @@
 .montador__titulo {
   margin: 0 0 var(--space-2);
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: var(--font-4xl);
   color: var(--color-ink);
 }
 
 .montador__subtitulo {
   margin: var(--space-5) 0 var(--space-2);
-  font-size: 0.82rem;
+  font-size: var(--font-md);
   font-weight: 500;
   letter-spacing: 0.02em;
 }
@@ -99,13 +99,13 @@
 }
 
 .matrix-card__nome {
-  font-size: 0.82rem;
+  font-size: var(--font-md);
   font-weight: 500;
   line-height: 1.3;
 }
 
 .matrix-card__meta {
-  font-size: 0.7rem;
+  font-size: var(--font-xs);
   color: var(--color-ink-soft);
 }
 
@@ -117,7 +117,7 @@
   gap: var(--space-3);
   margin: var(--space-5) 0;
   color: var(--color-ink-soft);
-  font-size: 0.82rem;
+  font-size: var(--font-md);
 }
 
 .montador__ou::before,
@@ -151,7 +151,7 @@
   border: 1px dashed var(--color-wine-500);
   border-radius: var(--radius-md);
   color: var(--color-wine-700);
-  font-size: 0.9rem;
+  font-size: var(--font-lg);
   font-weight: 500;
   text-align: center;
   cursor: pointer;
@@ -162,8 +162,18 @@
   background-color: rgba(105, 24, 24, 0.06);
 }
 
-.montador__arquivo:focus-visible + .montador__upload-texto {
+.montador__upload-dica {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-ink-soft);
+  font-size: var(--font-sm);
+  font-weight: 400;
+}
+
+.montador__arquivo:focus-visible + .montador__upload-texto,
+.montador__upload:focus-visible {
   outline: 2px solid var(--color-wine-700);
+  outline-offset: 2px;
 }
 
 .montador__opcoes {
@@ -189,7 +199,7 @@
 
 .montador__status {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: var(--font-md);
   color: var(--color-ink-soft);
   min-height: 1.2em;
 }
@@ -257,7 +267,7 @@
 }
 
 .categoria-mini__nome {
-  font-size: 0.78rem;
+  font-size: var(--font-sm);
   font-weight: 500;
 }
 
@@ -280,12 +290,41 @@
   box-shadow: 0 0 0 3px rgba(105, 24, 24, 0.28);
 }
 
+/* Seletor universal de cor: bolinha arco-íris ao lado dos swatches da paleta. */
+.swatch--livre {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  border: 2px dashed rgba(46, 35, 33, 0.4);
+  background: conic-gradient(from 45deg, #d94f4f, #d9b44f, #4f8f5f, #4f6f9f, #7a4f9f, #d94f8f, #d94f4f);
+}
+
+.swatch--livre input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.swatch--livre:focus-within {
+  border-color: var(--color-wine-700);
+  border-style: solid;
+  box-shadow: 0 0 0 3px rgba(105, 24, 24, 0.28);
+}
+
+.swatch--livre[aria-disabled="true"] {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 .montador__cor-linha {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   margin-top: var(--space-4);
-  font-size: 0.82rem;
+  font-size: var(--font-md);
   color: var(--color-ink-soft);
 }
 
@@ -528,7 +567,7 @@
 .montador__tinta {
   position: absolute;
   inset: 0;
-  background-color: #f3ded9;
+  background-color: var(--color-rose-100);
   mix-blend-mode: multiply;
   pointer-events: none;
   -webkit-mask-position: center;
@@ -604,7 +643,7 @@
 .enquadrador__titulo {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.65rem;
+  font-size: var(--font-5xl);
   font-weight: 500;
   line-height: 1.15;
   color: var(--color-wine-700);
@@ -612,7 +651,7 @@
 
 .enquadrador__sub {
   margin: 0.35rem 0 0;
-  font-size: 0.85rem;
+  font-size: var(--font-md);
   line-height: 1.5;
   color: var(--color-ink-soft);
 }
@@ -693,14 +732,14 @@
 }
 
 .enquadrador__soltar-titulo {
-  font-size: 0.95rem;
+  font-size: var(--font-lg);
   font-weight: 500;
   color: var(--color-wine-700);
 }
 
 .enquadrador__dica {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: var(--font-sm);
   line-height: 1.5;
   color: var(--color-ink-soft);
 }
@@ -709,7 +748,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  font-size: 0.72rem;
+  font-size: var(--font-xs);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-ink-soft);
@@ -729,7 +768,7 @@
 }
 
 .enquadrador__rotulo {
-  font-size: 0.85rem;
+  font-size: var(--font-md);
   font-weight: 500;
 }
 
@@ -846,7 +885,7 @@
   border-radius: var(--radius-sm);
   background-color: var(--color-alerta-bg);
   color: var(--color-alerta-ink);
-  font-size: 0.85rem;
+  font-size: var(--font-md);
 }
 
 /* Rodapé: trocar à esquerda, cancelar e usar à direita, sem quebrar texto */
@@ -874,7 +913,7 @@
   background: none;
   color: var(--color-wine-700);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: var(--font-md);
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
@@ -894,6 +933,81 @@
 .enquadrador[data-etapa="origem"] [data-enq-trocar],
 .enquadrador[data-etapa="origem"] [data-enq-usar] {
   display: none;
+}
+
+/* Etapa Publicar: Bordado e Matriz nova ------------------------------------------ */
+/* Fluxo normal: uma coluna. Com imagem convertida, o JS troca para --duplo: dois
+   painéis iguais, lado a lado, com as linhas alinhadas por subgrid. */
+.montador__final {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+.montador__final-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.montador__bloco-matriz[hidden] {
+  display: none;
+}
+
+/* Modo de duas colunas: os dois painéis herdam o mesmo visual (tracejado do
+   conversor) e os mesmos 4 compartimentos, para os campos alinharem na horizontal. */
+.montador__final--duplo {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(4, auto);
+  column-gap: var(--space-4);
+  row-gap: var(--space-3);
+  align-items: stretch;
+}
+
+.montador__final--duplo > .montador__final-col,
+.montador__final--duplo > .montador__bloco-matriz {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 4;
+  row-gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px dashed var(--color-wine-500);
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-50);
+}
+
+/* Sem subgrid (navegadores antigos): cada painel cuida das próprias linhas. */
+@supports not (grid-template-rows: subgrid) {
+  .montador__final--duplo > .montador__final-col,
+  .montador__final--duplo > .montador__bloco-matriz {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+/* Dentro dos painéis o título não precisa das margens de etapa. */
+.montador__final .montador__subtitulo {
+  margin: 0;
+}
+
+/* No celular os painéis ficam um embaixo do outro, na ordem da leitura. */
+@media (max-width: 640px) {
+  .montador__final--duplo {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    row-gap: var(--space-4);
+  }
+
+  .montador__final--duplo > .montador__final-col,
+  .montador__final--duplo > .montador__bloco-matriz {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    grid-row: auto;
+  }
 }
 
 @media (max-width: 480px) {

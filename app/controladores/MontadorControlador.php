@@ -84,7 +84,7 @@ class MontadorControlador
         if ($resultado['erros']) {
             Sessao::flash('erro', implode(' ', $resultado['erros']));
             // Só os textos voltam ao formulário: a grade e a foto chegam a 1 MB e iriam para a sessão no banco.
-            Sessao::guardarVelhos(array_intersect_key($_POST, array_flip(['titulo', 'descricao'])));
+            Sessao::guardarVelhos(array_intersect_key($_POST, array_flip(['titulo', 'descricao', 'nome_matriz', 'descricao_matriz'])));
             Resposta::redirecionar('/montador' . ($modo !== 'hub' ? '?modo=' . $modo : ''));
         }
 

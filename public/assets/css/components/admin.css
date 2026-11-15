@@ -29,10 +29,6 @@
   gap: var(--space-2);
 }
 
-.admin-topbar__sair {
-  margin: 0;
-}
-
 .admin-nav {
   display: flex;
   flex-direction: column;
@@ -46,11 +42,19 @@
 }
 
 .admin-nav a {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
-  font-size: 0.9rem;
+  font-size: var(--font-lg);
   color: var(--color-ink);
+}
+
+.admin-nav a svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
 }
 
 .admin-nav a:hover,
@@ -63,9 +67,61 @@
   font-weight: 600;
 }
 
+/* Coluna lateral: menu administrativo e o atalho separado que leva ao Hub público. */
+.admin-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Botão de destaque que leva ao Hub público, fora do menu administrativo. */
+.admin-hub {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.7rem 0.9rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--color-wine-700);
+  color: var(--color-sand-50);
+  font-size: var(--font-lg);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.admin-hub:hover,
+.admin-hub:focus-visible {
+  background-color: var(--color-wine-900);
+  box-shadow: var(--shadow-md);
+  transform: scale(1.03);
+}
+
+.admin-hub svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+
 /* O miolo pode encolher: sem isso, uma tabela larga estica a grade e a página vaza para o lado. */
 .admin-layout > main {
   min-width: 0;
+}
+
+/* Botão de voltar contextual, no topo da área de conteúdo. */
+.admin-voltar {
+  margin: 0 0 var(--space-4);
+}
+
+/* Ícones inline dentro dos botões da área da gerente (svg sem width/height não renderiza). */
+.admin-topbar__actions .btn svg,
+.admin-voltar svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 /* Busca e texto de ajuda acima das listas: respiro antes da tabela (ou do estado vazio). */

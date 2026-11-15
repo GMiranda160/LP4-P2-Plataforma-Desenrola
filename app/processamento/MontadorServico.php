@@ -44,6 +44,10 @@ class MontadorServico
         $modo = strtolower(trim((string) ($campos['modo'] ?? 'hub')));
         $titulo = trim((string) ($campos['titulo'] ?? ''));
         $descricao = trim((string) ($campos['descricao'] ?? ''));
+        // Nome e descrição da matriz nova: só valem quando uma imagem foi enviada (com matriz
+        // existente estes campos são ignorados, para não renomear o trabalho de outra pessoa).
+        $nomeMatriz = trim((string) ($campos['nome_matriz'] ?? ''));
+        $descricaoMatriz = trim((string) ($campos['descricao_matriz'] ?? ''));
         $corPeca = strtolower(trim((string) ($campos['cor_peca'] ?? '')));
         $inteiro = static fn(mixed $valor): int => is_numeric($valor) ? (int) $valor : -1;
 
@@ -158,6 +162,21 @@ class MontadorServico
                 : 'Escolha uma matriz ou envie uma imagem.';
         }
 
+        // Nome e descrição da matriz nova: só existem quando uma imagem foi enviada
+        // (é o único caso em que o formulário mostra o bloco). No modo matriz os campos
+        // são ignorados, porque o nome da matriz é o próprio título.
+        $tamanhoTexto = static fn(string $texto): int => function_exists('mb_strlen') ? mb_strlen($texto) : strlen($texto);
+
+        if ($grade !== null && $modo !== 'matriz') {
+            if ($tamanhoTexto($nomeMatriz) > 120) {
+                $erros[] = 'O nome da matriz deve ter no máximo 120 caracteres.';
+            }
+
+            if ($tamanhoTexto($descricaoMatriz) > 500) {
+                $erros[] = 'A descrição da matriz deve ter no máximo 500 caracteres.';
+            }
+        }
+
         if ($erros) {
             return ['erros' => $erros, 'id' => null, 'destino' => null];
         }
@@ -226,8 +245,9 @@ class MontadorServico
         try {
             if ($grade !== null) {
                 $matrizId = $this->matrizes->inserir([
-                    'nome' => $titulo,
-                    'descricao' => $descricao !== '' ? $descricao : null,
+                    // Em branco (formulário sem JavaScript): a matriz nasce com o título do bordado, como antes.
+                    'nome' => $nomeMatriz !== '' ? $nomeMatriz : $titulo,
+                    'descricao' => $descricaoMatriz !== '' ? $descricaoMatriz : ($descricao !== '' ? $descricao : null),
                     'categoria' => 'Geral',
                     'svg_path' => $arquivos['svg_path'],
                     'grade_path' => $arquivos['grade_path'],
@@ -237,7 +257,7 @@ class MontadorServico
                     'total_pontos' => $grade['total_pontos'],
                     'tempo_medio_min' => 30,
                     // Matriz criada pela gerente (no montador ou avulsa) entra como padrão do ateliê.
-                    'padrao' => $modo === 'matriz' || Auth::eGerente(),
+                    'padrao' => $modo === 'matriz' || $eGerente,
                     'autor_id' => $usuarioId,
                 ]);
             }

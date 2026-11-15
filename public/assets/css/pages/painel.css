@@ -37,7 +37,7 @@
 
 .painel-card__total {
   font-family: var(--font-body);
-  font-size: 2.1rem;
+  font-size: var(--font-6xl);
   font-weight: 600;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -49,13 +49,13 @@
   display: flex;
   align-items: flex-end;
   min-height: 2.1rem;
-  font-size: 1rem;
+  font-size: var(--font-xl);
   font-weight: 500;
   color: var(--color-ink-soft);
 }
 
 .painel-card__rotulo {
-  font-size: 0.8rem;
+  font-size: var(--font-sm);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-ink-soft);

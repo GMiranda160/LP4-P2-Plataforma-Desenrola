@@ -10,7 +10,7 @@
 ## 1. Contexto
 
 **Desenrola** é uma plataforma de bordados: um Hub onde as pessoas publicam suas criações, com o
-mostruário do ateliê Cris Bordados e Bolsas. Stack: PHP 8.4 sem framework, HTML, CSS e JavaScript.
+mostruário do ateliê Cris Bordados e Bolsas. Stack: PHP 8.2 ou mais novo sem framework, HTML, CSS e JavaScript.
 Entrega: 19/11/2026.
 
 **Seu trabalho são as telas de gestão, o catálogo público e os cadastros completos de Insumos e

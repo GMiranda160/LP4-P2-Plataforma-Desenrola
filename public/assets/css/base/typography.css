@@ -4,7 +4,7 @@
 
 body {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: var(--font-xl);
   font-weight: 400;
   color: var(--color-ink);
   background-color: var(--color-sand-50);
@@ -20,15 +20,15 @@ h4 {
 }
 
 h1 {
-  font-size: clamp(2.4rem, 1.35rem + 3.8vw, 4rem);
+  font-size: var(--font-h1);
 }
 
 h2 {
-  font-size: clamp(1.9rem, 1.35rem + 2.2vw, 2.9rem);
+  font-size: var(--font-h2);
 }
 
 h3 {
-  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  font-size: var(--font-h3);
 }
 
 p {
@@ -37,7 +37,7 @@ p {
 
 .eyebrow {
   font-family: var(--font-body);
-  font-size: 0.72rem;
+  font-size: var(--font-xs);
   font-weight: 500;
   letter-spacing: 0.24em;
   text-transform: uppercase;
@@ -45,7 +45,7 @@ p {
 }
 
 .lead {
-  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  font-size: var(--font-lead);
   color: var(--color-ink-soft);
   line-height: 1.7;
 }

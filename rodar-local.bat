@@ -33,7 +33,7 @@ for %%p in ("C:\php\php.exe" "%ProgramFiles%\PHP\php.exe" "%PF86%\PHP\php.exe") 
 
 if not defined PHP_BIN goto :sem_php
 
-"%PHP_BIN%" -r "exit(PHP_VERSION_ID >= 80400 ? 0 : 1);"
+"%PHP_BIN%" -r "exit(PHP_VERSION_ID >= 80200 ? 0 : 1);"
 if errorlevel 1 goto :php_antigo
 
 echo [OK] PHP %PHP_VER%
@@ -114,7 +114,7 @@ echo     winget install --id PHP.PHP.8.5 -e
 goto :erro
 
 :php_antigo
-echo [ERRO] O projeto precisa do PHP 8.4 ou mais novo.
+echo [ERRO] O projeto precisa do PHP 8.2 ou mais novo.
 echo.
 echo Atualize com o comando abaixo e rode de novo:
 echo     winget install --id PHP.PHP.8.5 -e

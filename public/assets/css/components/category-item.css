@@ -55,14 +55,14 @@
 .category-card__name {
   display: block;
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: var(--font-3xl);
   line-height: 1.1;
 }
 
 .category-card__count {
   display: block;
   margin-top: 0.3rem;
-  font-size: 0.68rem;
+  font-size: var(--font-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(251, 247, 244, 0.75);

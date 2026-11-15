@@ -32,9 +32,30 @@
   /* Tipografia */
   --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
   --font-body: "Jost", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
 
-  /* Tamanho de Fonte */
-  --font-large: 1.02rem;
+  /* Tamanho de Fonte - escala de texto (rem, 1rem = 16px)
+     Agrupada a partir de todos os tamanhos crus usados no site;
+     valores muito próximos foram unificados (erro máximo ~0.1rem). */
+  --font-3xs: 0.5rem;
+  --font-2xs: 0.6rem;
+  --font-xs: 0.7rem;
+  --font-sm: 0.78rem;
+  --font-md: 0.85rem;
+  --font-lg: 0.9rem;
+  --font-xl: 1rem;
+  --font-2xl: 1.1rem;
+  --font-3xl: 1.3rem;
+  --font-4xl: 1.5rem;
+  --font-5xl: 1.65rem;
+  --font-6xl: 2.1rem;
+
+  /* Tamanho de Fonte - títulos fluidos (clamp, crescem com o viewport) */
+  --font-lead: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  --font-h3: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --font-h2: clamp(1.9rem, 1.35rem + 2.2vw, 2.9rem);
+  --font-h1: clamp(2.4rem, 1.35rem + 3.8vw, 4rem);
+  --font-page-title: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
 
   /* Espaçamentos */
   --space-1: 0.25rem;

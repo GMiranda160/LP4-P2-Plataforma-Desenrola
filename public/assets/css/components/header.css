@@ -2,10 +2,19 @@
    Header - faixa superior, marca e navegação
    ========================================================================== */
 
+/*
+ * Arquivo: header.css
+ * Dono: Guilherme. Só Guilherme altera este arquivo.
+ * Responsabilidade: faixa superior, marca, navegação principal e menu móvel.
+ *                    Inclui o estado de seleção do item atual do menu
+ *                    (.nav__list a[aria-current="page"]).
+ * Veja INSTRUCOES_GUILHERME.md, seção 9.
+ */
+
 .topbar {
   background-color: var(--color-wine-900);
   color: var(--color-rose-100);
-  font-size: 0.72rem;
+  font-size: var(--font-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -34,6 +43,12 @@
 .topbar a:hover {
   color: var(--color-white);
   border-color: currentColor;
+}
+
+.topbar a svg {
+  width: 0.95em;
+  height: 0.95em;
+  flex-shrink: 0;
 }
 
 .site-header {
@@ -70,7 +85,7 @@
   background-color: var(--color-wine-700);
   color: var(--color-sand-50);
   font-family: var(--font-display);
-  font-size: 1.55rem;
+  font-size: var(--font-4xl);
   line-height: 1;
 }
 
@@ -78,7 +93,7 @@
   display: flex;
   flex-direction: column;
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: var(--font-3xl);
   line-height: 1;
   white-space: nowrap;
   color: var(--color-wine-900);
@@ -87,7 +102,7 @@
 .brand__text small {
   margin-top: 0.4rem;
   font-family: var(--font-body);
-  font-size: 0.6rem;
+  font-size: var(--font-2xs);
   font-weight: 400;
   letter-spacing: 0.3em;
   text-transform: uppercase;
@@ -101,7 +116,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.75rem;
+  font-size: var(--font-sm);
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -110,6 +125,7 @@
   position: relative;
   display: inline-block;
   padding-block: 0.35rem;
+  transition: color var(--transition);
 }
 
 .nav__list a::after {
@@ -120,12 +136,24 @@
   background-color: currentColor;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform var(--transition);
+  transition: transform var(--transition), height var(--transition);
 }
 
 .nav__list a:hover::after,
 .nav__list a[aria-current="page"]::after {
   transform: scaleX(1);
+}
+
+/* Item atual do menu: a cor da marca e o peso da fonte dizem que a página já está aberta. */
+.nav__list a[aria-current="page"] {
+  color: var(--color-wine-700);
+  font-weight: 500;
+}
+
+/* O sublinhado do item atual fica mais grosso e na cor da marca. */
+.nav__list a[aria-current="page"]::after {
+  height: 2px;
+  background-color: var(--color-wine-700);
 }
 
 .header-actions {
@@ -137,6 +165,138 @@
 
 .header-actions form {
   display: inline-flex;
+}
+
+/* Menu do usuário: botão com a inicial, o primeiro nome e a seta de abrir. */
+.user-menu {
+  position: relative;
+}
+
+.user-menu__avatar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.7rem 0.25rem 0.25rem;
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sand-100);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-md);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition);
+}
+
+.user-menu__avatar:hover {
+  background-color: var(--color-rose-100);
+  border-color: var(--color-border);
+}
+
+.user-menu__avatar[aria-expanded="true"] {
+  background-color: var(--color-rose-100);
+  border-color: var(--color-border);
+}
+
+.user-menu__letra {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--color-wine-700);
+  color: var(--color-sand-50);
+  font-family: var(--font-display);
+  font-size: var(--font-2xl);
+  line-height: 1;
+}
+
+.user-menu__seta {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--color-ink-soft);
+  transition: transform var(--transition);
+}
+
+.user-menu__avatar[aria-expanded="true"] .user-menu__seta {
+  transform: rotate(180deg);
+}
+
+.user-menu__painel {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  z-index: 1;
+  min-width: 13rem;
+  padding: var(--space-2);
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-md);
+  animation: user-menu-entra 220ms var(--ease-soft);
+}
+
+.user-menu__painel[hidden] {
+  display: none;
+}
+
+@keyframes user-menu-entra {
+  from {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.user-menu__nome {
+  padding: 0.4rem 0.75rem 0.7rem;
+  border-bottom: 1px solid var(--color-sand-200);
+  color: var(--color-ink-soft);
+  font-size: var(--font-md);
+  letter-spacing: 0.04em;
+}
+
+.user-menu__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.user-menu__lista form {
+  display: block;
+}
+
+.user-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-ink);
+  font-size: var(--font-lg);
+  text-align: left;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.user-menu__item svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+
+.user-menu__item:hover,
+.user-menu__item:focus-visible {
+  background-color: var(--color-sand-100);
+  color: var(--color-wine-700);
 }
 
 .nav-toggle {

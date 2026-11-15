@@ -426,141 +426,18 @@ variável ou rota, atualize esses documentos e avise o dono do arquivo.
 
 Execute no **SQL Editor** do Supabase.
 
-**`database/schema.sql`**
-
-```sql
-CREATE TABLE usuarios (
-  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  nome text NOT NULL,
-  email text NOT NULL UNIQUE,
-  senha_hash text NOT NULL,
-  perfil text NOT NULL DEFAULT 'usuario' CHECK (perfil IN ('usuario', 'gerente')),
-  pergunta_seguranca text NOT NULL,
-  resposta_hash text NOT NULL,
-  ativo boolean NOT NULL DEFAULT true,
-  criado_em timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE TABLE sessoes (
-  id text PRIMARY KEY,
-  dados text NOT NULL DEFAULT '',
-  expira_em timestamptz NOT NULL
-);
-CREATE INDEX sessoes_expira_idx ON sessoes (expira_em);
-
-CREATE TABLE clientes (
-  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  nome text NOT NULL,
-  cpf_cnpj text NOT NULL UNIQUE,
-  email text NOT NULL,
-  telefone text NOT NULL,
-  endereco text,
-  cep text,
-  criado_em timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE TABLE insumos (
-  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  tipo text NOT NULL CHECK (tipo IN ('tecido', 'linha', 'aviamento')),
-  nome text NOT NULL,
-  cor_hex text,
-  quantidade numeric(10,2) NOT NULL DEFAULT 0 CHECK (quantidade >= 0),
-  unidade text NOT NULL CHECK (unidade IN ('metro', 'carretel', 'peca')),
-  custo_unitario numeric(10,2) NOT NULL CHECK (custo_unitario > 0),
-  fornecedor text,
-  estoque_minimo numeric(10,2) NOT NULL DEFAULT 0,
-  criado_em timestamptz NOT NULL DEFAULT now()
-);
-CREATE UNIQUE INDEX insumos_tipo_nome_idx ON insumos (tipo, lower(nome));
-
-CREATE TABLE categorias (
-  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  nome text NOT NULL,
-  slug text NOT NULL UNIQUE,
-  mockup text NOT NULL
-);
-
-CREATE TABLE matrizes (
-  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  nome text NOT NULL,
-  descricao text,
-  categoria text NOT NULL DEFAULT 'Geral',
-  grade jsonb NOT NULL,
-  svg text NOT NULL,
-  largura int NOT NULL CHECK (largura BETWEEN 8 AND 256),
-  altura int NOT NULL CHECK (altura BETWEEN 8 AND 256),
-  total_pontos int NOT NULL CHECK (total_pontos > 0),
-  tempo_medio_min int NOT NULL DEFAULT 30 CHECK (tempo_medio_min > 0),
-  padrao boolean NOT NULL DEFAULT false,
-  autor_id bigint REFERENCES usuarios (id) ON DELETE SET NULL,
-  criado_em timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE TABLE bordados (
-  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  titulo text NOT NULL,
-  descricao text,
-  autor_id bigint NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
-  matriz_id bigint NOT NULL REFERENCES matrizes (id) ON DELETE RESTRICT,
-  categoria_id bigint NOT NULL REFERENCES categorias (id),
-  cor_peca text NOT NULL,
-  pos_x int NOT NULL CHECK (pos_x BETWEEN 0 AND 100),
-  pos_y int NOT NULL CHECK (pos_y BETWEEN 0 AND 100),
-  escala int NOT NULL CHECK (escala BETWEEN 10 AND 90),
-  tipo text NOT NULL DEFAULT 'hub' CHECK (tipo IN ('hub', 'produto')),
-  oculto boolean NOT NULL DEFAULT false,
-  tutorial_ia text,
-  criado_em timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX bordados_feed_idx ON bordados (criado_em DESC) WHERE tipo = 'hub' AND NOT oculto;
-
-CREATE TABLE produtos (
-  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  bordado_id bigint NOT NULL UNIQUE REFERENCES bordados (id) ON DELETE RESTRICT,
-  nome text NOT NULL,
-  descricao text,
-  preco_base numeric(10,2) NOT NULL CHECK (preco_base > 0),
-  destaque boolean NOT NULL DEFAULT false,
-  ativo boolean NOT NULL DEFAULT true,
-  criado_em timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE TABLE curtidas (
-  usuario_id bigint NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
-  bordado_id bigint NOT NULL REFERENCES bordados (id) ON DELETE CASCADE,
-  criado_em timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY (usuario_id, bordado_id)
-);
-CREATE INDEX curtidas_bordado_idx ON curtidas (bordado_id);
-
-CREATE TABLE comentarios (
-  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  bordado_id bigint NOT NULL REFERENCES bordados (id) ON DELETE CASCADE,
-  usuario_id bigint NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
-  texto text NOT NULL CHECK (char_length(texto) BETWEEN 1 AND 280),
-  oculto boolean NOT NULL DEFAULT false,
-  criado_em timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX comentarios_bordado_idx ON comentarios (bordado_id, criado_em);
-
--- O PHP conecta como dono das tabelas.
--- RLS sem políticas fecha a API pública automática do Supabase.
-ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
-ALTER TABLE sessoes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE clientes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE insumos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE categorias ENABLE ROW LEVEL SECURITY;
-ALTER TABLE matrizes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE bordados ENABLE ROW LEVEL SECURITY;
-ALTER TABLE produtos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE curtidas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE comentarios ENABLE ROW LEVEL SECURITY;
-```
+**`database/schema.sql`** é a fonte única da estrutura. Ele já reúne todas as migrações feitas
+em 14 e 15/11 (rotação, Storage, peças base, matrizes até 1024 pontos, foto do produto e RLS em
+`pecas`) e foi conferido contra o banco em produção. Não copie SQL para cá: edite só o arquivo.
 
 **`database/seed.sql`** cria só o necessário para o sistema iniciar:
 
 - As quatro categorias, com os mockups `toalha.svg`, `bolsa.svg`, `avental.svg` e `bastidor.svg`.
-- A conta de gerente.
+- As três peças base do montador (fotos já no Storage, pasta `base/`).
+- As contas de gerente.
+
+Mudança nova no banco: altere `schema.sql` (com `IF NOT EXISTS` para continuar reexecutável),
+rode só o trecho novo no SQL Editor e avise o grupo. Não crie mais arquivos de migração soltos.
 
 Os demais dados entram depois, por importação de arquivos ou pelo próprio site.
 
@@ -605,7 +482,8 @@ Passos:
 
 ### Validação no servidor: `GradeServico`
 
-Nunca confie no navegador.
+Nunca confie no navegador. O código abaixo é o modelo inicial; o arquivo atual aceita até 1024
+pontos de lado e cerca de 1 MB de JSON, e grava SVG e grade no Storage.
 
 ```php
 <?php
@@ -715,12 +593,17 @@ estilos de `produto.css`. Os dados iniciais vão em um `<script type="applicatio
 - Ofereça botões de ajuste para quem tiver dificuldade em arrastar no celular.
 
 **Salvar.** `POST /montador/salvar` recebe `modo`, `matriz_id` ou `grade_json`, `categoria_id`,
-`cor_peca`, `pos_x`, `pos_y`, `escala`, `titulo` e `descricao`.
+`cor_peca`, `pos_x`, `pos_y`, `escala`, `titulo`, `descricao` e, quando uma imagem nova é enviada
+(`grade_json`), também `nome_matriz` e `descricao_matriz`. Esses dois últimos campos
+(protegidos por `data-bloco-matriz`) aparecem na etapa Publicar somente nesse caso; com
+matriz existente eles são ignorados, para não renomear o trabalho de outra pessoa.
+Em branco, a matriz nasce com o título do bordado (comportamento anterior).
 
 No `MontadorServico`:
 
 1. Validar título, categoria, cor e posição.
-2. Se vier `grade_json`, validar, gerar SVG e chamar `MatrizDados::inserir`.
+2. Se vier `grade_json`, validar, gerar SVG e chamar `MatrizDados::inserir`
+   (a matriz nasce com `nome_matriz` e `descricao_matriz`; em branco, usa o título).
 3. Se vier `matriz_id`, aceitar qualquer matriz cadastrada (visibilidade geral).
    Matriz criada por gerente (avulsa ou junto do bordado) nasce como padrao = 't'.
 4. Em `modo=matriz`, exigir gerente, salvar com `padrao = 't'` e encerrar.

@@ -11,7 +11,7 @@
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: var(--font-sm);
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -22,6 +22,12 @@
     border-color var(--transition),
     transform var(--transition),
     box-shadow var(--transition);
+}
+
+.btn svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
 }
 
 .btn--primary {
@@ -53,7 +59,7 @@
 
 .btn--sm {
   padding: 0.65rem 1.15rem;
-  font-size: 0.7rem;
+  font-size: var(--font-xs);
   letter-spacing: 0.1em;
 }
 
@@ -75,7 +81,7 @@
   border: 0;
   background: none;
   color: var(--color-wine-700);
-  font-size: 0.8rem;
+  font-size: var(--font-sm);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: underline;

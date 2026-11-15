@@ -4,7 +4,11 @@
 -- Responsabilidade: estrutura completa do banco do Desenrola, no PostgreSQL (Supabase).
 --
 -- Como aplicar: cole no SQL Editor do Supabase e execute.
--- O script pode ser reexecutado sem apagar dados existentes.
+-- O script pode ser reexecutado sem apagar dados existentes. Depois dele, rode seed.sql.
+--
+-- Arquivo único: já inclui todas as migrações de 14 e 15/11/2026 (rotação, Storage,
+-- peças base, matrizes até 1024 pontos, foto do produto e RLS em pecas).
+-- Conferido contra o banco em produção em 15/11/2026.
 --
 -- Convenções:
 --   id sempre bigint identity, chaves com ON DELETE explícito;
@@ -91,7 +95,6 @@ CREATE TABLE IF NOT EXISTS matrizes (
   criado_em timestamptz NOT NULL DEFAULT now()
 );
 
--- Matriz aplicada numa peça. tipo=hub é o feed; tipo=produto alimenta o mostruário.
 -- Peças base com foto real, escolhidas no montador. A foto fica no Storage.
 CREATE TABLE IF NOT EXISTS pecas (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -102,6 +105,7 @@ CREATE TABLE IF NOT EXISTS pecas (
   criado_em timestamptz NOT NULL DEFAULT now()
 );
 
+-- Matriz aplicada numa peça. tipo=hub é o feed; tipo=produto alimenta o mostruário.
 CREATE TABLE IF NOT EXISTS bordados (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   titulo text NOT NULL,
@@ -133,6 +137,8 @@ CREATE TABLE IF NOT EXISTS produtos (
   preco_base numeric(10,2) NOT NULL CHECK (preco_base > 0),
   destaque boolean NOT NULL DEFAULT false,
   ativo boolean NOT NULL DEFAULT true,
+  -- Foto própria do produto no Storage (pasta produtos/). NULL: mostra a peça montada.
+  foto_path text,
   criado_em timestamptz NOT NULL DEFAULT now()
 );
 
@@ -164,6 +170,7 @@ ALTER TABLE clientes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE insumos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE categorias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE matrizes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pecas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bordados ENABLE ROW LEVEL SECURITY;
 ALTER TABLE produtos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE curtidas ENABLE ROW LEVEL SECURITY;

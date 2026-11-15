@@ -5,7 +5,8 @@
 --
 -- Conteúdo:
 --   1. As quatro categorias do mostruário (com os mockups em public/assets/img/mockups/).
---   2. As três contas de gerente (Guilherme, Eduardo e Arthur), para entrar no painel.
+--   2. As três peças base do montador (fotos no bucket mostruario, pasta base/).
+--   3. As três contas de gerente (Guilherme, Eduardo e Arthur), para entrar no painel.
 --
 -- Não cria nenhum outro usuário: o resto do banco é populado pelo próprio site.
 -- Pode ser reexecutado sem duplicar registros.
@@ -21,7 +22,21 @@ INSERT INTO categorias (nome, slug, mockup) VALUES
   ('Personalizados','personalizados','bastidor.svg')
 ON CONFLICT (slug) DO NOTHING;
 
--- 2. Contas de gerente ---------------------------------------------------
+-- 2. Peças base -----------------------------------------------------------
+-- As fotos já estão no Storage. Só insere se a tabela estiver vazia.
+
+INSERT INTO pecas (nome, categoria_id, imagem_path)
+SELECT v.nome, c.id, v.imagem_path
+FROM (VALUES
+  ('Toalha de rosto', 'toalhas',  'base/toalha-rosto.png', 1),
+  ('Toalha de banho', 'toalhas',  'base/toalha-banho.png', 2),
+  ('Avental',         'aventais', 'base/avental.png',      3)
+) AS v (nome, slug, imagem_path, ordem)
+JOIN categorias c ON c.slug = v.slug
+WHERE NOT EXISTS (SELECT 1 FROM pecas)
+ORDER BY v.ordem;
+
+-- 3. Contas de gerente ---------------------------------------------------
 -- Senha provisória: admin123 (troque no primeiro acesso, ou via SQL).
 -- A pergunta de segurança é um placeholder: os gerentes não usam o fluxo
 -- de recuperação pelo site. Resposta é uma string aleatória, sem significado.
