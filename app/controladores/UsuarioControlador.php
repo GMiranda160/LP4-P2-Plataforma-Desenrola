@@ -9,6 +9,16 @@ class UsuarioControlador
     /** TODO(Eduardo): mostrar usuarios/lista com o layout gerente, sem nenhum hash. */
     public function listar(): void
     {
-        throw new RuntimeException('Não implementado: UsuarioControlador::listar');
+        $busca = is_string($_GET['busca'] ?? null)
+        ? trim($_GET['busca'])
+        : '';
+
+        $usuarios = (new UsuarioDados())->listar($busca);
+
+        Visao::render('usuarios/lista', [
+            'titulo' => 'Usuários',
+            'busca' => $busca,
+            'usuarios' => $usuarios,
+        ], 'gerente');
     }
 }

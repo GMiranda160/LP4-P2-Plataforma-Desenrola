@@ -12,3 +12,42 @@
  * 6. Tratar falha de rede sem quebrar a página.
  * Veja INSTRUCOES_EDUARDO.md, seção 6.
  */
+
+document.addEventListener('click', async (evento) => {
+  const botao = evento.target.closest('.js-curtir');
+
+  if (!botao) {
+    return;
+  }
+
+  botao.disabled = true;
+
+  try {
+    const resposta = await fetch('/hub/curtir', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf"]').content,
+      },
+      body: new URLSearchParams({ id: botao.dataset.id }),
+    });
+
+    if (resposta.status === 401) {
+      window.location.href = '/login';
+      return;
+    }
+
+    if (!resposta.ok) {
+      throw new Error('Falha ao curtir');
+    }
+
+    const dados = await resposta.json();
+    botao.setAttribute('aria-pressed', String(dados.curtiu));
+    botao.querySelector('.js-curtidas').textContent = dados.curtidas;
+  } catch (erro) {
+    console.error('Não foi possível atualizar a curtida.', erro);
+  } finally {
+    botao.disabled = false;
+  }
+});

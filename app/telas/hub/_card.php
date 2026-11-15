@@ -12,5 +12,33 @@
  * 3. Criar o link de comentários para /hub/bordado?id=...#comentarios.
  * Veja INSTRUCOES_EDUARDO.md, seção 5.
  */
+
 ?>
-<p class="empty-state">Tela em construção.</p>
+<article class="product-card">
+  <a class="product-card__media" href="/hub/bordado?id=<?= (int) $b['id'] ?>">
+    <?php Visao::parcial('peca_bordada', ['item' => $b]); ?>
+  </a>
+
+  <div class="product-card__body">
+    <h2 class="product-card__name"><?= e($b['titulo']) ?></h2>
+    <p>por <?= e($b['autor']) ?></p>
+
+    <div class="hub-card__acoes">
+      <button
+        class="btn btn--ghost btn--sm js-curtir"
+        type="button"
+        data-id="<?= (int) $b['id'] ?>"
+        aria-pressed="<?= $b['curtiu'] ? 'true' : 'false' ?>"
+      >
+        ♥ <span class="js-curtidas"><?= (int) $b['curtidas'] ?></span>
+      </button>
+
+      <a
+        class="btn btn--ghost btn--sm"
+        href="/hub/bordado?id=<?= (int) $b['id'] ?>#comentarios"
+      >
+        Comentários (<?= (int) $b['comentarios'] ?>)
+      </a>
+    </div>
+  </div>
+</article>

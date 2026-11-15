@@ -9,3 +9,162 @@
  * 3. Usar white-space: pre-line no texto dos comentários.
  * Veja INSTRUCOES_EDUARDO.md, seção 8.
  */
+
+ /*
+ * Arquivo: hub.css
+ * Dono: Eduardo. Só Eduardo altera este arquivo.
+ * Responsabilidade: estilos do Hub.
+ */
+
+.hub-card__acoes,
+.hub-detalhe__acoes,
+.hub-comentario__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hub-card__acoes .btn,
+.hub-detalhe__acoes .btn,
+.hub-comentario__acoes .btn,
+.hub-paginacao .btn {
+  min-height: 44px;
+}
+
+.js-curtir[aria-pressed="true"] {
+  background-color: var(--color-wine-700);
+  border-color: var(--color-wine-700);
+  color: var(--color-sand-50);
+}
+
+.js-curtir:focus-visible,
+.hub-comentarios a:focus-visible,
+.hub-comentarios button:focus-visible {
+  outline: 3px solid var(--color-wine-500);
+  outline-offset: 2px;
+}
+
+.hub-detalhe {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.hub-detalhe__peca {
+  width: min(100%, 38rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-50);
+}
+
+.hub-detalhe__peca > * {
+  width: 100%;
+  height: 100%;
+}
+
+.hub-detalhe__descricao,
+.hub-comentario__texto {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.hub-detalhe dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-4);
+}
+
+.hub-detalhe dd {
+  margin: 0;
+}
+
+.hub-detalhe__paleta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hub-detalhe__paleta li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hub-detalhe__amostra {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--color-ink-soft);
+  border-radius: 50%;
+  background-color: var(--hub-cor-linha);
+}
+
+.hub-comentarios {
+  margin-top: var(--space-6);
+}
+
+.hub-comentarios__form,
+.hub-comentarios__lista {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.hub-comentarios__form {
+  margin-block: var(--space-4);
+}
+
+.hub-comentarios__form textarea {
+  min-height: 7rem;
+}
+
+.hub-comentario {
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--color-sand-200);
+}
+
+.hub-comentario__cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.hub-comentario__cabecalho time {
+  color: var(--color-ink-soft);
+}
+
+.hub-comentario__acoes form {
+  margin: 0;
+}
+
+.hub-paginacao {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+@media (max-width: 600px) {
+  .hub-detalhe dl {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+
+  .hub-detalhe dd {
+    margin-bottom: var(--space-2);
+  }
+
+  .hub-detalhe__acoes > *,
+  .hub-detalhe__acoes .btn {
+    width: 100%;
+  }
+
+  .hub-comentario__cabecalho {
+    flex-direction: column;
+  }
+}

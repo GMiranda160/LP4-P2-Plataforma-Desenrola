@@ -11,4 +11,20 @@
  * Veja INSTRUCOES_EDUARDO.md, seção 5.
  */
 ?>
-<p class="empty-state">Tela em construção.</p>
+
+<div class="page-head">
+  <h1><?= e($titulo) ?></h1>
+</div>
+
+<?php if (empty($bordados)): ?>
+  <p class="empty-state">
+    Você ainda não tem bordados.
+    <a href="/montador">Crie seu primeiro bordado</a>
+  </p>
+<?php else: ?>
+  <div class="product-grid">
+    <?php foreach ($bordados as $b): ?>
+      <?php require RAIZ . '/app/telas/hub/_card.php'; ?>
+    <?php endforeach; ?>
+  </div>
+<?php endif; ?>
