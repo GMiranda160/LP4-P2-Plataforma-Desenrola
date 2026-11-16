@@ -94,14 +94,17 @@ class ProdutoDados
     }
 
     /**
-     * Combinações de bordado disponíveis para virar produto (tipo='produto' sem produto vinculado),
-     * mais a combinação já vinculada a um produto (edição), se $atualId > 0.
+     * Bordados feitos por contas de gerente, ainda sem produto vinculado
+     * (ou vinculados ao produto em edição), para escolher como combinação do produto.
+     * Inclui as combinações (tipo=produto) montadas pelo Montador e os bordados do Hub
+     * feitos por contas de gerente.
      */
     public function combinacoes(int $atualId = 0): array
     {
-        $sql = "SELECT b.id, b.titulo, b.descricao
+        $sql = "SELECT b.id, b.titulo, b.descricao, b.tipo, u.nome AS autor
                 FROM bordados b
-                WHERE b.tipo = 'produto'
+                JOIN usuarios u ON u.id = b.autor_id
+                WHERE u.perfil = 'gerente'
                   AND (NOT EXISTS (SELECT 1 FROM produtos p WHERE p.bordado_id = b.id)
                        OR b.id = :atual)
                 ORDER BY b.id DESC";
@@ -201,13 +204,14 @@ class ProdutoDados
         return (bool) $consulta->fetchColumn();
     }
 
-    /** True se a combinação existe, é tipo='produto' e não está em outro produto (o de edição não conta). */
+    /** True se o bordado existe, é feito por um gerente e não está em outro produto (o de edição não conta). */
     public function combinacaoDisponivel(int $bordadoId, int $produtoId): bool
     {
         $consulta = Conexao::pdo()->prepare(
             "SELECT 1
              FROM bordados b
-             WHERE b.id = :id AND b.tipo = 'produto'
+             JOIN usuarios u ON u.id = b.autor_id
+             WHERE b.id = :id AND u.perfil = 'gerente'
                AND NOT EXISTS (SELECT 1 FROM produtos p
                                WHERE p.bordado_id = b.id AND p.id <> :atual)
              LIMIT 1"

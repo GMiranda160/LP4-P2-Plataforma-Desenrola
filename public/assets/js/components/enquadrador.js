@@ -454,6 +454,25 @@ export function criarEnquadrador(dialogo, { aoConfirmar } = {}) {
 
       const cfg = config();
 
+      // Cada abertura começa do zero: nada de herdar a imagem de um fluxo anterior
+      // (a peça não pode nascer com a imagem enviada para a matriz).
+      if (urlTemporaria) {
+        URL.revokeObjectURL(urlTemporaria);
+        urlTemporaria = null;
+      }
+
+      fonte = null;
+      blobAtual = null;
+      corFundo = '#ffffff';
+      z = 1;
+      cx = 0;
+      cy = 0;
+      arraste = null;
+      if (imagem) imagem.removeAttribute('src');
+      if (moldura) moldura.classList.remove('is-arrastando');
+      if (campoLink) campoLink.value = '';
+      if (arquivo) arquivo.value = '';
+
       if (titulo) titulo.textContent = cfg.titulo;
       if (botaoUsar) botaoUsar.textContent = cfg.usar;
       if (dicaArquivo) dicaArquivo.textContent = cfg.dica;
@@ -461,7 +480,6 @@ export function criarEnquadrador(dialogo, { aoConfirmar } = {}) {
         subtitulo.dataset.origem = cfg.origem;
         subtitulo.dataset.ajuste = cfg.ajuste;
       }
-      if (arquivo) arquivo.value = '';
 
       mostrarErro('');
       dialogo.showModal();

@@ -8,7 +8,35 @@
  */
 
 .montador {
-  max-width: 720px;
+  max-width: var(--container);
+  /* Espaço para a barra fixa no rodapé não cobrir o conteúdo. */
+  padding-bottom: 7rem;
+}
+
+/* O .form compartilhado limita a 720px; aqui ele usa toda a coluna do grid
+   (a barra lateral de resumo fica intacta). */
+.montador .form {
+  max-width: none;
+}
+
+/* Botão "?" do guia do montador: flutua sobre a borda direita da trilha
+   de passos, no espaço vazio acima dela, sem ocupar um slot no layout. */
+.montador__guia {
+  position: absolute;
+  z-index: 5;
+  top: clamp(0.6rem, 1.8vw, 1.15rem);
+  right: clamp(0.25rem, 1.5vw, 1.1rem);
+}
+
+/* O formulário e todos os blocos internos podem encolher dentro da coluna */
+.montador .form,
+.montador__etapa,
+.montador__faixas,
+.montador__faixa,
+.montador__conversor,
+.montador__ou,
+.carousel {
+  min-width: 0;
 }
 
 .montador__etapa {
@@ -38,13 +66,6 @@
 }
 
 /* Matrizes ---------------------------------------------------------------- */
-
-.matrix-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-}
 
 .matrix-card {
   display: flex;
@@ -343,6 +364,9 @@
 .montador__area {
   position: relative;
   aspect-ratio: 4 / 5;
+  width: 100%;
+  max-width: 620px;
+  margin-inline: auto;
   overflow: hidden;
   border-radius: var(--radius-lg);
   background-color: var(--color-sand-100);
@@ -476,24 +500,81 @@
   }
 }
 
-/* Montador v2: peca base com foto real e foto do usuario --------------------- */
+/* Montador v2: faixa de presets e de cor e faixa da foto enviada (etapa 2) --- */
 
-.montador__arquivo-peca {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  overflow: hidden;
+.montador__faixa {
+  display: grid;
+  gap: var(--space-4);
 }
 
-.montador__arquivo-peca:focus-visible + .montador__upload-texto {
+.montador__faixa--presets {
+  margin-top: var(--space-4);
+}
+
+/* Dentro das faixas o gap manda: zera as margens herdadas dos componentes. */
+.montador__faixa .montador__subtitulo,
+.montador__faixa .categorias-mini,
+.montador__faixa .chip-group {
+  margin: 0;
+}
+
+.montador__faixa--foto {
+  padding: var(--space-4);
+  border: 1px dashed var(--color-wine-500);
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-50);
+}
+
+.montador__faixa--foto .montador__subtitulo {
+  margin: 0;
+}
+
+/* Botão grande "Escolher a foto da sua peça": um tile central dentro da faixa. */
+.montador__foto-abrir {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: var(--space-4) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  font: inherit;
+  color: var(--color-wine-700);
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.montador__foto-abrir:hover {
+  background-color: rgba(105, 24, 24, 0.06);
+}
+
+.montador__foto-abrir:focus-visible {
   outline: 2px solid var(--color-wine-700);
+  outline-offset: 2px;
 }
 
-.montador__cores-bloco.is-oculto,
-.montador__upload-foto[hidden],
+.montador__foto-icone {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 0.15rem;
+  color: var(--color-wine-500);
+}
+
+.montador__foto-abrir-texto {
+  font-size: var(--font-lg);
+  font-weight: 500;
+}
+
+.montador__foto-abrir-dica {
+  font-size: var(--font-sm);
+  font-weight: 400;
+  color: var(--color-ink-soft);
+}
+
 .montador__foto-nota[hidden],
-.montador__foto-aviso[hidden] {
+.montador__foto-aviso[hidden],
+.montador__foto-preview[hidden] {
   display: none;
 }
 
@@ -501,21 +582,6 @@
   width: 64px;
   height: 72px;
   object-fit: contain;
-}
-
-.categoria-mini__img--upload {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 72px;
-  border: 1px dashed var(--color-wine-500);
-  border-radius: var(--radius-md);
-  color: var(--color-wine-500);
-}
-
-.categoria-mini__img--upload svg {
-  width: 30px;
-  height: 30px;
 }
 
 /* Absoluta pelo mesmo motivo de .peca__foto: no grid, height: 100% não resolve e a foto
@@ -531,34 +597,17 @@
 
 .montador__foto-nota,
 .montador__foto-aviso {
-  margin-top: var(--space-2);
+  margin: 0;
   color: var(--color-ink-soft);
 }
 
-.montador__upload-foto {
-  margin-top: var(--space-3);
-}
-
-/* Prévia da foto enviada pela pessoa (etapa 2). */
-.categoria-mini__foto-usuario {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
-}
-
-.categoria-mini__foto-usuario[hidden],
-.categoria-mini__img--upload svg[hidden],
-.montador__foto-preview[hidden] {
-  display: none;
-}
-
+/* Prévia da foto enviada pela pessoa (etapa 2), centralizada na faixa. */
 .montador__foto-preview {
   display: block;
-  max-width: min(100%, 280px);
-  max-height: 320px;
-  margin-top: var(--space-3);
-  border-radius: var(--radius-md, 8px);
+  width: min(100%, 240px);
+  max-height: 260px;
+  margin: 0 auto;
+  border-radius: var(--radius-md);
   object-fit: contain;
   box-shadow: var(--shadow-sm);
 }
@@ -588,13 +637,6 @@
 }
 
 /* Popup da foto da peça: origem e enquadramento 4:5 (js/components/enquadrador.js) ---------- */
-.montador__upload-foto {
-  width: 100%;
-  background: none;
-  font: inherit;
-  cursor: pointer;
-}
-
 .enquadrador {
   --enq-coluna: 360px; /* largura da moldura e do zoom, alinhados no mesmo eixo */
   /* margin: auto centraliza o dialog modal; o reset.css zera a margem de tudo. */
@@ -1034,3 +1076,605 @@
     flex: 1;
   }
 }
+
+/* ==========================================================================
+   Montador v3: trilha de pontos, duas colunas, resumo lateral e barra fixa
+   ========================================================================== */
+
+/* Passo 1 em duas faixas empilhadas: carousel das matrizes em cima, escolher
+   a imagem embaixo. A coluna de resumo à direita continua intacta. */
+.montador__faixas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+/* Carousel das matrizes: trilho horizontal com snap, setas nas bordas e
+   máscara de fade indicando que há mais cards para os lados. */
+.carousel {
+  position: relative;
+  margin: 0 -0.25rem;
+}
+
+.carousel__trilho {
+  display: flex;
+  justify-content: safe center;
+  gap: var(--space-3);
+  padding: 4px 0.25rem var(--space-3);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-sand-200) transparent;
+}
+
+.carousel__trilho::-webkit-scrollbar {
+  height: 6px;
+}
+
+.carousel__trilho::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sand-200);
+}
+
+.carousel__trilho .matrix-card {
+  flex: 0 0 158px;
+  scroll-snap-align: start;
+}
+
+.carousel.is-inicio:not(.is-fim) .carousel__trilho {
+  -webkit-mask-image: linear-gradient(to right, #000 78%, transparent);
+  mask-image: linear-gradient(to right, #000 78%, transparent);
+}
+
+.carousel.is-fim:not(.is-inicio) .carousel__trilho {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 22%);
+  mask-image: linear-gradient(to right, transparent, #000 22%);
+}
+
+.carousel:not(.is-inicio):not(.is-fim) .carousel__trilho {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.carousel__seta {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-top: -1.1rem;
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-white);
+  color: var(--color-wine-700);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.carousel__seta:hover {
+  transform: scale(1.08);
+}
+
+.carousel__seta:focus-visible {
+  outline: 2px solid var(--color-wine-700);
+  outline-offset: 2px;
+}
+
+.carousel__seta:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.carousel__seta svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.carousel__seta--ant {
+  left: -0.6rem;
+}
+
+.carousel__seta--prox {
+  right: -0.6rem;
+}
+
+@media (pointer: coarse) {
+  .carousel__seta {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel__seta {
+    transition: none;
+  }
+}
+
+/* Corpo em duas colunas: formulário e resumo lateral. As duas vão até a
+   mesma altura (a maior manda); o palco do resumo cresce para preencher. */
+.montador__corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: var(--space-6);
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .montador__corpo {
+    /* minmax(0, 1fr): impede que o conteúdo mínimo de um filho estique a coluna e vaze a tela */
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Painel de resumo: acompanha cada escolha em tempo real. */
+.resumo {
+  position: sticky;
+  top: 5.5rem;
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 1024px) {
+  .resumo {
+    position: static;
+  }
+}
+
+.resumo__titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px dashed var(--color-sand-200);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-wine-700);
+}
+
+.resumo__titulo small {
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs);
+  letter-spacing: 0.08em;
+  color: var(--color-ink-soft);
+}
+
+.resumo__palco {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 1 1 auto;
+  min-height: 240px;
+  overflow: hidden;
+  border: 1px dashed var(--color-sand-200);
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-50);
+}
+
+/* Mockup do bordado sobre a peça: peça, tinta (máscara da própria foto) e
+   matriz posicionada, espelhando a área do passo 3 em tamanho pequeno. */
+.resumo__mockup {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: min(100%, 15rem);
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.resumo__mockup[hidden] {
+  display: none;
+}
+
+.resumo__peca {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.resumo__peca[hidden] {
+  display: none;
+}
+
+.resumo__tinta {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.resumo__matriz {
+  position: absolute;
+  height: auto;
+  transform: translate(-50%, -50%) rotate(var(--giro, 0deg));
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.resumo__vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 18ch;
+  color: var(--color-ink-soft);
+  text-align: center;
+  font-size: var(--font-sm);
+  line-height: 1.5;
+}
+
+.resumo__vazio svg {
+  width: 40px;
+  height: 40px;
+  stroke: var(--color-wine-500);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 3 4;
+}
+
+.resumo__vazio[hidden] {
+  display: none;
+}
+
+.resumo__nome {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-2xl);
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+
+.resumo__meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-xs);
+  letter-spacing: 0.06em;
+  color: var(--color-wine-500);
+}
+
+.resumo__linhas {
+  display: grid;
+  margin: 0;
+}
+
+.resumo__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0.55rem 0;
+  border-top: 1px dashed var(--color-sand-200);
+}
+
+.resumo__linha dt {
+  font-size: var(--font-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.resumo__linha dd {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+  color: var(--color-ink);
+  text-align: right;
+}
+
+.resumo__cor {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background-color: var(--c, #fff);
+  border: 1px solid rgba(46, 35, 33, 0.25);
+}
+
+/* Stepper: trilha de pontos. Uma linha tracejada corre pelos círculos e a
+   parte vencida se preenche de vinho conforme o avanço (--trilha, de 0 a 1). */
+.stepper--pontos {
+  position: relative;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: var(--space-6);
+  --bola: 2.35rem;
+  --trilha: 0;
+}
+
+.stepper--pontos::before,
+.stepper--pontos::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: calc(var(--bola) / 2);
+  left: calc(var(--bola) / 2);
+  height: 3px;
+  transform: translateY(-50%);
+  background-repeat: repeat-x;
+  background-size: 15px 3px;
+  background-position: left center;
+}
+
+.stepper--pontos::before {
+  right: calc(var(--bola) / 2);
+  background-image: linear-gradient(90deg, var(--color-rose-300) 52%, transparent 44%);
+}
+
+.stepper--pontos::after {
+  width: calc((100% - var(--bola)) * var(--trilha));
+  background-image: linear-gradient(90deg, var(--color-wine-700) 52%, transparent 44%);
+  transition: width 0.5s ease;
+}
+
+.stepper--pontos .stepper__step {
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  border-radius: 0;
+}
+
+.stepper__botao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+}
+
+.stepper__botao:not(:disabled) {
+  cursor: pointer;
+}
+
+.stepper__botao:not(:disabled):hover .stepper__dot {
+  transform: scale(1.12);
+}
+
+.stepper__botao:focus-visible {
+  outline: 2px solid var(--color-wine-700);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.stepper--pontos .stepper__dot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--bola);
+  height: var(--bola);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sand-200);
+  color: var(--color-ink);
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stepper--pontos .stepper__number {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font-size: var(--font-md);
+  font-weight: 600;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Check que se desenha quando a etapa é concluída. */
+.stepper__check {
+  position: absolute;
+  width: 56%;
+  height: 56%;
+  stroke: var(--color-sand-50);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.4s ease 0.1s;
+}
+
+.stepper--pontos .stepper__step.is-active .stepper__dot {
+  background-color: var(--color-wine-700);
+  color: var(--color-sand-50);
+  transform: scale(1.14);
+  box-shadow: 0 0 0 5px rgba(105, 24, 24, 0.14), 0 0 0 1px rgba(105, 24, 24, 0.35);
+}
+
+.stepper--pontos .stepper__step.is-done .stepper__dot {
+  background-color: var(--color-wine-700);
+  color: var(--color-sand-50);
+}
+
+.stepper--pontos .stepper__step.is-done .stepper__number {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.stepper--pontos .stepper__step.is-done .stepper__check {
+  stroke-dashoffset: 0;
+}
+
+.stepper__rotulo {
+  font-size: var(--font-sm);
+  letter-spacing: 0.05em;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+}
+
+.stepper--pontos .stepper__step.is-active .stepper__rotulo {
+  color: var(--color-wine-700);
+  font-weight: 600;
+}
+
+.stepper--pontos .stepper__step.is-done .stepper__rotulo {
+  color: var(--color-ink);
+}
+
+@media (max-width: 640px) {
+  .stepper--pontos {
+    --bola: 2rem;
+  }
+
+  .stepper__rotulo {
+    display: none;
+  }
+
+  .stepper--pontos .stepper__step.is-active .stepper__rotulo,
+  .stepper--pontos .stepper__step.is-done .stepper__rotulo {
+    display: block;
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Barra fixa no rodapé: progresso à esquerda, ações à direita. */
+.montador__barra {
+  position: fixed;
+  z-index: 60;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.6rem var(--container-pad) calc(0.6rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-sand-200);
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px) saturate(1.15);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+}
+
+.montador__barra-dentro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.montador__progresso {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+  margin: 0;
+}
+
+.montador__progresso-rotulo {
+  font-family: var(--font-mono);
+  font-size: var(--font-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+}
+
+.montador__progresso-nome {
+  font-family: var(--font-display);
+  font-size: var(--font-lg);
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.montador__progresso-trilha {
+  width: 9rem;
+  height: 3px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sand-200);
+}
+
+.montador__progresso-preenchimento {
+  display: block;
+  width: 25%;
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--color-wine-700);
+  transition: width 0.4s ease;
+}
+
+.montador__barra-acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+}
+
+@media (max-width: 720px) {
+  .montador__progresso-trilha,
+  .montador__progresso-rotulo {
+    display: none;
+  }
+
+  .montador__progresso-nome {
+    font-size: var(--font-md);
+    max-width: 34vw;
+  }
+}
+
+@media print {
+  .montador__barra {
+    display: none;
+  }
+}
+
+/* No mobile a barra fixa do montador empilha acima da nav de baixo (.nav-bottom). */
+@media (max-width: 1100px) {
+  .montador__barra {
+    bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+
+  .montador {
+    padding-bottom: 10.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stepper--pontos::after,
+  .stepper--pontos .stepper__dot,
+  .stepper--pontos .stepper__number,
+  .stepper__check,
+  .montador__progresso-preenchimento {
+    transition: none;
+  }
+}
+

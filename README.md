@@ -56,7 +56,7 @@ Valem para todas as pessoas do grupo e para qualquer IA usada no projeto:
 | **Arquivos** | Supabase Storage (bucket `mostruario`): SVG e grade das matrizes em `matrizes/`, fotos das peças base em `pecas/` e `base/`, foto da própria peça enviada no montador em `fotos/` e foto do produto em `produtos/`. O banco guarda só o caminho (e a paleta da matriz) |
 | **IA** | Gemini, com cada tutorial salvo no banco e um texto reserva para falhas |
 | **Contas** | Todo e-mail do sistema usa `@example.com`; a pessoa digita só o prefixo no formulário |
-| **Divisão** | Cada arquivo tem um único dono, e Guilherme entrega os arquivos comentados |
+| **Divisão** | Cada arquivo tem um dono; o Guilherme pode alterar qualquer arquivo e entrega a base comentada |
 
 O Railway executa PHP por Docker. Por isso, o projeto tem um `Dockerfile` na raiz.
 
@@ -174,7 +174,7 @@ Regras gerais:
 ## 6. Estrutura de pastas
 
 Letra entre colchetes indica o dono do arquivo: **[A]** Arthur, **[E]** Eduardo, **[G]** Guilherme.
-Só o dono altera o arquivo.
+Arthur e Eduardo alteram só os arquivos com a letra deles; o Guilherme pode alterar qualquer arquivo.
 
 ```text
 /
@@ -496,7 +496,7 @@ funcionar em celular, porque a turma vai usar o sistema pelo telefone.
 
 ## 12. Responsabilidades
 
-**Regra principal: duas pessoas nunca alteram o mesmo arquivo.**
+**Regra principal: Arthur e Eduardo alteram somente os arquivos com a letra deles; o Guilherme pode alterar qualquer arquivo.**
 
 | Pessoa | Telas | Lógica em PHP | Documento |
 |---|---|---|---|
@@ -597,7 +597,7 @@ Regras:
 - Nunca use `git push --force`.
 - Nunca faça commit de `.env`, senha ou chave.
 - Não envie código que quebra a página inicial: cada push na `main` publica o site.
-- Nunca altere arquivo de outra pessoa. Peça ao dono. Arquivos da base são com Guilherme.
+- Se você não é o Guilherme, nunca altere arquivo de outra pessoa. Peça ao dono. Arquivos da base são com Guilherme.
 
 Prefixos de commit: `feat`, `fix`, `style`, `docs`, `refactor`.
 

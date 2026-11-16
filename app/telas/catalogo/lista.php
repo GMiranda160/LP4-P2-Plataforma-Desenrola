@@ -7,13 +7,19 @@
  * Campos de $categorias: nome, slug
  * Campos de $produtos: id, nome, descricao, preco_base, categoria e dados da peça
  * Responsabilidade: filtros por categoria e grade de produtos do mostruário; sem produtos, exibe o estado vazio.
+ * Botão de guia ao lado do título: incluído pelo Guilherme (regra: o Guilherme altera qualquer arquivo).
  * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
 <section class="section catalogo">
 <div class="container">
 <div class="page-head">
-  <h1><?= e($pagina ?? $titulo) ?></h1>
+  <div class="page-head__lado">
+    <h1><?= e($pagina ?? $titulo) ?></h1>
+    <button class="guia-btn" type="button" data-guia-abrir="guia-catalogo" aria-label="Como o catálogo funciona" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+    </button>
+  </div>
 </div>
 
 <nav class="catalog-filters" aria-label="Filtrar por categoria">

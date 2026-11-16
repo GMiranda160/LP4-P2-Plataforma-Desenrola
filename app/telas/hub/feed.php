@@ -34,7 +34,12 @@ $urlCurtidos = '/hub?' . http_build_query(
   <header class="hub-cabecalho">
     <div>
       <p class="eyebrow">Comunidade</p>
-      <h1><?= e($titulo) ?></h1>
+      <div class="hub-cabecalho__titulo">
+        <h1><?= e($titulo) ?></h1>
+        <button class="guia-btn" type="button" data-guia-abrir="guia-hub" aria-label="Como o Hub funciona" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        </button>
+      </div>
       <p class="lead">O que a comunidade está bordando agora. Curta, comente e peça o tutorial de cada peça.</p>
     </div>
     <a class="btn btn--primary" href="/montador"><?= hub_icone('novo') ?> Criar bordado</a>

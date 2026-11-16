@@ -74,11 +74,27 @@ $coresTecido = ['#f3ded9', '#ffffff', '#2e2321', '#691818', '#3f5a45', '#2f4a6b'
 <div class="montador container section" data-montador>
   <script type="application/json" id="dados-montador"><?= $json ?></script>
 
-  <ol class="stepper" role="list">
+  <!-- "?" do guia do montador: flutua no canto direito vazio, sobre a borda
+       da trilha de passos, sem ocupar um slot no layout. -->
+  <button class="guia-btn montador__guia" type="button" data-guia-abrir="guia-montador" aria-label="Como o montador funciona" aria-haspopup="dialog">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+  </button>
+
+  <ol class="stepper stepper--pontos" role="list" data-stepper style="--trilha: 0">
     <?php foreach ($etapas as $i => $nomeEtapa): ?>
-      <li class="stepper__step<?= $i === 0 ? ' is-active' : '' ?>" data-step><span class="stepper__number"><?= $i + 1 ?></span> <?= e($nomeEtapa) ?></li>
+      <li class="stepper__step<?= $i === 0 ? ' is-active' : '' ?>" data-step>
+        <button type="button" class="stepper__botao" data-step-botao<?= $i === 0 ? ' aria-current="step"' : '' ?><?= $i !== 0 ? ' disabled' : '' ?>>
+          <span class="stepper__dot" aria-hidden="true">
+            <span class="stepper__number"><?= $i + 1 ?></span>
+            <svg class="stepper__check" viewBox="0 0 24 24" fill="none"><path d="M6.5 12.6l3.8 3.8L17.5 8" pathLength="100"/></svg>
+          </span>
+          <span class="stepper__rotulo"><?= e($nomeEtapa) ?></span>
+        </button>
+      </li>
     <?php endforeach; ?>
   </ol>
+
+  <div class="montador__corpo">
 
   <form id="form-montador" class="form" method="post" action="/montador/salvar" novalidate>
     <?= Csrf::campo() ?>
@@ -105,20 +121,29 @@ $coresTecido = ['#f3ded9', '#ffffff', '#2e2321', '#691818', '#3f5a45', '#2f4a6b'
         <p class="field-hint">Escolha uma matriz existente ou envie uma imagem para converter em pontos.</p>
       <?php endif; ?>
 
-      <?php if ($modo === 'matriz'): ?>
-        <?php /* Matriz nova sempre nasce de uma imagem: as existentes não aparecem aqui. */ ?>
-      <?php elseif ($matrizes): ?>
-        <div class="matrix-grid" role="radiogroup" aria-label="Matrizes disponíveis">
-          <?php foreach ($matrizes as $matriz): ?>
-            <label class="matrix-card">
-              <input type="radio" name="matriz_id" value="<?= (int) $matriz['id'] ?>"
-                     <?= (int) $matriz['id'] === $matrizInicial ? 'checked' : '' ?>>
-              <span class="matrix-card__img"><img src="<?= e(svg_data_uri((string) $matriz['svg'])) ?>" alt="<?= e($matriz['nome']) ?>" loading="lazy"></span>
-              <span class="matrix-card__nome"><?= e($matriz['nome']) ?></span>
-              <span class="matrix-card__meta"><?= (int) $matriz['largura'] ?>×<?= (int) $matriz['altura'] ?> · <?= (int) $matriz['total_pontos'] ?> pontos</span>
-            </label>
-          <?php endforeach; ?>
-        </div>
+      <div class="montador__faixas">
+        <?php if ($modo === 'matriz'): ?>
+          <?php /* Matriz nova sempre nasce de uma imagem: as existentes não aparecem aqui. */ ?>
+        <?php elseif ($matrizes): ?>
+          <div class="carousel" data-carousel>
+            <div class="carousel__trilho" role="radiogroup" aria-label="Matrizes disponíveis">
+            <?php foreach ($matrizes as $matriz): ?>
+              <label class="matrix-card">
+                <input type="radio" name="matriz_id" value="<?= (int) $matriz['id'] ?>"
+                       <?= (int) $matriz['id'] === $matrizInicial ? 'checked' : '' ?>>
+                <span class="matrix-card__img"><img src="<?= e(svg_data_uri((string) $matriz['svg'])) ?>" alt="<?= e($matriz['nome']) ?>" loading="lazy"></span>
+                <span class="matrix-card__nome"><?= e($matriz['nome']) ?></span>
+                <span class="matrix-card__meta"><?= (int) $matriz['largura'] ?>×<?= (int) $matriz['altura'] ?> · <?= (int) $matriz['total_pontos'] ?> pontos</span>
+              </label>
+            <?php endforeach; ?>
+            </div>
+            <button type="button" class="carousel__seta carousel__seta--ant" data-carousel-ant aria-label="Matrizes anteriores">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <button type="button" class="carousel__seta carousel__seta--prox" data-carousel-prox aria-label="Mais matrizes">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
       <?php else: ?>
         <p class="empty-state">Nenhuma matriz ainda. Envie uma imagem abaixo para criar a primeira.</p>
       <?php endif; ?>
@@ -158,10 +183,6 @@ $coresTecido = ['#f3ded9', '#ffffff', '#2e2321', '#691818', '#3f5a45', '#2f4a6b'
         <p class="montador__status" aria-live="polite"></p>
         <button type="button" class="btn btn--ghost btn--sm montador__limpar">Limpar imagem</button>
       </div>
-
-      <div class="step-nav">
-        <span></span>
-        <button type="button" class="btn btn--primary" data-avancar>Avançar</button>
       </div>
     </section>
 
@@ -169,51 +190,51 @@ $coresTecido = ['#f3ded9', '#ffffff', '#2e2321', '#691818', '#3f5a45', '#2f4a6b'
     <?php if ($modo !== 'matriz'): ?>
     <section class="montador__etapa" data-etapa="peca" aria-label="Escolha a peça">
       <h2 class="montador__titulo">2. Escolha a peça</h2>
-      <p class="field-hint">Escolha uma peça base com foto real ou envie a foto da sua peça.</p>
+      <p class="field-hint">Escolha uma peça base com foto real e uma cor, ou envie a foto da sua peça.</p>
 
-      <p class="montador__subtitulo">Peça base (foto real)</p>
-      <div class="categorias-mini" role="radiogroup" aria-label="Peças base">
-        <?php foreach ($pecas as $item): ?>
-          <?php $url = StorageServico::urlPublica((string) $item['imagem_path']); ?>
-          <label class="categoria-mini">
-            <input type="radio" name="peca_base" value="<?= (int) $item['id'] ?>" data-foto="<?= e($url) ?>"
-                   data-categoria-id="<?= (int) $item['categoria_id'] ?>">
-            <span class="categoria-mini__img categoria-mini__img--foto"><img src="<?= e($url) ?>" alt="<?= e($item['nome']) ?>" loading="lazy"></span>
-            <span class="categoria-mini__nome"><?= e($item['nome']) ?></span>
+      <!-- Faixa de presets e de cor (em cima) -->
+      <div class="montador__faixa montador__faixa--presets">
+        <p class="montador__subtitulo">Peça base (foto real)</p>
+        <div class="categorias-mini" role="radiogroup" aria-label="Peças base">
+          <?php foreach ($pecas as $item): ?>
+            <?php $url = StorageServico::urlPublica((string) $item['imagem_path']); ?>
+            <label class="categoria-mini">
+              <input type="radio" name="peca_base" value="<?= (int) $item['id'] ?>" data-foto="<?= e($url) ?>"
+                     data-categoria-id="<?= (int) $item['categoria_id'] ?>">
+              <span class="categoria-mini__img categoria-mini__img--foto"><img src="<?= e($url) ?>" alt="<?= e($item['nome']) ?>" loading="lazy"></span>
+              <span class="categoria-mini__nome"><?= e($item['nome']) ?></span>
+            </label>
+          <?php endforeach; ?>
+        </div>
+
+        <p class="montador__subtitulo">Cor da peça</p>
+        <div class="chip-group montador__cores-tecido" role="group" aria-label="Cor da peça">
+          <?php foreach ($coresTecido as $cor): ?>
+            <button type="button" class="swatch" data-cor="<?= e($cor) ?>" style="--swatch: <?= e($cor) ?>" aria-pressed="<?= $cor === '#f3ded9' ? 'true' : 'false' ?>" aria-label="Cor <?= e($cor) ?>"></button>
+          <?php endforeach; ?>
+          <label class="swatch swatch--livre montador__cor-livre" title="Outra cor">
+            <input type="color" class="montador__cor-input" data-cor-livre value="#f3ded9" aria-label="Outra cor">
           </label>
-        <?php endforeach; ?>
-        <label class="categoria-mini">
-          <input type="radio" name="peca_base" value="foto" data-categoria-id="<?= $categoriaPersonalizados ?>">
-          <span class="categoria-mini__img categoria-mini__img--upload" aria-hidden="true">
-            <img class="categoria-mini__foto-usuario" data-foto-miniatura alt="" hidden>
-            <svg data-foto-icone viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          </span>
-          <span class="categoria-mini__nome">Minha foto</span>
-        </label>
+        </div>
       </div>
 
-      <button type="button" class="montador__upload montador__upload-foto" data-foto-linha data-foto-abrir hidden>
-        <span class="montador__upload-texto" data-foto-abrir-texto>Escolher a foto da sua peça</span>
-      </button>
+      <p class="montador__ou"><span>ou envie a foto da sua peça</span></p>
 
-      <img class="montador__foto-preview" data-foto-preview alt="Prévia da foto da sua peça" hidden>
-      <p class="field-hint montador__foto-nota" data-foto-nota hidden>
-        A foto é reduzida neste navegador e guardada junto com o bordado quando você salvar.
-      </p>
-
-      <p class="montador__subtitulo">Cor da peça</p>
-      <div class="chip-group montador__cores-tecido" role="group" aria-label="Cor da peça">
-        <?php foreach ($coresTecido as $cor): ?>
-          <button type="button" class="swatch" data-cor="<?= e($cor) ?>" style="--swatch: <?= e($cor) ?>" aria-pressed="<?= $cor === '#f3ded9' ? 'true' : 'false' ?>" aria-label="Cor <?= e($cor) ?>"></button>
-        <?php endforeach; ?>
-        <label class="swatch swatch--livre montador__cor-livre" title="Outra cor">
-          <input type="color" class="montador__cor-input" data-cor-livre value="#f3ded9" aria-label="Outra cor">
-        </label>
-      </div>
-
-      <div class="step-nav">
-        <button type="button" class="btn btn--ghost" data-voltar>Voltar</button>
-        <button type="button" class="btn btn--primary" data-avancar>Avançar</button>
+      <!-- Faixa da foto enviada (embaixo): o rádio peca_base=foto segue escondido aqui. -->
+      <div class="montador__faixa montador__faixa--foto">
+        <input class="montador__arquivo" type="radio" name="peca_base" value="foto"
+               data-categoria-id="<?= $categoriaPersonalizados ?>" tabindex="-1" aria-hidden="true">
+        <p class="montador__subtitulo">Foto da sua peça</p>
+        <p class="field-hint">Frente e com boa luz. A foto é reduzida no navegador e guardada com o bordado.</p>
+        <button type="button" class="montador__foto-abrir" data-foto-abrir>
+          <svg class="montador__foto-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="montador__foto-abrir-texto" data-foto-abrir-texto>Escolher a foto da sua peça</span>
+          <span class="montador__foto-abrir-dica">Envie, cole ou arraste uma imagem · PNG, JPEG ou WebP até 10 MB</span>
+        </button>
+        <img class="montador__foto-preview" data-foto-preview alt="Prévia da foto da sua peça" hidden>
+        <p class="field-hint montador__foto-nota" data-foto-nota hidden>
+          A foto é reduzida neste navegador e guardada junto com o bordado quando você salvar.
+        </p>
       </div>
     </section>
 
@@ -242,11 +263,6 @@ $coresTecido = ['#f3ded9', '#ffffff', '#2e2321', '#691818', '#3f5a45', '#2f4a6b'
       <div class="montador__controles">
         <p class="montador__posicao field-hint" aria-live="polite">Posição 50% × 50% · Tamanho 45 · Giro 0°</p>
         <button type="button" class="btn btn--ghost btn--sm" data-resetar>Centralizar e endireitar</button>
-      </div>
-
-      <div class="step-nav">
-        <button type="button" class="btn btn--ghost" data-voltar>Voltar</button>
-        <button type="button" class="btn btn--primary" data-avancar>Avançar</button>
       </div>
     </section>
 
@@ -305,17 +321,53 @@ $coresTecido = ['#f3ded9', '#ffffff', '#2e2321', '#691818', '#3f5a45', '#2f4a6b'
         <?php endif; ?>
       </div>
 
-      <div class="step-nav">
-        <button type="button" class="btn btn--ghost" data-voltar>Voltar</button>
-        <span class="step-nav__fim">
-          <?php if ($modo !== 'matriz'): ?>
-            <button type="button" class="btn btn--ghost" data-baixar>Baixar imagem</button>
-          <?php endif; ?>
-          <button type="submit" class="btn btn--primary"><?= e($textoBotao) ?></button>
-        </span>
-      </div>
     </section>
   </form>
+
+  <aside class="resumo" aria-label="Resumo do seu bordado">
+    <p class="resumo__titulo"><span>Seu bordado</span><small data-resumo-etapa>Passo 1 de 4</small></p>
+    <div class="resumo__palco">
+      <div class="resumo__mockup" data-res-mockup hidden aria-hidden="true">
+        <img class="resumo__peca" data-res-peca-img alt="">
+        <div class="resumo__tinta" data-res-tinta></div>
+        <img class="resumo__matriz" data-res-matriz alt="">
+      </div>
+      <span class="resumo__vazio" data-res-vazio>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M7 7l2.4 2.4M14.6 14.6L17 17M17 7l-2.4 2.4M9.4 14.6L7 17"/><circle cx="12" cy="12" r="2.6"/></svg>
+        <span>Escolha uma matriz ou envie uma imagem para ver a prévia aqui.</span>
+      </span>
+    </div>
+    <p class="resumo__nome" data-res-nome>Nenhuma matriz ainda</p>
+    <p class="resumo__meta" data-res-meta>—</p>
+    <dl class="resumo__linhas">
+      <div class="resumo__linha"><dt>Peça</dt><dd data-res-peca>Nenhuma</dd></div>
+      <div class="resumo__linha"><dt>Tecido</dt><dd><span class="resumo__cor" data-res-cor style="--c: #f3ded9" aria-hidden="true"></span><span data-res-cor-nome>Rosa claro</span></dd></div>
+      <div class="resumo__linha"><dt>Tamanho</dt><dd data-res-tamanho>256 pontos</dd></div>
+      <div class="resumo__linha"><dt>Cores</dt><dd data-res-cores>8 cores</dd></div>
+      <div class="resumo__linha"><dt>Posição</dt><dd data-res-posicao>50% × 50% · 45 · 0°</dd></div>
+    </dl>
+  </aside>
+  </div>
+
+  <!-- Barra fixa no rodapé: passo à esquerda, Voltar/Baixar/Avançar à direita.
+       O botão principal envia o formulário com form="form-montador"; o montador.js
+       decide se o envio avança a etapa ou publica (na última). -->
+  <div class="montador__barra" data-barra>
+    <div class="montador__barra-dentro">
+      <p class="montador__progresso">
+        <span class="montador__progresso-rotulo"><span data-barra-passo>Passo 1 de 4</span></span>
+        <span class="montador__progresso-nome" data-barra-nome>Escolha a matriz</span>
+        <span class="montador__progresso-trilha" aria-hidden="true"><span class="montador__progresso-preenchimento" data-barra-preenchimento></span></span>
+      </p>
+      <div class="montador__barra-acoes">
+        <?php if ($modo !== 'matriz'): ?>
+          <button type="button" class="btn btn--ghost btn--sm" data-baixar hidden>Baixar imagem</button>
+        <?php endif; ?>
+        <button type="button" class="btn btn--ghost" data-barra-voltar hidden>Voltar</button>
+        <button type="submit" form="form-montador" class="btn btn--primary" data-barra-acao data-texto-final="<?= e($textoBotao) ?>">Avançar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Popup de imagem, usado em dois modos pelo montador.js:
        1. foto da peça (etapa 2): origem e enquadramento 4:5, devolve JPEG;

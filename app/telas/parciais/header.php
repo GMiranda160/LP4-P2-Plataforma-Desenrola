@@ -12,6 +12,8 @@
  * O botão "?" do guia de auth fica ao lado de Entrar ou do menu do usuário;
  * é absoluto (.guia-btn--auth), fora do fluxo, para não entrar no cálculo
  * de alinhamento da navbar. Ao lado fica o "?" do guia da home, junto à marca.
+ * O botão "?" do guia do catálogo não fica na navbar: fica na própria tela,
+ * ao lado do título (app/telas/catalogo/lista.php).
  */
 
 $usuario = Auth::usuario();
@@ -82,5 +84,28 @@ $ativo = static function (string ...$rotas) use ($caminho): string {
   </div>
 </header>
 
+<!-- Barra de navegação fixa no rodapé, só no mobile (≤ 1100px), no estilo de app. -->
+<nav class="nav-bottom" aria-label="Navegação principal">
+  <a class="nav-bottom__item" href="/"<?= $ativo('/') ?>>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.5V20h11V9.5"/></svg>
+    <span>Início</span>
+  </a>
+  <a class="nav-bottom__item" href="/hub"<?= $ativo('/hub') ?>>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.4" cy="8.6" r="3.1"/><path d="M3.8 19.6c.7-3.8 2.8-5.7 5.6-5.7s4.9 1.9 5.6 5.7"/><circle cx="16.6" cy="9.6" r="2.4"/><path d="M14.8 14.2c2.6.3 4.2 2 4.6 5.3"/></svg>
+    <span>Hub</span>
+  </a>
+  <a class="nav-bottom__item" href="/catalogo"<?= $ativo('/catalogo', '/produto') ?>>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg>
+    <span>Catálogo</span>
+  </a>
+  <a class="nav-bottom__item" href="/montador" aria-label="Montar bordado"<?= $ativo('/montador') ?>>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20c5.5 0 9.5-4 9.5-9.5"/><path d="M13.5 10.5 20 4"/><circle cx="20" cy="4" r="1.5"/></svg>
+    <span aria-hidden="true">Montar</span>
+  </a>
+</nav>
+
 <?php Visao::guia('home'); ?>
 <?php Visao::guia('auth'); ?>
+<?php Visao::guia('catalogo'); ?>
+<?php Visao::guia('montador'); ?>
+<?php Visao::guia('hub'); ?>

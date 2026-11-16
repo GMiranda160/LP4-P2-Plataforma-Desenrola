@@ -68,7 +68,7 @@ class ProdutoServico
         return (new ProdutoDados())->buscar($id);
     }
 
-    /** Combinações de bordado disponíveis para virar produto. Inclui a do produto em edição, se houver. */
+    /** Combinações e bordados de gerente disponíveis para virar produto. Inclui a combinação do produto em edição, se houver. */
     public function combinacoes(?int $atualId = null): array
     {
         return (new ProdutoDados())->combinacoes($atualId ?? 0);

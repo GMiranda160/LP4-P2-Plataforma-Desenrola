@@ -69,7 +69,7 @@ if (($partes[0] ?? '') === 'gerente' && $caminho !== '/gerente') {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?v=<?= (int) (@filemtime(RAIZ . '/public/assets/css/main.css') ?: 1) ?>" />
 </head>
 <body class="admin">
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -137,6 +137,8 @@ if (($partes[0] ?? '') === 'gerente' && $caminho !== '/gerente') {
       <?= $conteudo ?>
     </main>
   </div>
+
+  <?php Visao::guia('painel'); ?>
 
   <script type="module" src="/assets/js/main.js?v=<?= (int) (@filemtime(RAIZ . '/public/assets/js/main.js') ?: 1) ?>"></script>
 </body>

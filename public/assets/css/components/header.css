@@ -345,3 +345,67 @@
 .nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(3) {
   transform: translateY(-6.5px) rotate(-45deg);
 }
+
+/* Barra de navegação fixa no rodapé (mobile, até 1100px), no estilo de app.
+   Substitui o dropdown do hamburger com os quatro destinos principais sempre visíveis. */
+.nav-bottom {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .nav-bottom {
+    position: fixed;
+    z-index: 55;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--color-sand-200);
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px) saturate(1.15);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+  }
+
+  .nav-bottom__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.45rem 0.2rem 0.5rem;
+    font-size: clamp(0.6rem, 2.6vw, 0.72rem);
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+    transition: color var(--transition), background-color var(--transition);
+  }
+
+  .nav-bottom__item svg {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .nav-bottom__item:hover {
+    color: var(--color-wine-700);
+    background-color: rgba(105, 24, 24, 0.05);
+  }
+
+  .nav-bottom__item:focus-visible {
+    outline: 2px solid var(--color-wine-700);
+    outline-offset: -2px;
+    background-color: rgba(105, 24, 24, 0.08);
+  }
+
+  .nav-bottom__item[aria-current="page"] {
+    color: var(--color-wine-700);
+    background-color: rgba(105, 24, 24, 0.08);
+  }
+
+  /* O rodapé deixa respiro para a barra fixa não cobrir os contatos. */
+  .site-footer {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+}
+

@@ -6,7 +6,8 @@
  * Recebe: $titulo, $produto, $combinacoes
  * Envia POST (multipart, por causa da foto) para /gerente/produtos/salvar.
  * Campos: id, bordado_id, nome, descricao, preco_base, destaque, ativo, foto (arquivo), remover_foto
- * Responsabilidade: cadastro e edição de produtos; a combinação é sempre um bordado do tipo produto, criado no Montador.
+ * Responsabilidade: cadastro e edição de produtos; a combinação é um bordado feito por um gerente
+ * (como combinação no Montador, ou como post no Hub), ainda sem produto vinculado.
  * Sem foto própria, a página do produto usa a renderização da peça bordada.
  * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
@@ -25,13 +26,26 @@ $fotoAtual = (string) ($produto['foto_path'] ?? '');
       <label for="bordado_id">Combinação</label>
       <select class="text-field" id="bordado_id" name="bordado_id" required data-combinacao>
         <option value="">Selecione</option>
-        <?php foreach ($combinacoes as $c): ?>
-          <option value="<?= (int) $c['id'] ?>"
-            data-nome="<?= e($c['titulo']) ?>" data-descricao="<?= e($c['descricao'] ?? '') ?>"
-            <?= (int) ($produto['bordado_id'] ?? 0) === (int) $c['id'] ? 'selected' : '' ?>>
-            <?= e($c['titulo']) ?>
-          </option>
-        <?php endforeach; ?>
+        <optgroup label="Combinações de produto">
+          <?php foreach ($combinacoes as $c): ?>
+            <?php if (($c['tipo'] ?? 'produto') !== 'produto') { continue; } ?>
+            <option value="<?= (int) $c['id'] ?>"
+              data-nome="<?= e($c['titulo']) ?>" data-descricao="<?= e($c['descricao'] ?? '') ?>"
+              <?= (int) ($produto['bordado_id'] ?? 0) === (int) $c['id'] ? 'selected' : '' ?>>
+              <?= e($c['titulo']) ?><?= !empty($c['autor']) ? ' · ' . e($c['autor']) : '' ?>
+            </option>
+          <?php endforeach; ?>
+        </optgroup>
+        <optgroup label="Bordados de gerente no Hub">
+          <?php foreach ($combinacoes as $c): ?>
+            <?php if (($c['tipo'] ?? 'produto') === 'produto') { continue; } ?>
+            <option value="<?= (int) $c['id'] ?>"
+              data-nome="<?= e($c['titulo']) ?>" data-descricao="<?= e($c['descricao'] ?? '') ?>"
+              <?= (int) ($produto['bordado_id'] ?? 0) === (int) $c['id'] ? 'selected' : '' ?>>
+              <?= e($c['titulo']) ?><?= !empty($c['autor']) ? ' · ' . e($c['autor']) : '' ?>
+            </option>
+          <?php endforeach; ?>
+        </optgroup>
       </select>
       <a class="btn btn--ghost btn--sm" href="/montador?modo=produto">Criar combinação</a>
     </div>

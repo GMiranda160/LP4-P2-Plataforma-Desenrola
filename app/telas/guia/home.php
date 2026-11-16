@@ -414,7 +414,7 @@
             </div>
           </aside>
 
-          <ol class="pipeline">
+          <ol class="pipeline pipeline--auth">
             <li class="pipeline__passo guia__anim" style="--d:40ms">
               <span class="pipeline__tag">PASSO 9</span>
               <span class="pipeline__icone"><svg viewBox="0 0 24 24" class="fx fx--render"><rect class="fx__moldura" pathLength="100" x="3.5" y="4" width="17" height="16" rx="2.2"/><circle class="fx__dot" cx="7.4" cy="7.8" r="0.85" fill="currentColor" stroke="none"/><path class="fx__linha fx__linha--1" pathLength="100" d="M6.8 12.2h5.6"/><path class="fx__linha fx__linha--2" pathLength="100" d="M6.8 15.6h9.6"/></svg></span>
@@ -452,7 +452,7 @@
         <ul class="guia__chips guia__chips--rumo guia__anim" style="--d:240ms">
           <li>layout padrão: publico</li>
           <li>título: $titulo da tela, ou PLATAFORMA</li>
-          <li>main.js com filemtime fura o cache</li>
+          <li>main.css e main.js com filemtime furam o cache</li>
         </ul>
       </section>
 
@@ -663,7 +663,7 @@
               <div class="est2__passo guia__anim" style="--d:180ms">
                 <span class="est2__ic"><svg viewBox="0 0 24 24"><path class="est2-desenha" pathLength="100" d="M9.5 10.5a4 4 0 0 1 5.6 0l2.4 2.4a4 4 0 0 1-5.6 5.6l-1.2-1.2"/><path class="est2-desenha est2-d2" pathLength="100" d="M14.5 13.5a4 4 0 0 1-5.6 0l-2.4-2.4a4 4 0 0 1 5.6-5.6l1.2 1.2"/></svg></span>
                 <span class="est2__knot">2</span>
-                <span class="est2__txt"><h4>O único link</h4><p>no head: <code>assets/css/main.css</code></p></span>
+                <span class="est2__txt"><h4>O único link</h4><p>no head: <code>assets/css/main.css?v=mtime</code></p></span>
               </div>
 
               <span class="est2__seta guia__anim" style="--d:240ms" aria-hidden="true"><span class="est2__fio"></span><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span>
@@ -671,7 +671,7 @@
               <div class="est2__passo guia__anim" style="--d:300ms">
                 <span class="est2__ic"><svg viewBox="0 0 24 24"><path class="est2-desenha" pathLength="100" d="M19 12a7 7 0 1 1-2.05-4.95"/><path class="est2-desenha est2-d2" pathLength="100" d="M19 5v4.5h-4.5"/></svg></span>
                 <span class="est2__knot">3</span>
-                <span class="est2__txt"><h4>O cache</h4><p>sem <code>?v=</code>: o navegador guarda; Ctrl+F5 fura</p></span>
+                <span class="est2__txt"><h4>O cache</h4><p><code>?v=</code> do <code>filemtime</code>: mudou o arquivo, muda o número</p></span>
               </div>
 
               <span class="est2__seta guia__anim" style="--d:360ms" aria-hidden="true"><span class="est2__fio"></span><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span>

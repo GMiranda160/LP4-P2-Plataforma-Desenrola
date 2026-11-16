@@ -67,3 +67,10 @@
   margin: 0;
   font-size: var(--font-page-title);
 }
+
+/* Título da página com o botão de guia ao lado (ex.: catálogo). */
+.page-head__lado {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

@@ -12,7 +12,6 @@ import { query, queryAll, on } from '../utils/dom.js';
 import { converterImagem, desenharGrade } from './conversor.js';
 import { criarEnquadrador } from '../components/enquadrador.js';
 
-const PASSOS = ['matriz', 'peca', 'posicao', 'publicar'];
 const COR_PADRAO = '#f3ded9';
 const POS_PADRAO = 50;
 const ESCALA_PADRAO = 45;
@@ -31,7 +30,12 @@ export function initMontador(root) {
 
   const etapas = queryAll('.montador__etapa', root);
   const passos = queryAll('.stepper__step', root);
-  const botoesVoltar = queryAll('[data-voltar]', root);
+  const stepper = query('[data-stepper]', root);
+  const barraPasso = query('[data-barra-passo]', root);
+  const barraNome = query('[data-barra-nome]', root);
+  const barraPreenchimento = query('[data-barra-preenchimento]', root);
+  const barraVoltar = query('[data-barra-voltar]', root);
+  const barraAcao = query('[data-barra-acao]', root);
   const erroBox = query('.montador__erro', root);
   const gradeJson = query('[data-grade-json]', form);
   const posX = query('[data-pos-x]', form);
@@ -51,6 +55,20 @@ export function initMontador(root) {
   const pecaIdCampo = query('[data-peca-id]', form);
   const fotoPecaCampo = query('[data-foto-peca]', form);
   const baixar = query('[data-baixar]', root);
+  const resMockup = query('[data-res-mockup]', root);
+  const resPecaImg = query('[data-res-peca-img]', root);
+  const resTinta = query('[data-res-tinta]', root);
+  const resMatriz = query('[data-res-matriz]', root);
+  const resVazio = query('[data-res-vazio]', root);
+  const resNome = query('[data-res-nome]', root);
+  const resMeta = query('[data-res-meta]', root);
+  const resPeca = query('[data-res-peca]', root);
+  const resCor = query('[data-res-cor]', root);
+  const resCorNome = query('[data-res-cor-nome]', root);
+  const resTamanho = query('[data-res-tamanho]', root);
+  const resCores = query('[data-res-cores]', root);
+  const resPosicao = query('[data-res-posicao]', root);
+  const resumoEtapa = query('[data-resumo-etapa]', root);
 
   // Etapa 1: matriz existente ou imagem convertida.
   const radiosMatriz = queryAll('input[name="matriz_id"]', root);
@@ -63,11 +81,8 @@ export function initMontador(root) {
 
   // Etapa 2: peça base com foto real ou foto enviada pela própria pessoa.
   const radiosBase = queryAll('input[name="peca_base"]', root);
-  const fotoLinha = query('[data-foto-linha]', root);
   const fotoAbrirTexto = query('[data-foto-abrir-texto]', root);
   const fotoNota = query('[data-foto-nota]', root);
-  const fotoMiniatura = query('[data-foto-miniatura]', root);
-  const fotoIcone = query('[data-foto-icone]', root);
   const fotoPreview = query('[data-foto-preview]', root);
   const modoMontagem = String(dados.modo ?? 'hub');
 
@@ -97,15 +112,149 @@ export function initMontador(root) {
   }
 
   function irPara(indice) {
-    passoAtual = Math.max(0, Math.min(indice, PASSOS.length - 1));
+    passoAtual = Math.max(0, Math.min(indice, etapas.length - 1));
 
     etapas.forEach((etapa, i) => etapa.classList.toggle('is-active', i === passoAtual));
     passos.forEach((passo, i) => {
       passo.classList.toggle('is-active', i === passoAtual);
-      passo.setAttribute('aria-current', i === passoAtual ? 'step' : 'false');
+      passo.classList.toggle('is-done', i < passoAtual);
+      const botao = passo.querySelector('[data-step-botao]');
+      if (botao) {
+        botao.disabled = i >= passoAtual;
+        if (i === passoAtual) botao.setAttribute('aria-current', 'step');
+        else botao.removeAttribute('aria-current');
+      }
     });
 
+    const total = etapas.length;
+
+    if (stepper) stepper.style.setProperty('--trilha', total > 1 ? String(passoAtual / (total - 1)) : '0');
+    if (barraPasso) barraPasso.textContent = `Passo ${passoAtual + 1} de ${total}`;
+    if (barraNome) barraNome.textContent = etapas[passoAtual]?.getAttribute('aria-label') ?? '';
+    if (barraPreenchimento) barraPreenchimento.style.width = `${((passoAtual + 1) / total) * 100}%`;
+    if (barraVoltar) barraVoltar.hidden = passoAtual === 0;
+    if (barraAcao) barraAcao.textContent = passoAtual === total - 1 ? barraAcao.dataset.textoFinal : 'Avançar';
+    if (baixar) baixar.hidden = passoAtual !== total - 1;
+    if (resumoEtapa) resumoEtapa.textContent = `Passo ${passoAtual + 1} de ${total}`;
+
     esconderErro();
+    atualizarResumo();
+  }
+
+  const NOMES_CORS = {
+    '#f3ded9': 'Rosa claro',
+    '#ffffff': 'Branco',
+    '#2e2321': 'Preto',
+    '#691818': 'Vinho',
+    '#3f5a45': 'Verde',
+    '#2f4a6b': 'Azul',
+    '#d9c9b8': 'Cru',
+    '#b7a6d9': 'Lilás',
+  };
+
+  const formatarPontos = (numero) => Number(numero || 0).toLocaleString('pt-BR');
+
+  /** Resumo lateral: prévia da "montagem" (peça com o bordado, como no passo 3),
+      nome, medidas e escolhas da etapa atual. Nada é salvo em banco; é tudo DOM ao vivo. */
+  function atualizarResumo() {
+    const matriz = matrizEscolhida();
+    const convertida = gradeSelecionada();
+    const encontrada = matriz ? (dados.matrizes ?? []).find((m) => String(m.id) === matriz.value) : null;
+    const fonteMatriz = convertida ? convertida.preview : (encontrada?.svg ?? null);
+
+    if (resMockup && resVazio) {
+      const etapaAtual = etapas[passoAtual]?.dataset.etapa ?? 'matriz';
+      const comPeca = modoMontagem !== 'matriz';
+      const base = radiosBase.find((radio) => radio.checked);
+      const fontePeca = comPeca ? (pecaModo() === 'foto' ? fotoDoUsuario : base?.dataset.foto ?? null) : null;
+
+      // O render segue a etapa: Matriz mostra a matriz, Peça mostra a peça,
+      // Posição em diante mostra peça + tinta + matriz.
+      let verMatriz = false;
+      let verPeca = false;
+
+      if (etapaAtual === 'matriz') {
+        verMatriz = true;
+      } else if (etapaAtual === 'peca') {
+        verPeca = true;
+      } else {
+        verMatriz = true;
+        verPeca = true;
+      }
+
+      if (resPecaImg) {
+        if (fontePeca) resPecaImg.src = fontePeca;
+        resPecaImg.hidden = !(verPeca && fontePeca);
+      }
+
+      if (resTinta) {
+        const cor = (corPeca?.value || '#ffffff').toLowerCase();
+        const comTinta = verPeca && comPeca && Boolean(fontePeca) && cor !== '#ffffff' && pecaModo() !== 'foto';
+        resTinta.style.backgroundColor = cor;
+        resTinta.style.webkitMaskImage = comTinta ? `url("${fontePeca}")` : 'none';
+        resTinta.style.maskImage = comTinta ? `url("${fontePeca}")` : 'none';
+        resTinta.style.display = comTinta ? 'block' : 'none';
+      }
+
+      if (resMatriz) {
+        if (fonteMatriz) resMatriz.src = fonteMatriz;
+        const x = Number(posX?.value ?? POS_PADRAO);
+        const y = Number(posY?.value ?? POS_PADRAO);
+        const escalaValor = comPeca ? Number(escala?.value ?? ESCALA_PADRAO) : 72;
+        const giro = Number(rotacao?.value ?? 0);
+        resMatriz.style.left = `${x}%`;
+        resMatriz.style.top = `${y}%`;
+        resMatriz.style.width = `${escalaValor}%`;
+        resMatriz.style.setProperty('--giro', `${giro}deg`);
+        resMatriz.style.display = verMatriz && fonteMatriz ? '' : 'none';
+      }
+
+      const temCena = (verMatriz && fonteMatriz) || (verPeca && fontePeca);
+      resMockup.hidden = !temCena;
+      resVazio.hidden = temCena;
+    }
+
+    if (resNome && resMeta) {
+      if (convertida) {
+        resNome.textContent = 'Sua imagem convertida';
+        resMeta.textContent = `${convertida.largura}×${convertida.altura} · ${formatarPontos(convertida.totalPontos)} pontos`;
+      } else if (matriz) {
+        resNome.textContent = encontrada?.nome ?? 'Matriz escolhida';
+        resMeta.textContent = encontrada ? `${encontrada.largura}×${encontrada.altura} · ${formatarPontos(encontrada.total_pontos)} pontos` : '—';
+      } else {
+        resNome.textContent = 'Nenhuma matriz ainda';
+        resMeta.textContent = '—';
+      }
+    }
+
+    if (resPeca) {
+      if (modoMontagem === 'matriz') {
+        resPeca.textContent = 'Matriz do ateliê';
+      } else if (pecaModo() === 'foto') {
+        resPeca.textContent = 'Minha foto';
+      } else {
+        const marcada = radiosBase.find((radio) => radio.checked);
+        const rotulo = marcada?.closest('.categoria-mini')?.querySelector('.categoria-mini__nome')?.textContent.trim();
+        resPeca.textContent = rotulo ?? 'Nenhuma';
+      }
+    }
+
+    if (resCor && resCorNome) {
+      const cor = (corPeca?.value || '#ffffff').toLowerCase();
+      resCor.style.setProperty('--c', cor);
+      resCorNome.textContent = pecaModo() === 'foto' ? 'Foto da peça' : (NOMES_CORS[cor] ?? 'Personalizada');
+    }
+
+    if (resTamanho) resTamanho.textContent = `${largura?.value ?? 256} pontos`;
+    if (resCores) resCores.textContent = `${cores?.value ?? 8} cores`;
+
+    if (resPosicao) {
+      const x = posX?.value ?? POS_PADRAO;
+      const y = posY?.value ?? POS_PADRAO;
+      const tamanho = escala?.value ?? ESCALA_PADRAO;
+      const giro = rotacao?.value ?? 0;
+      resPosicao.textContent = `${x}% × ${y}% · ${tamanho} · ${giro}°`;
+    }
   }
 
   function mostrarErro(mensagem) {
@@ -152,6 +301,7 @@ export function initMontador(root) {
     }
 
     caixa?.toggleAttribute('hidden', !peca.getAttribute('src'));
+    atualizarResumo();
   }
 
   function limparImagem({ manterSelecao = false } = {}) {
@@ -268,6 +418,7 @@ export function initMontador(root) {
     if (corLivre) corLivre.value = limpa;
 
     atualizarTinta();
+    atualizarResumo();
   }
 
   function atualizarTinta() {
@@ -286,19 +437,17 @@ export function initMontador(root) {
     tinta.style.display = !fundo || cor === '#ffffff' || modo === 'foto' ? 'none' : 'block';
   }
 
-  /** Prévia da foto enviada na etapa 2: miniatura no cartão "Minha foto" e imagem maior abaixo do botão. */
+  /** Prévia da foto enviada na etapa 2: imagem reduzida na faixa da foto e a nota de rodapé. */
   function mostrarFotoEnviada() {
     const temFoto = Boolean(fotoDoUsuario);
 
-    [fotoMiniatura, fotoPreview].forEach((img) => {
-      if (!img) return;
-      if (temFoto) img.src = fotoDoUsuario;
-      else img.removeAttribute('src');
-    });
+    if (fotoPreview) {
+      if (temFoto) fotoPreview.src = fotoDoUsuario;
+      else fotoPreview.removeAttribute('src');
+      fotoPreview.hidden = !temFoto;
+    }
 
-    fotoMiniatura?.toggleAttribute('hidden', !temFoto);
-    fotoIcone?.toggleAttribute('hidden', temFoto);
-    fotoPreview?.toggleAttribute('hidden', !temFoto || pecaModo() !== 'foto');
+    if (fotoNota) fotoNota.hidden = !temFoto;
   }
 
   function sincronizarModoPeca() {
@@ -316,12 +465,11 @@ export function initMontador(root) {
       corLivre.closest('.swatch--livre')?.setAttribute('aria-disabled', modo === 'foto' ? 'true' : 'false');
     }
 
-    fotoLinha?.toggleAttribute('hidden', modo !== 'foto');
-    fotoNota?.toggleAttribute('hidden', false);
     mostrarFotoEnviada();
 
     sincronizarCategoria();
     renderizarFundo();
+    atualizarResumo();
   }
 
   function carregarImg(src) {
@@ -459,6 +607,16 @@ export function initMontador(root) {
     }
 
     if (posicaoTexto) posicaoTexto.textContent = `Posição ${x}% × ${y}% · Tamanho ${tamanho} · Giro ${giro}°`;
+
+    if (resPosicao) resPosicao.textContent = `${x}% × ${y}% · ${tamanho} · ${giro}°`;
+
+    // O mockup do resumo acompanha a posição, o tamanho e o giro no mesmo instante.
+    if (resMatriz) {
+      resMatriz.style.left = `${x}%`;
+      resMatriz.style.top = `${y}%`;
+      resMatriz.style.width = `${Number(escala?.value ?? ESCALA_PADRAO)}%`;
+      resMatriz.style.setProperty('--giro', `${giro}deg`);
+    }
   }
 
   /** Centro da caixa em pixels da tela, a partir de pos_x e pos_y. */
@@ -599,12 +757,46 @@ export function initMontador(root) {
     return true;
   }
 
-  // Eventos: etapas.
-  queryAll('[data-avancar]', root).forEach((botao) => on(botao, 'click', () => {
-    if (passoValido(passoAtual)) irPara(passoAtual + 1);
-  }));
+  // Eventos: etapas. Passos concluídos na trilha funcionam como atalho.
+  passos.forEach((passo, i) => {
+    on(passo.querySelector('[data-step-botao]'), 'click', () => {
+      if (i < passoAtual) irPara(i);
+    });
+  });
 
-  botoesVoltar.forEach((botao) => on(botao, 'click', () => irPara(passoAtual - 1)));
+  on(barraVoltar, 'click', () => irPara(passoAtual - 1));
+  on(largura, 'change', atualizarResumo);
+  on(cores, 'change', atualizarResumo);
+
+  // Carousel das matrizes: as setas rolam o trilho e o fade das bordas acompanha a posição.
+  const carousel = query('[data-carousel]', root);
+  if (carousel) {
+    const trilho = carousel.querySelector('.carousel__trilho');
+    const setaAnt = carousel.querySelector('[data-carousel-ant]');
+    const setaProx = carousel.querySelector('[data-carousel-prox]');
+    const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const atualizarBordas = () => {
+      if (!trilho) return;
+      const max = trilho.scrollWidth - trilho.clientWidth - 1;
+      carousel.classList.toggle('is-inicio', trilho.scrollLeft <= 1);
+      carousel.classList.toggle('is-fim', trilho.scrollLeft >= max);
+      if (setaAnt) setaAnt.disabled = trilho.scrollLeft <= 1;
+      if (setaProx) setaProx.disabled = trilho.scrollLeft >= max;
+    };
+
+    if (trilho) {
+      trilho.addEventListener('scroll', atualizarBordas, { passive: true });
+      window.addEventListener('resize', atualizarBordas);
+      atualizarBordas();
+    }
+
+    const passoCarousel = () => Math.max(170, (trilho?.clientWidth ?? 320) * 0.7);
+    const irParaLado = (direcao) => trilho?.scrollBy({ left: direcao * passoCarousel(), behavior: semMovimento ? 'auto' : 'smooth' });
+
+    on(setaAnt, 'click', () => irParaLado(-1));
+    on(setaProx, 'click', () => irParaLado(1));
+  }
 
   // Eventos: matriz e imagem.
   radiosMatriz.forEach((radio) => on(radio, 'change', () => {
@@ -622,15 +814,22 @@ export function initMontador(root) {
   // Eventos: peça base com foto e foto enviada pela pessoa.
   radiosBase.forEach((radio) => on(radio, 'change', () => sincronizarModoPeca()));
 
+  // Marca o modo "foto" no grupo de rádio (o modo foto não tem tile próprio:
+  // nasce do botão de enviar a foto).
+  const marcarModoFoto = () => {
+    const radioFoto = radiosBase.find((radio) => radio.value === 'foto');
+    if (radioFoto) radioFoto.checked = true;
+  };
+
   // Foto da pessoa: popup com origem (computador, arrastar, colar ou link) e enquadramento 4:5.
   // A foto já sai em 4:5, a proporção da peça: preenche a área inteira, sem faixas nas laterais.
   const enquadrador = criarEnquadrador(query('[data-enquadrador]', root), {
     aoConfirmar(dataUrl) {
       fotoDoUsuario = dataUrl;
+      marcarModoFoto();
+      sincronizarModoPeca();
       if (fotoAbrirTexto) fotoAbrirTexto.textContent = 'Trocar ou reenquadrar a foto';
       esconderErro();
-      mostrarFotoEnviada();
-      renderizarFundo();
     },
   });
 
@@ -701,13 +900,20 @@ export function initMontador(root) {
   on(form, 'submit', async (evento) => {
     const ultima = etapas.length - 1;
 
+    // Fora da última etapa o botão da barra significa "avançar", não publicar.
+    if (passoAtual < ultima) {
+      evento.preventDefault();
+      if (passoValido(passoAtual)) irPara(passoAtual + 1);
+      return;
+    }
+
     if (!passoValido(ultima)) {
       evento.preventDefault();
       irPara(ultima);
       return;
     }
 
-    const botao = query('button[type="submit"]', form);
+    const botao = barraAcao ?? query('button[type="submit"]', form);
     const marcada = radiosBase.find((radio) => radio.checked);
     const comFoto = modoMontagem !== 'matriz' && pecaModo() === 'foto';
 
