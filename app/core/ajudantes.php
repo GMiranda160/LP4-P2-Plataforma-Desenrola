@@ -93,3 +93,17 @@ function svg_data_uri(string $svg): string
 
     return 'data:image/svg+xml;base64,' . base64_encode($svg);
 }
+
+/**
+ * Destino de volta depois de uma ação do Hub (comentar, excluir, ocultar), vindo do campo "voltar".
+ * Só aceita caminhos internos do Hub (/hub... ou /meus-bordados...), para não virar redirecionamento aberto;
+ * qualquer outro valor devolve $padrao.
+ */
+function destino_hub(mixed $voltar, string $padrao): string
+{
+    if (!is_string($voltar) || !preg_match('~\A/(hub|meus-bordados)(/[a-z-]+)?(\?[A-Za-z0-9=&%_.-]*)?(#[A-Za-z0-9_-]+)?\z~', $voltar)) {
+        return $padrao;
+    }
+
+    return $voltar;
+}

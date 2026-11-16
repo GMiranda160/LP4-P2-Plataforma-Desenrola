@@ -53,6 +53,18 @@
   text-align: center;
 }
 
+/* Miniatura da foto na listagem: 72px de largura mantendo a proporção 4:5, cantos arredondados. */
+.table__foto {
+  width: 72px;
+}
+
+.table__foto .peca {
+  width: 72px;
+  height: auto;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
 .table__actions {
   text-align: center;
   white-space: nowrap;

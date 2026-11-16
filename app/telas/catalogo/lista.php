@@ -10,7 +10,7 @@
  * Veja INSTRUCOES_ARTHUR.md, seção 4.
  */
 ?>
-<section class="section">
+<section class="section catalogo">
 <div class="container">
 <div class="page-head">
   <h1><?= e($pagina ?? $titulo) ?></h1>

@@ -21,6 +21,7 @@
     <table class="table">
       <thead>
         <tr>
+          <th>Foto</th>
           <th>Nome</th>
           <th>Categoria</th>
           <th>Preço base</th>
@@ -32,6 +33,9 @@
       <tbody>
         <?php foreach ($produtos as $p): ?>
           <tr>
+            <td class="table__foto">
+              <?php Visao::parcial('peca_bordada', ['item' => $p]); ?>
+            </td>
             <td><?= e($p['nome']) ?></td>
             <td><?= e($p['categoria']) ?></td>
             <td><?= moeda($p['preco_base']) ?></td>

@@ -15,7 +15,10 @@ class GeminiServico
     private const URL_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
     private const MODELO_PADRAO = 'gemini-flash-latest';
     private const MODELO_FALLBACK = 'gemini-flash-lite-latest';
-    private const TIMEOUT = 25;
+    /** Espera no modelo principal: 25s de folga, sempre com a contingência pronta no fallback. */
+    private const TIMEOUT_PRINCIPAL = 25;
+    private const TIMEOUT_FALLBACK = 30;
+    private const TIMEOUT_CONEXAO = 5;
 
     /**
      * Gera o texto para o prompt. Tenta o modelo principal; se ele falhar por
@@ -34,7 +37,7 @@ class GeminiServico
         $fallback = (string) getenv('GEMINI_FALLBACK_MODEL') ?: self::MODELO_FALLBACK;
 
         try {
-            return $this->chamar($principal, $prompt, $chave);
+            return $this->chamar($principal, $prompt, $chave, self::TIMEOUT_PRINCIPAL);
         } catch (RuntimeException $erroPrincipal) {
             if ($principal === $fallback) {
                 throw $erroPrincipal;
@@ -42,18 +45,21 @@ class GeminiServico
 
             error_log('Gemini: modelo ' . $principal . ' falhou (' . $erroPrincipal->getMessage() . '); tentando ' . $fallback);
 
-            return $this->chamar($fallback, $prompt, $chave);
+            return $this->chamar($fallback, $prompt, $chave, self::TIMEOUT_FALLBACK);
         }
     }
 
-    /** Uma chamada generateContent. Lança RuntimeException se a resposta não vier no formato esperado. */
-    private function chamar(string $modelo, string $prompt, string $chave): string
+    /** Uma chamada generateContent, com o tempo máximo de espera em segundos. Lança RuntimeException se a resposta não vier no formato esperado. */
+    private function chamar(string $modelo, string $prompt, string $chave, int $timeout): string
     {
         $url = self::URL_BASE . rawurlencode($modelo) . ':generateContent';
 
         $corpo = json_encode([
             'contents' => [['parts' => [['text' => $prompt]]]],
-            'generationConfig' => ['temperature' => 0.4],
+            'generationConfig' => [
+                'temperature' => 0.4,
+                'maxOutputTokens' => 1200,
+            ],
         ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
         $curl = curl_init($url);
@@ -65,7 +71,8 @@ class GeminiServico
         curl_setopt_array($curl, [
             CURLOPT_POST => true,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => self::TIMEOUT,
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_CONNECTTIMEOUT => self::TIMEOUT_CONEXAO,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 'x-goog-api-key: ' . $chave,
@@ -92,6 +99,11 @@ class GeminiServico
 
         $dados = json_decode((string) $resposta, true);
         $texto = $dados['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        $motivo = $dados['candidates'][0]['finishReason'] ?? null;
+
+        if (is_string($motivo) && $motivo !== '' && $motivo !== 'STOP') {
+            error_log('Gemini: finishReason = ' . $motivo);
+        }
 
         if (!is_string($texto) || trim($texto) === '') {
             throw new RuntimeException('Gemini sem texto na resposta (' . $modelo . ').');

@@ -35,6 +35,11 @@
 
 /* Navegação compacta e hero em coluna ------------------------------------- */
 @media (max-width: 1100px) {
+  /* Sem o menu central (display:none), o bloco de ações vai para a última coluna. */
+  .header-actions {
+    grid-column: 3;
+  }
+
   .nav-toggle {
     display: inline-flex;
   }

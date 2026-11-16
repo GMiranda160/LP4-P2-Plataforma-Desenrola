@@ -3,6 +3,7 @@
  * Dono: Guilherme. Só Guilherme altera este arquivo.
  * Inicializa o menu móvel, o menu do usuário, as animações de rolagem, a vitrine
  * da home e as máscaras de reais (data-moeda) e de CPF/CNPJ, telefone e CEP (data-mascara).
+ * Importa também hub.js, que registra as curtidas por delegação de eventos.
  */
 
 import { queryAll } from './utils/dom.js';
@@ -16,6 +17,7 @@ import { initToasts } from './components/toast.js';
 import { initGuia } from './components/guia.js';
 import { initMoeda } from './components/moeda.js';
 import { initMascara } from './components/mascara.js';
+import './pages/hub.js';
 
 initHeader();
 initMenuUsuario();

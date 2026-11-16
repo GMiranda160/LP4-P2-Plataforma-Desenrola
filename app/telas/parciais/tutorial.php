@@ -16,8 +16,13 @@ $temTutorial = is_string($tutorialSalvo) && trim($tutorialSalvo) !== '';
   <h3 class="tutorial__titulo">Tutorial para bordar</h3>
 
   <?php if ($temTutorial): ?>
-    <p class="field-hint">Texto gerado por IA, revise antes de bordar.</p>
-    <div class="tutorial__texto"><?= e($tutorialSalvo) ?></div>
+    <p class="field-hint">Texto gerado por IA, revise antes de bordar.
+      <?php if (Auth::id() !== null): ?>
+        <button type="button" class="link-button" data-tutorial-regenerar>Regenerar</button>
+      <?php endif; ?>
+    </p>
+    <div class="tutorial__texto" data-tutorial-texto><?= e($tutorialSalvo) ?></div>
+    <p class="tutorial__erro form__error" data-tutorial-erro role="alert" hidden></p>
   <?php else: ?>
     <p class="field-hint">A IA monta um passo a passo simples, a partir deste bordado.</p>
     <button type="button" class="btn btn--ghost" data-tutorial-gerar>Gerar tutorial com IA</button>

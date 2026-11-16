@@ -99,7 +99,7 @@
 }
 
 .guia__eyebrow {
-  font-size: 1.7cqh;
+  font-size: var(--font-sm);
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -144,14 +144,18 @@
 }
 
 .guia__lede {
-  font-size: 1.8cqh;
-  line-height: 1.5;
+  font-size: var(--font-lg);
+  line-height: 1.45;
   color: var(--color-ink-soft);
-  max-width: 100ch;
+  max-width: 125ch;
 }
 
 .guia__lede b {
   color: var(--color-ink);
+}
+
+.guia__lede code {
+  font-size: 0.85em;
 }
 
 .guia__nota {
@@ -163,7 +167,7 @@
   border-left: 3px solid var(--color-wine-700);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: var(--color-rose-100);
-  font-size: 1.6cqh;
+  font-size: var(--font-md);
   line-height: 1.45;
   color: var(--color-ink);
 }
@@ -193,13 +197,35 @@
   border-radius: var(--radius-pill);
   padding: 0.45cqh 0.9cqw;
   font-family: var(--font-mono);
-  font-size: 1.55cqh;
+  font-size: var(--font-sm);
   font-weight: 500;
 }
 
 /* ==========================================================================
    Deck (um slide por vez, sem rolagem vertical)
    ========================================================================== */
+
+/* Escala única de tipografia dos guias (home e auth).
+   Os mesmos tokens do site (--font-*) são redefinidos aqui em cqh, então tudo
+   dentro do deck cresce e encolhe com o popup. Vale o menor entre altura e
+   largura (calibrado na proporção 1,7 de uma tela larga), para telas 4:3 de
+   projetor não quebrarem mais linhas. O piso em rem segura telas muito pequenas.
+   Regra: dentro do guia, use só estes tokens; nada de px, rem ou cqh soltos
+   em font-size (exceção: texto dentro de SVG, que escala com o viewBox). */
+.guia__deck-frame {
+  --font-3xs: max(0.55rem, min(1.3cqh, 0.76cqw));
+  --font-2xs: max(0.58rem, min(1.45cqh, 0.85cqw));
+  --font-xs: max(0.62rem, min(1.6cqh, 0.94cqw));
+  --font-sm: max(0.66rem, min(1.8cqh, 1.06cqw));
+  --font-md: max(0.72rem, min(1.95cqh, 1.15cqw));
+  --font-lg: max(0.76rem, min(2.1cqh, 1.24cqw));
+  --font-xl: max(0.85rem, min(2.4cqh, 1.41cqw));
+  --font-2xl: max(0.9rem, min(2.6cqh, 1.53cqw));
+  --font-3xl: max(1.1rem, min(3.3cqh, 1.94cqw));
+  --font-4xl: max(1.3rem, min(4.4cqh, 2.59cqw));
+  --font-5xl: max(1.45rem, min(5.4cqh, 3.18cqw));
+  --font-6xl: max(1.8rem, min(8cqh, 4.71cqw));
+}
 
 .guia__deck-frame {
   container-type: size;
@@ -221,7 +247,7 @@
 
 .guia__deck-title {
   font-family: var(--font-display);
-  font-size: 2.6cqh;
+  font-size: var(--font-3xl);
   font-weight: 600;
   line-height: 1.1;
   color: var(--color-wine-900);
@@ -236,7 +262,7 @@
 
 .guia__contador {
   font-family: var(--font-mono);
-  font-size: 1.55cqh;
+  font-size: var(--font-xs);
   letter-spacing: 0.1em;
   color: var(--color-ink-soft);
   border: 1px solid var(--color-sand-200);
@@ -266,10 +292,6 @@
   animation: guia-entra 0.36s var(--ease-soft) both;
 }
 
-.guia__slide .guia__lede {
-  font-size: 1.72cqh;
-}
-
 @keyframes guia-entra {
   from { opacity: 0; transform: translateX(1.6cqw); }
   to { opacity: 1; transform: none; }
@@ -291,7 +313,7 @@
 
 .guia__h {
   font-family: var(--font-display);
-  font-size: 3.7cqh;
+  font-size: var(--font-4xl);
   font-weight: 600;
   line-height: 1.05;
   color: var(--color-wine-900);
@@ -324,7 +346,7 @@
   color: var(--color-wine-700);
   border-radius: var(--radius-pill);
   padding: 0.95cqh 1.2cqw;
-  font-size: 1.6cqh;
+  font-size: var(--font-sm);
   font-weight: 600;
   cursor: pointer;
   transition: border-color var(--transition), color var(--transition), transform var(--transition);
@@ -413,7 +435,7 @@
 
 .guia__capa-h {
   font-family: var(--font-display);
-  font-size: 7cqh;
+  font-size: var(--font-6xl);
   font-weight: 600;
   line-height: 0.99;
   color: var(--color-wine-900);
@@ -426,7 +448,7 @@
 }
 
 .guia__capa .guia__lede {
-  font-size: 1.8cqh;
+  font-size: var(--font-lg);
 }
 
 .guia__capa .guia__chips {
@@ -435,7 +457,7 @@
 
 .guia__dica {
   margin-top: 1.2cqh;
-  font-size: 1.7cqh;
+  font-size: var(--font-md);
   color: var(--color-ink-soft);
   border-top: 1px dashed var(--color-sand-200);
   padding-top: 0.9cqh;
@@ -444,7 +466,7 @@
 .guia__capa-arte {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: 1.1cqw;
   min-height: 0;
   min-width: 0;
@@ -489,7 +511,7 @@
 
 .bs__nome {
   font-family: var(--font-display);
-  font-size: 4.15cqh;
+  font-size: var(--font-4xl);
   font-weight: 600;
   line-height: 1;
   color: var(--color-sand-50);
@@ -538,7 +560,7 @@
 .guia__capa-arte {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: 1.1cqw;
 }
 
@@ -657,7 +679,7 @@
   border: 1px solid var(--color-sand-200);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
   gap: 0.4cqh;
   padding: 0 0.6cqw;
 }
@@ -777,7 +799,7 @@
 .mapa3 {
   flex: 1 1 auto;
   min-height: 0;
-  --vgap: 3cqh;
+  --vgap: 2.4cqh;
   --knot: 5.4cqh;
   --bandpad: 1.2cqh;
   --passo: 15cqh;
@@ -789,7 +811,7 @@
 
 .mapa3__rail {
   display: grid;
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
   row-gap: var(--vgap);
   min-height: 0;
 }
@@ -797,13 +819,13 @@
 .mapa3__zona {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 0.35cqh;
+  justify-content: safe center;
+  gap: 0.25cqh;
   background: var(--color-white);
   border: 1px solid var(--color-sand-200);
   border-left: 0.35cqh solid var(--color-sand-200);
   border-radius: 0.7cqh;
-  padding: 0.8cqh 0.9cqw;
+  padding: 0.5cqh 0.9cqw;
 }
 
 .mapa3__zona.z-portaria { border-left-color: var(--color-wine-500); border-left-style: dashed; }
@@ -812,25 +834,25 @@
 .mapa3__zona.z-saida { border-left-color: var(--color-wine-700); background: var(--color-sand-100); }
 
 .mapa3__zona b {
-  font-size: 1.7cqh;
+  font-size: var(--font-sm);
   line-height: 1.1;
   color: var(--color-wine-900);
 }
 
 .mapa3__zona p {
-  font-size: 1.42cqh;
+  font-size: var(--font-xs);
   line-height: 1.35;
   color: var(--color-ink-soft);
 }
 
 .mapa3__zona code {
-  font-size: 1.3cqh;
+  font-size: var(--font-2xs);
   color: var(--color-wine-700);
   word-break: break-word;
 }
 
 .mapa3__zona small {
-  font-size: 1.22cqh;
+  font-size: var(--font-2xs);
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -840,7 +862,7 @@
 .mapa3__board {
   position: relative;
   display: grid;
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
   row-gap: var(--vgap);
   min-height: 0;
 }
@@ -882,7 +904,7 @@
   background: var(--color-wine-700);
   color: var(--color-sand-50);
   font-family: var(--font-mono);
-  font-size: 1.95cqh;
+  font-size: var(--font-lg);
   box-shadow: 0 0 0 4px var(--color-sand-50);
 }
 
@@ -902,7 +924,7 @@
 .z-saida .mapa3__knot { background: var(--color-sand-50); color: var(--color-wine-900); box-shadow: 0 0 0 4px var(--color-wine-700); }
 
 .mapa3__rot {
-  font-size: 1.5cqh;
+  font-size: var(--font-xs);
   font-weight: 600;
   color: var(--color-ink);
   line-height: 1.15;
@@ -911,7 +933,7 @@
 .mapa3__rot small {
   display: block;
   font-family: var(--font-mono);
-  font-size: 1.34cqh;
+  font-size: var(--font-2xs);
   font-weight: 400;
   color: var(--color-ink-soft);
   margin-top: 0.15cqh;
@@ -1006,7 +1028,7 @@
 .trilha3__rail {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
   gap: 1cqh;
   min-height: 0;
 }
@@ -1025,7 +1047,7 @@
   border: 1px solid var(--color-sand-200);
   border-radius: 0.45cqh;
   background: var(--color-white);
-  font-size: 1.4cqh;
+  font-size: var(--font-xs);
   font-weight: 500;
   color: var(--color-ink-soft);
   opacity: 0.6;
@@ -1034,7 +1056,7 @@
 .trilha3__mini small {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 1.3cqh;
+  font-size: var(--font-2xs);
   color: var(--color-rose-300);
 }
 
@@ -1072,25 +1094,25 @@
 }
 
 .trilha3__zona b {
-  font-size: 1.8cqh;
+  font-size: var(--font-md);
   line-height: 1.1;
   color: var(--color-wine-900);
 }
 
 .trilha3__zona p {
-  font-size: 1.58cqh;
+  font-size: var(--font-sm);
   line-height: 1.45;
   color: var(--color-ink-soft);
 }
 
 .trilha3__zona code {
-  font-size: 1.36cqh;
+  font-size: var(--font-2xs);
   color: var(--color-wine-700);
   word-break: break-word;
 }
 
 .trilha3__zona small {
-  font-size: 1.3cqh;
+  font-size: var(--font-2xs);
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1132,7 +1154,7 @@
   background: var(--color-wine-700);
   color: var(--color-sand-50);
   font-family: var(--font-mono);
-  font-size: 2.4cqh;
+  font-size: var(--font-xl);
   box-shadow: 0 0 0 5px var(--color-sand-100);
 }
 
@@ -1181,12 +1203,14 @@
   color: var(--color-ink-soft);
 }
 
+/* Etiquetas em linhas de duas, à direita: em coluna única elas saíam do cartão. */
 .pass3__chips {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.4cqh;
-  max-width: 11cqw;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-content: center;
+  gap: 0.4cqh 0.4cqw;
+  max-width: 22cqw;
 }
 
 .pass3__chips code {
@@ -1195,7 +1219,7 @@
   border: 1px solid var(--color-sand-200);
   border-radius: 5px;
   padding: 0.3cqh 0.6cqw;
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   color: var(--color-ink);
   white-space: nowrap;
 }
@@ -1205,7 +1229,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   height: 3.2cqh;
   width: 2cqh;
   margin-left: calc(0.42cqh + 1.3cqw + 1.65cqh);
@@ -1246,11 +1270,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   text-align: center;
-  gap: 1.15cqh;
+  gap: 1.6cqh;
   border-radius: var(--radius-md);
-  padding: 1.6cqh 1.15cqw;
+  padding: 2.6cqh 1.4cqw;
   border: 1.5px dashed;
   font-size: var(--font-md);
   line-height: 1.5;
@@ -1258,8 +1282,8 @@
 }
 
 .portao__saida svg {
-  width: 6.2cqh;
-  height: 6.2cqh;
+  width: 8cqh;
+  height: 8cqh;
   stroke: currentColor;
   fill: none;
   stroke-width: 1.7;
@@ -1341,15 +1365,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: 1.05cqh;
   min-width: 0;
   text-align: center;
 }
 
 .portao__circulo {
-  width: 17cqh;
-  height: 17cqh;
+  width: 24cqh;
+  height: 24cqh;
   border-radius: 50%;
   background: var(--color-white);
   border: 0.42cqh dashed var(--color-wine-700);
@@ -1363,7 +1387,7 @@
 
 .portao__circulo span {
   font-family: var(--font-display);
-  font-size: var(--font-3xl);
+  font-size: var(--font-4xl);
   font-weight: 600;
   line-height: 1.15;
   color: var(--color-wine-900);
@@ -1399,8 +1423,8 @@
 .trab5__trilha {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1cqh;
+  justify-content: safe center;
+  gap: 0.6cqh;
   min-height: 0;
   min-width: 0;
 }
@@ -1518,9 +1542,11 @@
 
 .trab5__chips {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.35cqh;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-content: center;
+  gap: 0.35cqh 0.4cqw;
+  max-width: 24cqw;
 }
 
 .trab5__chips code {
@@ -1552,12 +1578,12 @@
 
 .trab5__seta {
   flex: 0 0 auto;
-  height: 3.4cqh;
+  height: 2.6cqh;
   align-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   width: 2cqh;
 }
 
@@ -1589,24 +1615,29 @@
   align-content: center;
 }
 
+/* Número e ícone lado a lado na primeira linha; o resto ocupa a largura toda. */
 .trab5__consulta {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto auto;
   justify-content: center;
+  align-content: center;
+  justify-items: center;
+  align-items: center;
   text-align: center;
-  gap: 0.7cqh;
+  gap: 0.45cqh 0.8cqw;
   min-width: 0;
   min-height: 0;
   background: var(--color-white);
   border: 1px solid var(--color-sand-200);
   border-left: 0.42cqh solid var(--color-wine-700);
   border-radius: 0.8cqh;
-  padding: 0.9cqh 0.9cqw;
+  padding: 0.6cqh 0.9cqw;
   box-shadow: var(--shadow-sm);
 }
 
 .trab5__consulta .trab5__knot--md { box-shadow: 0 0 0 4px var(--color-sand-100); }
+.trab5__consulta > :not(.trab5__knot):not(.trab5__icone) { grid-column: 1 / -1; }
+.trab5__consulta .trab5__icone { width: 4.6cqh; height: 4.6cqh; }
 
 .trab5__consulta h4 {
   font-size: var(--font-xl);
@@ -1630,7 +1661,7 @@
 }
 
 .trab5__consulta small {
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   line-height: 1.45;
   color: var(--color-ink-soft);
   max-width: 34ch;
@@ -1657,7 +1688,7 @@
   border-radius: var(--radius-md);
   padding: 1cqh 0.85cqw 1.1cqh;
   display: grid;
-  grid-template-rows: auto 31cqh auto 1fr auto;
+  grid-template-rows: auto 22cqh auto 1fr auto;
   grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   align-items: stretch;
@@ -1734,7 +1765,7 @@
 .pipeline__chips {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: safe center;
   gap: 0.35cqh 0.3cqw;
   align-self: end;
 }
@@ -1910,22 +1941,6 @@
   62% { transform: translate(0.6px, 0); opacity: 1; }
   70% { transform: translate(0, 0); opacity: 0; }
   100% { transform: translate(-6.5px, -2px); opacity: 0; }
-}
-
-/* Slides 7 a 10: a escala de fonte acompanha a altura do deck (cqh), como nos
-   slides 1 a 6. Os mesmos tokens do site são redefinidos só aqui dentro; o piso
-   em rem é o tamanho antigo, para telas pequenas não ficarem menores que antes. */
-.ref__papel,
-.est2 {
-  --font-3xs: max(0.62rem, 1.3cqh);
-  --font-2xs: max(0.66rem, 1.45cqh);
-  --font-xs: max(0.72rem, 1.6cqh);
-  --font-sm: max(0.78rem, 1.8cqh);
-  --font-md: max(0.85rem, 1.95cqh);
-  --font-lg: max(0.9rem, 2.1cqh);
-  --font-xl: max(1rem, 2.4cqh);
-  --font-2xl: max(1.1rem, 2.6cqh);
-  --font-3xl: max(1.3rem, 3.3cqh);
 }
 
 /* Anexo de referência (slides 7 a 9): papel de risca + carimbo REF */
@@ -2110,7 +2125,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
   gap: 0.42cqh;
   padding: 0.4cqh 1cqh 0.75cqh;
 }
@@ -2181,7 +2196,7 @@
   grid-row: 1 / -1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
   align-items: center;
   gap: 0.6cqh;
   padding: 1cqh 0.75cqw;
@@ -2379,7 +2394,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: 0.45cqh;
   padding: 0.8cqh 0.5cqw;
   border-right: 1px dashed var(--color-sand-200);
@@ -2437,13 +2452,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.8cqh;
+  justify-content: safe center;
+  gap: 0.5cqh;
   text-align: center;
   background: var(--color-sand-100);
   border: 1px solid var(--color-sand-200);
   border-radius: 0.55cqh;
-  padding: 1cqh 0.6cqw;
+  padding: 0.7cqh 0.6cqw;
 }
 
 .est2__knot {
@@ -2470,7 +2485,7 @@
 .est2__ic {
   display: grid;
   place-items: center;
-  height: 6.2cqh;
+  height: 5.8cqh;
 }
 
 .est2__ic svg {
@@ -2483,20 +2498,33 @@
   stroke-linejoin: round;
 }
 
-/* O ícone se desenha uma vez, logo depois de o cartão aparecer (o --d do
-   cartão é herdado), e fica inteiro. Em loop, metade do tempo ele parecia
-   quebrado na apresentação. Ao voltar ao slide, o display reinicia o traço. */
+/* O ícone se desenha em loop: traça, segura um instante, apaga pelo fim do
+   traço e recomeça. O --d do cartão é herdado e só atrasa a primeira volta;
+   a defasagem do segundo traço (.est2-d2) mora no próprio keyframe para valer
+   em toda volta. Apagar para --100 (e não voltar a 100) faz o traço deslizar
+   para fora pelo fim, e o pulo 100% -> 0% acontece com o traço invisível.
+   Ao voltar ao slide, o display reinicia o ciclo. Usado nos ícones do
+   slide 10 do guia da home e nos passos dos slides 3 a 5 do guia de auth. */
 .est2-desenha {
   stroke-dasharray: 100;
-  animation: est2-desenha 0.9s ease-out both;
+  animation: est2-desenha 4.6s ease-in-out infinite both;
   animation-delay: calc(var(--d, 0ms) + 250ms);
 }
 
-.est2-d2 { animation-delay: calc(var(--d, 0ms) + 600ms); }
+.est2-d2 { animation-name: est2-desenha-d2; }
 
 @keyframes est2-desenha {
-  from { stroke-dashoffset: 100; opacity: 0.35; }
-  to { stroke-dashoffset: 0; opacity: 1; }
+  0%       { stroke-dashoffset: 100; opacity: 0.35; }
+  20%      { stroke-dashoffset: 0; opacity: 1; }
+  68%      { stroke-dashoffset: 0; opacity: 1; }
+  88%, 100% { stroke-dashoffset: -100; opacity: 0.35; }
+}
+
+@keyframes est2-desenha-d2 {
+  0%, 8%    { stroke-dashoffset: 100; opacity: 0.35; }
+  28%       { stroke-dashoffset: 0; opacity: 1; }
+  74%       { stroke-dashoffset: 0; opacity: 1; }
+  94%, 100% { stroke-dashoffset: -100; opacity: 0.35; }
 }
 
 .est2__txt {
@@ -2561,7 +2589,7 @@
 .est2__chips {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: safe center;
   gap: 0.22cqh 0.35cqw;
 }
 
@@ -2580,7 +2608,7 @@
 @media (max-width: 940px) {
   .guia__capa { grid-template-columns: 1fr; gap: 0.6cqh; }
   .guia__capa-arte { display: none; }
-  .guia__capa-h { font-size: 5.4cqh; }
+  .guia__capa-h { font-size: var(--font-5xl); }
   .trab5__seta { display: none; }
   .trab5__faixa--ctl { padding: 0.65rem 0.75rem; gap: 0.5rem; grid-template-columns: auto auto minmax(0, 1fr); }
   .trab5__faixa--ctl .trab5__chips { display: none; }
@@ -2614,10 +2642,10 @@
   .arvore__cols { grid-template-columns: 1fr; }
   .est2__banda { grid-template-columns: 1fr; }
   .est2__carga { flex-direction: row; gap: 0.6rem; border-right: none; border-bottom: 1px dashed var(--color-sand-200); padding: 0.55rem 0.7rem; }
-  .est2__fluxo { flex-wrap: wrap; justify-content: center; }
+  .est2__fluxo { flex-wrap: wrap; justify-content: safe center; }
   .est2__passo { flex: 1 1 30%; }
   .est2__seta { display: none; }
-  .portao { display: flex; flex-direction: column; justify-content: center; gap: 0.7cqh; }
+  .portao { display: flex; flex-direction: column; justify-content: safe center; gap: 0.7cqh; }
   .portao__seta { display: none; }
   .portao__centro { order: -1; }
   .portao__circulo { width: 9cqh; height: 9cqh; border-width: 2px; outline-offset: 3px; }
@@ -2695,8 +2723,23 @@
   .wf,
   .guia__fluxo-fio,
   .guia__fluxo-no,
-  .pipeline__passo::after {
+  .pipeline__passo::after,
+  .gl-arq-1,
+  .gl-arq-2,
+  .gl-arq-3,
+  .gl-check,
+  .gl-stitch,
+  .gl-grafo__linha {
     animation: none;
+  }
+
+  .gl-check {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  .gl-stitch {
+    opacity: 1;
   }
 
   .wf {
@@ -2714,3 +2757,258 @@
     opacity: 1;
   }
 }
+
+
+/* ==========================================================================
+   Guia de auth - geral (grafo do ciclo), capa animada do bastidor e botão "?"
+   ========================================================================== */
+
+/* Grafo do ciclo do Auth: as três conexões ida e volta, animadas em marcha. */
+.gl-grafo {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: min(100%, 73cqh);
+  margin-inline: auto;
+}
+
+.gl-grafo__linha {
+  stroke: var(--color-wine-500);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 5 7;
+  animation: gl-fluxo 0.9s linear infinite;
+}
+
+@keyframes gl-fluxo {
+  to { stroke-dashoffset: -12; }
+}
+
+.gl-grafo__no {
+  fill: var(--color-white);
+  stroke: var(--color-sand-200);
+  stroke-width: 1.5;
+}
+
+.gl-grafo__titulo {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  fill: var(--color-wine-900);
+}
+
+.gl-grafo__cap {
+  font-family: var(--font-body);
+  font-size: 11px;
+  fill: var(--color-ink-soft, var(--color-ink));
+}
+
+.gl-grafo__rotulo {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  fill: var(--color-wine-700);
+}
+
+.gl-grafo__rotulo2 {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  fill: var(--color-ink-soft, var(--color-ink));
+}
+
+.gl-grafo__hoop {
+  stroke: var(--color-wine-700);
+  stroke-width: 4.4;
+}
+
+.gl-grafo__stitch {
+  stroke: var(--color-rose-300);
+  stroke-width: 2;
+  stroke-dasharray: 5 7;
+  stroke-linecap: round;
+}
+
+.gl-grafo__hoop-txt {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  fill: var(--color-wine-900);
+}
+
+.gl-grafo__db {
+  stroke: var(--color-wine-700);
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: rgba(105, 24, 24, 0.06);
+}
+
+/* Pipeline mais compacto para slides densos (3 passos com muito texto). */
+.pipeline--auth .pipeline__passo {
+  grid-template-rows: auto 23cqh auto 1fr auto;
+}
+
+/* Botão "?" do guia de auth, na navbar, ao lado de Entrar ou do dropdown do
+   usuário. Fora do fluxo: absoluto à direita de .header-actions, pendurado
+   na zona de padding do container; o grid 1fr auto 1fr não sente. */
+.guia-btn--auth {
+  position: absolute;
+  left: calc(100% + 0.45rem);
+  top: 50%;
+  margin-top: -15px;
+  z-index: 1;
+}
+
+@media (max-width: 1100px) {
+  /* Abaixo de 1100px o botão Entrar some e o padding lateral é curto demais
+     para o botão absoluto: volta para o fluxo, depois do menu do usuário. */
+  .guia-btn--auth {
+    position: static;
+    margin-top: 0;
+  }
+}
+
+/* Capa do guia de auth: os três POSTs voam para o bastidor, o AuthServico
+   confere e o check se desenha como carimbo de "está certo". Loop de 6.5s. */
+.gl-cena {
+  flex: 0 0 auto;
+  width: 52cqh;
+  height: auto;
+}
+
+.gl-chao {
+  stroke: var(--color-rose-300);
+  stroke-width: 1.6;
+  stroke-dasharray: 1 6.5;
+  stroke-linecap: round;
+}
+
+.gl-hoop {
+  stroke: var(--color-wine-700);
+  stroke-width: 4.4;
+}
+
+.gl-hoop-top {
+  fill: var(--color-rose-300);
+}
+
+.gl-hoop-txt {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  fill: var(--color-wine-900);
+}
+
+.gl-stitch {
+  stroke: var(--color-rose-300);
+  stroke-width: 2;
+  stroke-dasharray: 5 7;
+  stroke-linecap: round;
+  opacity: 0.6;
+  animation: gl-pulso 6.5s var(--ease-soft) infinite;
+}
+
+.gl-arq-doc {
+  stroke: var(--color-wine-700);
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: var(--color-white);
+}
+
+.gl-arq-linha {
+  stroke: var(--color-rose-300);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.gl-arq-txt {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  fill: var(--color-wine-900);
+}
+
+.gl-arq {
+  opacity: 1;
+}
+
+.gl-arq-1 { transform: translate(30px, 2px) rotate(-6deg); animation: gl-arq1 6.5s var(--ease-soft) infinite; }
+.gl-arq-2 { transform: translate(30px, 56px) rotate(5deg); animation: gl-arq2 6.5s var(--ease-soft) infinite; }
+.gl-arq-3 { transform: translate(30px, 110px) rotate(-4deg); animation: gl-arq3 6.5s var(--ease-soft) infinite; }
+
+@keyframes gl-arq1 {
+  0% { transform: translate(30px, 2px) rotate(-6deg) scale(1); opacity: 0; }
+  6% { opacity: 1; }
+  24% { transform: translate(150px, 68px) rotate(2deg) scale(0.6); opacity: 1; }
+  31%, 100% { transform: translate(150px, 68px) rotate(0) scale(0.6); opacity: 0; }
+}
+
+@keyframes gl-arq2 {
+  0%, 22% { transform: translate(30px, 56px) rotate(5deg) scale(1); opacity: 0; }
+  28% { opacity: 1; }
+  46% { transform: translate(150px, 74px) rotate(-2deg) scale(0.6); opacity: 1; }
+  53%, 100% { transform: translate(150px, 74px) rotate(0) scale(0.6); opacity: 0; }
+}
+
+@keyframes gl-arq3 {
+  0%, 44% { transform: translate(30px, 110px) rotate(-4deg) scale(1); opacity: 0; }
+  50% { opacity: 1; }
+  68% { transform: translate(150px, 80px) rotate(3deg) scale(0.6); opacity: 1; }
+  75%, 100% { transform: translate(150px, 80px) rotate(0) scale(0.6); opacity: 0; }
+}
+
+@keyframes gl-pulso {
+  0% { opacity: 0.6; }
+  20% { opacity: 1; }
+  28% { opacity: 0.6; }
+  44% { opacity: 0.6; }
+  48% { opacity: 1; }
+  55% { opacity: 0.6; }
+  66% { opacity: 0.6; }
+  72% { opacity: 1; }
+  80%, 100% { opacity: 0.6; }
+}
+
+.gl-check {
+  stroke: var(--color-wine-700);
+  stroke-width: 5.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 56;
+  stroke-dashoffset: 56;
+  animation: gl-check 6.5s var(--ease-soft) infinite;
+}
+
+@keyframes gl-check {
+  0%, 70% { stroke-dashoffset: 56; opacity: 1; }
+  82% { stroke-dashoffset: 0; }
+  93% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* ==========================================================================
+   Guia de auth - ajustes de layout para telas grandes
+   A tipografia vem da escala única do deck (.guia__deck-frame); aqui só medidas.
+   ========================================================================== */
+
+.guia--auth .guia__nota { padding: 0.9cqh 1.3cqw; }
+.guia--auth .guia__chips li { padding: 0.55cqh 1.05cqw; }
+.guia--auth .gl-cena { width: 66cqh; }
+
+/* Geral: grafo com espaço de tela cheia */
+.guia--auth .gl-grafo { width: min(100%, 1065px); }
+
+/* Fluxos: passos mais legíveis em telas grandes */
+.guia--auth .pipeline--auth .pipeline__passo {
+  grid-template-rows: auto 17cqh auto 1fr auto;
+}
+
+.guia--auth .pipeline__tag { font-size: var(--font-md); padding: 0.35cqh 1cqw; }
+.guia--auth .pipeline__passo code { font-size: var(--font-md); min-height: 5.6cqh; }
+.guia--auth .pipeline__passo p { font-size: var(--font-md); line-height: 1.5; }
+.guia--auth .pipeline__chips code { font-size: var(--font-xs); padding: 0.3cqh 0.7cqw; }

@@ -157,6 +157,7 @@
 }
 
 .header-actions {
+  position: relative; /* âncora do .guia-btn--auth (absoluto, fora do fluxo) */
   display: flex;
   align-items: center;
   gap: var(--space-3);

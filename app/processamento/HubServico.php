@@ -51,7 +51,7 @@ class HubServico
         );
 
         return [
-            'bordados' => array_slice($linhas, 0, self::POR_PAGINA),
+            'bordados' => array_map([$this, 'decodificarPaleta'], array_slice($linhas, 0, self::POR_PAGINA)),
             'temMais' => count($linhas) > self::POR_PAGINA,
         ];
     }
@@ -65,7 +65,16 @@ class HubServico
     /** Bordados do Hub do próprio usuário, inclusive ocultos. */
     public function doAutor(int $autorId): array
     {
-        return $this->dados->doAutor($autorId);
+        return array_map([$this, 'decodificarPaleta'], $this->dados->doAutor($autorId));
+    }
+
+    /** Troca a paleta em JSON da matriz por uma lista de cores. */
+    private function decodificarPaleta(array $bordado): array
+    {
+        $paleta = json_decode((string) ($bordado['paleta'] ?? ''), true);
+        $bordado['paleta'] = is_array($paleta) ? array_values($paleta) : [];
+
+        return $bordado;
     }
 
     /**
@@ -80,10 +89,7 @@ class HubServico
             return null;
         }
 
-        $paleta = json_decode((string) $bordado['paleta'], true);
-        $bordado['paleta'] = is_array($paleta) ? array_values($paleta) : [];
-
-        return $bordado;
+        return $this->decodificarPaleta($bordado);
     }
 
     /** Autor do bordado ou gerente podem excluir. */

@@ -10,12 +10,13 @@ declare(strict_types=1);
 class HubDados
 {
     /**
-     * Campos do card do Hub, iguais ao contrato de hub/_card.php.
+     * Campos do post do Hub, iguais ao contrato de hub/_card.php: o post já mostra
+     * descrição, ficha da matriz, paleta e tutorial, então tudo vem na mesma consulta.
      * Usa :usuario para calcular "curtiu"; visitante passa 0.
      */
-    private const CAMPOS_CARD = 'b.id, b.titulo, b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, b.oculto, b.criado_em,
+    private const CAMPOS_CARD = 'b.id, b.titulo, b.descricao, b.autor_id, b.tutorial_ia, b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, b.oculto, b.criado_em,
                        COALESCE(b.foto_path, pc.imagem_path) AS foto_peca, (b.foto_path IS NULL) AS foto_tingir, 
-                       u.nome AS autor, c.nome AS categoria, c.mockup, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura,
+                       u.nome AS autor, c.nome AS categoria, c.mockup, COALESCE(m.svg_path, m.svg) AS svg, m.largura, m.altura, m.total_pontos, m.paleta,
                        (SELECT count(*) FROM curtidas x WHERE x.bordado_id = b.id) AS curtidas,
                        (SELECT count(*) FROM comentarios x
                          WHERE x.bordado_id = b.id AND NOT x.oculto) AS comentarios,
@@ -82,9 +83,7 @@ class HubDados
      */
     public function detalhe(int $id, int $usuario): ?array
     {
-        $sql = 'SELECT ' . self::CAMPOS_CARD . ',
-                       b.descricao, b.autor_id, b.tipo, b.tutorial_ia,
-                       m.largura, m.altura, m.total_pontos, m.paleta
+        $sql = 'SELECT ' . self::CAMPOS_CARD . ', b.tipo
                 ' . self::JUNCOES . '
                 WHERE b.id = :id';
 

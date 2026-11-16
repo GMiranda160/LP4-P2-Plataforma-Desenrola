@@ -211,6 +211,9 @@ function mockup_svg(string $arquivo): string
         <?php endforeach; ?>
       </div>
     <?php endif; ?>
+    <div class="showcase__footer hub-secao__rodape">
+      <a class="btn btn--ghost showcase__action" href="/hub">Ver tudo no Hub</a>
+    </div>
   </div>
 </section>
 

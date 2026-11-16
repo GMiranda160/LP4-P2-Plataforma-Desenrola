@@ -2,6 +2,10 @@
    Página inicial - seções, hero e blocos de apoio
    ========================================================================== */
 
+.hub-secao__rodape {
+  justify-content: flex-end;
+}
+
 .section {
   position: relative;
   padding-block: var(--section-y);

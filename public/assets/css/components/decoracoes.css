@@ -1,0 +1,195 @@
+/*
+ * Arquivo: decoracoes.css
+ * Dono: Guilherme. Só Guilherme altera este arquivo.
+ * Responsabilidade: ornamentos fora da home, nas páginas que respiram:
+ * estado vazio, cantos delicados nos erros, telas de conta e catálogo.
+ * Regra da casa: sempre atrás do conteúdo e nunca interativos.
+ * Importado depois das páginas porque precisa vencer o padding da página
+ * do catálogo.
+ */
+
+/* Área da gerente: estampa de fundo única em todas as telas do painel.
+   Ondas delicadas logo abaixo da topbar, do lado do botão da conta, e
+   carretel com linha logo abaixo da lista do menu lateral, ambos levemente
+   interseccionando a caixa branca acima (como estampa enfiada por baixo),
+   rolando junto com a página. Nunca fixed. Somem no celular. */
+body.admin {
+  position: relative;
+  z-index: 0;
+}
+
+body.admin::before {
+  content: "";
+  position: absolute;
+  top: 3.5rem;
+  right: 1.25rem;
+  z-index: -1;
+  width: 360px;
+  height: 84px;
+  background: url('../../img/decorations/ondas-delicadas.svg') no-repeat center / contain;
+  opacity: 0.2;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Carretel: preso à coluna lateral, logo abaixo do botão "Ir para o Hub",
+   com leve interseção por baixo dele e levemente na diagonal. Fica fora do
+   fluxo (absoluto), por isso não desloca nada; atrás do botão, rolando
+   junto com a página. */
+.admin-rail {
+  position: relative;
+}
+
+.admin-rail::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: -4.5rem;
+  z-index: -1;
+  height: 156px;
+  width: 154px;
+  background: url('../../img/decorations/carretel-e-linha.svg') no-repeat left top / contain;
+  opacity: 0.15;
+  transform: translateY(1.5rem) rotate(-25deg);
+  transform-origin: 18% 0%;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 900px) {
+  body.admin::before,
+  .admin-rail::after {
+    display: none;
+  }
+}
+
+/* Telas de conta: respiro entre o cartão e o rodapé. */
+.auth-container {
+  padding-bottom: clamp(3rem, 8vh, 5rem);
+}
+
+/* Estado vazio: bastidor tracejado acima do texto, em qualquer lista. */
+.empty-state::before {
+  content: "";
+  display: block;
+  width: 118px;
+  height: 100px;
+  margin: 0 auto 1.15rem;
+  background: url('../../img/decorations/bastidor-vazio.svg') no-repeat center / contain;
+  opacity: 0.9;
+}
+
+/* Erros 403 e 404: flor no canto como na vitrine, carretel no outro canto. */
+.erros::before {
+  content: "";
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 150px;
+  height: 165px;
+  background: url('../../img/decorations/flor-minimalista.svg') no-repeat center / contain;
+  opacity: 0.18;
+  pointer-events: none;
+  user-select: none;
+}
+
+.erros::after {
+  content: "";
+  position: absolute;
+  bottom: 0.9rem;
+  left: 1.1rem;
+  width: 118px;
+  height: 122px;
+  background: url('../../img/decorations/carretel-e-linha.svg') no-repeat center / contain;
+  opacity: 0.2;
+  pointer-events: none;
+  user-select: none;
+}
+
+.erros > .container {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .erros::before,
+  .erros::after {
+    display: none;
+  }
+}
+
+/* Telas de conta: ornamento contextual por tela, estampado no fundo da
+   página, atrás do cartão, rolando junto com ele. Preso ao cartão com
+   offsets para a lateral; só aparece quando sobra largura. Entrar: círculo
+   suave (como o hero). Cadastro: a flor minimalista (como a vitrine).
+   Recuperar a senha: folhas e ramos (como o sobre da home). */
+@media (min-width: 1200px) {
+  .auth-container {
+    position: relative;
+    z-index: 0;
+  }
+
+  .auth-container::after {
+    content: "";
+    position: absolute;
+    top: 3rem;
+    right: -11.25rem;
+    z-index: -1;
+    width: 215px;
+    height: 215px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../../img/decorations/circulos-suaves.svg');
+    opacity: 0.16;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .auth-container:has(form[action="/cadastro"])::after {
+    width: 172px;
+    height: 228px;
+    background-image: url('../../img/decorations/flor-minimalista.svg');
+    opacity: 0.22;
+  }
+
+  .auth-container:has(form[action="/recuperar-senha"])::after,
+  .auth-container:has(form[action="/recuperar-senha/redefinir"])::after {
+    width: 165px;
+    height: 220px;
+    background-image: url('../../img/decorations/folhas-e-ramos.svg');
+    opacity: 0.2;
+  }
+}
+
+/* Catálogo: cantos de decoração no topo, como na seção de categorias. */
+.catalogo::before {
+  content: "";
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  width: 160px;
+  height: 160px;
+  background: url('../../img/decorations/detalhes-de-cantos.svg') no-repeat center / contain;
+  opacity: 0.18;
+  pointer-events: none;
+  user-select: none;
+}
+
+.catalogo > .container {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .catalogo::before {
+    display: none;
+  }
+}
+
+/* Catálogo: fio de costura separando os filtros da grade. */
+.catalog-filters {
+  padding-bottom: 1rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 2px dashed var(--color-rose-300);
+}

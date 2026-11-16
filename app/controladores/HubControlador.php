@@ -23,7 +23,7 @@ class HubControlador
 
         Visao::render('hub/feed', [
             'titulo' => 'Hub de bordados',
-            'bordados' => $resultado['bordados'],
+            'bordados' => $this->completarPosts($resultado['bordados']),
             'categorias' => (new ProdutoServico())->categorias(),
             'categoriaAtual' => $categoria,
             'ordem' => $ordem,
@@ -57,7 +57,7 @@ class HubControlador
     {
         Visao::render('hub/meus', [
             'titulo' => 'Meus bordados',
-            'bordados' => $this->servico->doAutor((int) Auth::id()),
+            'bordados' => $this->completarPosts($this->servico->doAutor((int) Auth::id())),
         ]);
     }
 
@@ -85,7 +85,10 @@ class HubControlador
         }
 
         Sessao::flash('sucesso', 'Bordado excluído com sucesso!');
-        Resposta::redirecionar(Auth::eGerente() ? '/hub' : '/meus-bordados');
+        $padrao = Auth::eGerente() ? '/hub' : '/meus-bordados';
+        // Voltar para a página do bordado excluído daria "não encontrado".
+        $voltar = destino_hub($_POST['voltar'] ?? null, $padrao);
+        Resposta::redirecionar(str_starts_with($voltar, '/hub/bordado') ? $padrao : $voltar);
     }
 
     /** POST /gerente/hub/ocultar: inverte bordados.oculto e volta para o bordado. */
@@ -99,23 +102,32 @@ class HubControlador
         }
 
         Sessao::flash('sucesso', 'Visibilidade do bordado atualizada.');
-        Resposta::redirecionar('/hub/bordado?id=' . $id);
+        Resposta::redirecionar(destino_hub($_POST['voltar'] ?? null, '/hub/bordado?id=' . $id));
+    }
+
+    /**
+     * Completa cada post do feed com os dois últimos comentários e com a permissão de excluir,
+     * para o post mostrar tudo sem abrir a página do bordado. Uma consulta só para os comentários.
+     */
+    private function completarPosts(array $bordados): array
+    {
+        $eGerente = Auth::eGerente();
+        $ultimos = (new ComentarioServico())->ultimosPorBordados(array_column($bordados, 'id'), 2, $eGerente);
+
+        foreach ($bordados as &$bordado) {
+            $bordado['ultimosComentarios'] = $ultimos[(int) $bordado['id']] ?? [];
+            $bordado['podeExcluir'] = $this->servico->podeExcluir($bordado, Auth::id(), $eGerente);
+        }
+        unset($bordado);
+
+        return $bordados;
     }
 
     /**
      * Comentários do bordado, pela lógica de Eduardo (ocultos só para a gerente).
-     * TODO(Guilherme): remover o try/catch quando ComentarioServico::listar estiver pronto.
-     * Até lá, a página do bordado abre sem comentários em vez de dar erro 500.
      */
     private function comentarios(int $bordadoId, bool $eGerente): array
     {
-        try {
-            return (new ComentarioServico())->listar($bordadoId, $eGerente);
-        } catch (RuntimeException $e) {
-            if (str_starts_with($e->getMessage(), 'Não implementado')) {
-                return [];
-            }
-            throw $e;
-        }
+        return (new ComentarioServico())->listar($bordadoId, $eGerente);
     }
 }

@@ -6,7 +6,7 @@
  */
 class ComentarioControlador
 {
-    /** TODO(Eduardo): limitar a 5 comentários por minuto com Sessao, chamar o serviço e voltar para /hub/bordado?id=...#comentarios. */
+    /** POST /hub/comentar: limita a 5 por minuto na sessão, publica pelo serviço e volta para a seção de comentários do bordado. */
     public function comentar(): void
     {
         $usuarioId = Auth::id();
@@ -22,7 +22,7 @@ class ComentarioControlador
             Resposta::redirecionar('/hub');
         }
 
-        $destino = '/hub/bordado?id=' . $bordadoId . '#comentarios';
+        $destino = destino_hub($_POST['voltar'] ?? null, '/hub/bordado?id=' . $bordadoId . '#comentarios');
         $agora = time();
 
         $instantes = Sessao::obter('comentarios_minuto', []);
@@ -56,7 +56,7 @@ class ComentarioControlador
         Resposta::redirecionar($destino);
     }
 
-    /** TODO(Eduardo): chamar o serviço com Auth::id() e Auth::eGerente(). */
+    /** POST /hub/comentario/excluir: exclui pelo serviço com Auth::id() e Auth::eGerente(), e volta para a seção de comentários. */
     public function excluir(): void
     {
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -72,7 +72,13 @@ class ComentarioControlador
             Resposta::redirecionar('/login');
         }
 
-        $excluido = (new ComentarioServico())->excluir(
+        $servico = new ComentarioServico();
+        $comentario = $servico->buscar($id);
+        $destino = destino_hub($_POST['voltar'] ?? null, $comentario !== null
+            ? '/hub/bordado?id=' . (int) $comentario['bordado_id'] . '#comentarios'
+            : '/hub');
+
+        $excluido = $servico->excluir(
             $id,
             $usuarioId,
             Auth::eGerente()
@@ -80,14 +86,14 @@ class ComentarioControlador
 
         if (!$excluido) {
             Sessao::flash('erro', 'Não foi possível excluir esse comentário.');
-            Resposta::redirecionar('/hub');
+            Resposta::redirecionar($destino);
         }
 
         Sessao::flash('sucesso', 'Comentário excluído.');
-        Resposta::redirecionar('/hub');
+        Resposta::redirecionar($destino);
     }
 
-    /** TODO(Eduardo): inverter oculto. A rota é somente da gerente. */
+    /** POST /gerente/hub/comentario/ocultar: inverte o oculto. A rota já exige gerente; volta para a seção de comentários. */
     public function ocultar(): void
     {
         if (!Auth::eGerente()) {
@@ -102,9 +108,15 @@ class ComentarioControlador
             Resposta::redirecionar('/hub');
         }
 
-        (new ComentarioServico())->alternarOculto($id);
+        $servico = new ComentarioServico();
+        $comentario = $servico->buscar($id);
+        $destino = destino_hub($_POST['voltar'] ?? null, $comentario !== null
+            ? '/hub/bordado?id=' . (int) $comentario['bordado_id'] . '#comentarios'
+            : '/hub');
+
+        $servico->alternarOculto($id);
 
         Sessao::flash('sucesso', 'Visibilidade do comentário atualizada.');
-        Resposta::redirecionar('/hub');
+        Resposta::redirecionar($destino);
     }
 }

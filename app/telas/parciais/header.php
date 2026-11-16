@@ -9,6 +9,9 @@
  * que abre o painel com Meus bordados, Painel (gerente) e Sair por POST em /sair.
  * Sem cidade ou região; usa os contatos e a marca de bootstrap.php.
  * Marca com aria-current="page" o item do menu que corresponde à rota atual.
+ * O botão "?" do guia de auth fica ao lado de Entrar ou do menu do usuário;
+ * é absoluto (.guia-btn--auth), fora do fluxo, para não entrar no cálculo
+ * de alinhamento da navbar. Ao lado fica o "?" do guia da home, junto à marca.
  */
 
 $usuario = Auth::usuario();
@@ -68,6 +71,9 @@ $ativo = static function (string ...$rotas) use ($caminho): string {
       <?php else: ?>
         <?php Visao::parcial('menu_usuario', ['naGerencia' => false]); ?>
       <?php endif; ?>
+      <button class="guia-btn guia-btn--auth" type="button" data-guia-abrir="guia-auth" aria-label="Como o acesso funciona" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      </button>
 
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Abrir menu">
         <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
@@ -77,3 +83,4 @@ $ativo = static function (string ...$rotas) use ($caminho): string {
 </header>
 
 <?php Visao::guia('home'); ?>
+<?php Visao::guia('auth'); ?>

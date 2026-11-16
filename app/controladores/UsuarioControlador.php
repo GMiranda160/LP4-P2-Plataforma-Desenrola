@@ -6,7 +6,7 @@
  */
 class UsuarioControlador
 {
-    /** TODO(Eduardo): mostrar usuarios/lista com o layout gerente, sem nenhum hash. */
+    /** GET /gerente/usuarios: lista os usuários com o layout da gerente, sem nenhum hash; busca por nome ou e-mail em ?busca=. */
     public function listar(): void
     {
         $busca = is_string($_GET['busca'] ?? null)

@@ -1,25 +1,15 @@
 /**
  * Arquivo: hub.js
  * Dono: Eduardo. Só Eduardo altera este arquivo.
- * Responsabilidade: curtir sem recarregar a página.
- *
- * TODO(Eduardo):
- * 1. Usar delegação de eventos em .js-curtir.
- * 2. Enviar POST para /hub/curtir com o campo id, Accept: application/json e X-CSRF-Token.
- * 3. O token está em meta[name="csrf"].
- * 4. Com status 401, ir para /login.
- * 5. Atualizar aria-pressed e .js-curtidas com a resposta { curtiu, curtidas }.
- * 6. Tratar falha de rede sem quebrar a página.
+ * Responsabilidade: interações dos posts do Hub, por delegação de eventos:
+ *                   curtir sem recarregar (.js-curtir: POST para /hub/curtir com Accept: application/json e
+ *                   X-CSRF-Token de meta[name="csrf"]), abrir e fechar o tutorial do post (.js-abrir-tutorial)
+ *                   e pedir confirmação antes de excluir (form[data-confirmar]).
  * Veja INSTRUCOES_EDUARDO.md, seção 6.
  */
 
-document.addEventListener('click', async (evento) => {
-  const botao = evento.target.closest('.js-curtir');
-
-  if (!botao) {
-    return;
-  }
-
+/** Envia a curtida e atualiza o coração e o número do post. */
+async function curtir(botao) {
   botao.disabled = true;
 
   try {
@@ -49,5 +39,95 @@ document.addEventListener('click', async (evento) => {
     console.error('Não foi possível atualizar a curtida.', erro);
   } finally {
     botao.disabled = false;
+  }
+}
+
+/** Abre ou fecha o painel do tutorial ligado ao botão por aria-controls. */
+function alternarTutorial(botao) {
+  const painel = document.getElementById(botao.getAttribute('aria-controls'));
+
+  if (!painel) {
+    return;
+  }
+
+  const abrir = painel.hidden;
+  painel.hidden = !abrir;
+  botao.setAttribute('aria-expanded', String(abrir));
+
+  // No Hub o tutorial é um popup: trava a rolagem do fundo e devolve o foco ao fechar.
+  if (painel.classList.contains('hub-modal')) {
+    document.body.classList.toggle('hub-modal-aberto', abrir);
+
+    if (abrir) {
+      const fechar = painel.querySelector('.hub-modal__fechar');
+
+      if (fechar) {
+        fechar.focus();
+      }
+    } else {
+      botao.focus();
+    }
+  }
+}
+
+/** Fecha um popup de tutorial aberto. */
+function fecharModal(modal) {
+  modal.hidden = true;
+  document.body.classList.remove('hub-modal-aberto');
+
+  const botao = document.querySelector(`[aria-controls="${modal.id}"]`);
+
+  if (botao) {
+    botao.setAttribute('aria-expanded', 'false');
+    botao.focus();
+  }
+}
+
+document.addEventListener('click', (evento) => {
+  const alvo = evento.target instanceof Element ? evento.target : null;
+
+  if (!alvo) {
+    return;
+  }
+
+  const fechar = alvo.closest('[data-hub-fechar]');
+
+  if (fechar) {
+    const modal = fechar.closest('.hub-modal');
+
+    if (modal) {
+      fecharModal(modal);
+      return;
+    }
+  }
+
+  const botaoCurtir = alvo.closest('.js-curtir');
+
+  if (botaoCurtir) {
+    curtir(botaoCurtir);
+    return;
+  }
+
+  const botaoTutorial = alvo.closest('.js-abrir-tutorial');
+
+  if (botaoTutorial) {
+    alternarTutorial(botaoTutorial);
+  }
+});
+
+document.addEventListener('keydown', (evento) => {
+  if (evento.key !== 'Escape') {
+    return;
+  }
+
+  document.querySelectorAll('.hub-modal:not([hidden])').forEach(fecharModal);
+});
+
+/* Excluir bordado ou comentário só depois de confirmar. */
+document.addEventListener('submit', (evento) => {
+  const mensagem = evento.target.dataset?.confirmar;
+
+  if (mensagem && !window.confirm(mensagem)) {
+    evento.preventDefault();
   }
 });

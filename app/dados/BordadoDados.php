@@ -56,10 +56,14 @@ class BordadoDados
         $sql = 'SELECT b.id, b.titulo, b.descricao, b.autor_id, b.matriz_id, b.categoria_id,
                        b.cor_peca, b.pos_x, b.pos_y, b.escala, b.rotacao, b.tipo, b.tutorial_ia, b.criado_em,
                        m.largura, m.altura, m.total_pontos, m.paleta, COALESCE(m.svg_path, m.svg) AS svg,
-                       c.nome AS categoria
+                       c.nome AS categoria,
+                       pr.nome AS produto_nome, pr.descricao AS produto_descricao,
+                       pc.nome AS peca_nome
                 FROM bordados b
                 JOIN matrizes m ON m.id = b.matriz_id
                 JOIN categorias c ON c.id = b.categoria_id
+                LEFT JOIN produtos pr ON pr.bordado_id = b.id
+                LEFT JOIN pecas pc ON pc.id = b.peca_id
                 WHERE b.id = :id';
 
         $consulta = Conexao::pdo()->prepare($sql);

@@ -7,13 +7,25 @@
  */
 class ComentarioServico
 {
-    /** TODO(Eduardo): devolver os comentários do mais antigo ao mais novo, com o nome do autor. */
+    /** Devolve os comentários do mais antigo ao mais novo, com o nome do autor; ocultos só quando $incluirOcultos. */
     public function listar(int $bordadoId, bool $incluirOcultos = false): array
     {
         return (new ComentarioDados())->listar($bordadoId, $incluirOcultos);
     }
 
-    /** TODO(Eduardo): aplicar trim, aceitar de 1 a 280 caracteres com mb_strlen, recusar bordado oculto e devolver a lista de erros. */
+    /** Os últimos comentários de cada bordado do feed, agrupados por bordado_id; ocultos só quando $incluirOcultos. */
+    public function ultimosPorBordados(array $bordadoIds, int $limite = 2, bool $incluirOcultos = false): array
+    {
+        return (new ComentarioDados())->ultimosPorBordados($bordadoIds, $limite, $incluirOcultos);
+    }
+
+    /** O comentário com este id, ou null se não existir. Usado para saber para onde voltar após excluir ou ocultar. */
+    public function buscar(int $id): ?array
+    {
+        return (new ComentarioDados())->buscar($id);
+    }
+
+    /** Aplica trim, exige de 1 a 280 caracteres (mb_strlen), recusa bordado oculto ou inexistente e devolve a lista de erros. */
     public function comentar(int $bordadoId, int $usuarioId, string $texto): array
     {
         $dados = new ComentarioDados();
@@ -38,7 +50,7 @@ class ComentarioServico
         return [];
     }
 
-    /** TODO(Eduardo): excluir só para o autor ou a gerente. */
+    /** Exclui o comentário se quem pede for o autor ou a gerente. Devolve true se excluiu. */
     public function excluir(int $id, int $usuarioId, bool $eGerente): bool
     {
         $dados = new ComentarioDados();
@@ -59,7 +71,7 @@ class ComentarioServico
         return true;
     }
 
-    /** TODO(Eduardo): inverter o campo oculto. */
+    /** Inverte o campo oculto do comentário. */
     public function alternarOculto(int $id): void
     {
         (new ComentarioDados())->alternarOculto($id);

@@ -6,7 +6,7 @@
  */
 class ComentarioDados
 {
-    /** TODO(Eduardo): buscar com JOIN em usuarios. Sem ocultos, filtrar AND NOT c.oculto. */
+    /** Os comentários do bordado, do mais antigo ao mais novo, com o nome do autor pelo JOIN em usuarios. Sem $incluirOcultos, filtra AND NOT c.oculto. */
     public function listar(int $bordadoId, bool $incluirOcultos = false): array
     {
         $sql = '
@@ -35,7 +35,53 @@ class ComentarioDados
         return $consulta->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** TODO(Eduardo): devolver o comentário, ou null. */
+    /**
+     * Os últimos $limite comentários de cada bordado da lista, numa consulta só, para o feed.
+     * Devolve [bordado_id => [comentários do mais antigo ao mais novo]]. Sem $incluirOcultos, filtra os ocultos.
+     */
+    public function ultimosPorBordados(array $bordadoIds, int $limite, bool $incluirOcultos = false): array
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $bordadoIds), static fn (int $id): bool => $id > 0)));
+
+        if ($ids === []) {
+            return [];
+        }
+
+        $marcas = implode(', ', array_fill(0, count($ids), '?'));
+        $sql = '
+            SELECT id, bordado_id, usuario_id, autor, texto, oculto, criado_em
+            FROM (
+                SELECT
+                    c.id,
+                    c.bordado_id,
+                    c.usuario_id,
+                    u.nome AS autor,
+                    c.texto,
+                    c.oculto,
+                    c.criado_em,
+                    ROW_NUMBER() OVER (PARTITION BY c.bordado_id ORDER BY c.criado_em DESC, c.id DESC) AS posicao
+                FROM comentarios c
+                JOIN usuarios u ON u.id = c.usuario_id
+                WHERE c.bordado_id IN (' . $marcas . ')'
+            . ($incluirOcultos ? '' : ' AND NOT c.oculto') . '
+            ) ultimos
+            WHERE posicao <= ?
+            ORDER BY criado_em ASC, id ASC
+        ';
+
+        $consulta = Conexao::pdo()->prepare($sql);
+        $consulta->execute([...$ids, max(1, $limite)]);
+
+        $porBordado = [];
+
+        foreach ($consulta->fetchAll(PDO::FETCH_ASSOC) as $comentario) {
+            $porBordado[(int) $comentario['bordado_id']][] = $comentario;
+        }
+
+        return $porBordado;
+    }
+
+    /** O comentário com este id, ou null se não existir. */
     public function buscar(int $id): ?array
     {
         $consulta = Conexao::pdo()->prepare(
@@ -52,7 +98,7 @@ class ComentarioDados
         return $comentario === false ? null : $comentario;
     }
 
-    /** TODO(Eduardo): executar o INSERT. */
+    /** Grava o comentário. */
     public function inserir(int $bordadoId, int $usuarioId, string $texto): void
     {
         $consulta = Conexao::pdo()->prepare(
@@ -67,7 +113,7 @@ class ComentarioDados
         ]);
     }
 
-    /** TODO(Eduardo): executar o DELETE. */
+    /** Apaga o comentário pelo id. */
     public function excluir(int $id): void
     {
         $consulta = Conexao::pdo()->prepare(
@@ -78,7 +124,7 @@ class ComentarioDados
         $consulta->execute(['id' => $id]);
     }
 
-    /** TODO(Eduardo): inverter oculto. */
+    /** Inverte o campo oculto do comentário. */
     public function alternarOculto(int $id): void
     {
         $consulta = Conexao::pdo()->prepare(
@@ -90,7 +136,7 @@ class ComentarioDados
         $consulta->execute(['id' => $id]);
     }
 
-    /** TODO(Eduardo): executar SELECT 1 FROM bordados WHERE id = :id AND NOT oculto. */
+    /** true se o bordado existe e não está oculto. */
     public function bordadoVisivel(int $bordadoId): bool
     {
         $consulta = Conexao::pdo()->prepare(
@@ -105,7 +151,7 @@ class ComentarioDados
         return $consulta->fetchColumn() !== false;
     }
 
-    /** TODO(Eduardo): devolver o total, usado no painel. */
+    /** O total de comentários, usado no painel. */
     public function contar(): int
     {
         $consulta = Conexao::pdo()->query(

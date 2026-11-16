@@ -172,6 +172,8 @@
 
 .showcase__action {
   min-width: 220px;
+  /* Empurra o botão para a direita do rodapé, mesmo quando a dica e o botão de pausa estão escondidos. */
+  margin-left: auto;
 }
 
 /* Poucos itens (cabem todos na vitrine): parada e centralizada, sem a cópia do loop.

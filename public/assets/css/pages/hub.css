@@ -1,170 +1,897 @@
 /*
  * Arquivo: hub.css
  * Dono: Eduardo. Só Eduardo altera este arquivo.
- * Responsabilidade: estilos do Hub.
- *
- * TODO(Eduardo):
- * 1. Criar os estilos de feed, detalhe e comentários, com o prefixo hub-.
- * 2. Dar ao botão de curtir um estado para [aria-pressed="true"].
- * 3. Usar white-space: pre-line no texto dos comentários.
+ * Responsabilidade: estilos do Hub, com prefixo hub-: cabeçalho das páginas, coluna lateral de filtros,
+ *                   post completo (peça ao lado do conteúdo no computador, empilhado no celular), ficha da matriz,
+ *                   barra de ações, comentários e tutorial; coração preenchido em [aria-pressed="true"]
+ *                   e pre-line nos textos escritos pelas pessoas.
  * Veja INSTRUCOES_EDUARDO.md, seção 8.
  */
 
- /*
- * Arquivo: hub.css
- * Dono: Eduardo. Só Eduardo altera este arquivo.
- * Responsabilidade: estilos do Hub.
- */
+/* ---------- Página ---------- */
 
-.hub-card__acoes,
-.hub-detalhe__acoes,
-.hub-comentario__acoes {
+/* Wrapper das telas públicas do Hub: mesma largura e respiro do restante do site público. */
+.hub-page {
+  padding-block: var(--space-6) var(--space-8);
+}
+
+.hub-cabecalho {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-sand-200);
 }
 
-.hub-card__acoes .btn,
-.hub-detalhe__acoes .btn,
-.hub-comentario__acoes .btn,
-.hub-paginacao .btn {
-  min-height: 44px;
+.hub-cabecalho h1 {
+  margin: var(--space-1) 0 var(--space-2);
+  color: var(--color-wine-900);
+  font-size: var(--font-page-title);
 }
 
-.js-curtir[aria-pressed="true"] {
+.hub-cabecalho .lead {
+  max-width: 38rem;
+  margin: 0;
+}
+
+.hub-icone {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hub-avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   background-color: var(--color-wine-700);
-  border-color: var(--color-wine-700);
   color: var(--color-sand-50);
+  font-family: var(--font-display);
+  font-size: var(--font-2xl);
+  font-weight: 600;
+  line-height: 1;
 }
 
-.js-curtir:focus-visible,
-.hub-comentarios a:focus-visible,
-.hub-comentarios button:focus-visible {
-  outline: 3px solid var(--color-wine-500);
-  outline-offset: 2px;
+.hub-avatar--sm {
+  width: 30px;
+  height: 30px;
+  font-size: var(--font-lg);
 }
 
-.hub-detalhe {
+/* Coluna lateral à esquerda no computador; o feed preenche a largura restante do container. */
+.hub-layout {
   display: grid;
+  gap: var(--space-5);
+}
+
+.hub-lateral {
+  display: grid;
+  align-content: start;
   gap: var(--space-4);
 }
 
-.hub-detalhe__peca {
-  width: min(100%, 38rem);
-  aspect-ratio: 1;
-  margin-inline: auto;
-  overflow: hidden;
-  border-radius: var(--radius-md);
+.hub-lateral__bloco {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+}
+
+.hub-lateral__titulo {
+  margin: 0;
+  color: var(--color-wine-500);
+  font-family: var(--font-body);
+  font-size: var(--font-xs);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Os chips do catálogo trazem um tracejado de separação; dentro do bloco ele sobra. */
+.hub-lateral .catalog-filters {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+/* Chips com ícone: ícone e texto na mesma linha, alinhados pelo centro. */
+.hub-lateral .filter-chip {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2);
+}
+
+.hub-lateral .filter-chip .hub-icone {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+.hub-lateral__convite p {
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: var(--font-lg);
+}
+
+.hub-lateral__convite .btn {
+  justify-self: start;
+}
+
+.hub-resumo__quem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hub-resumo__numeros {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  text-align: center;
+}
+
+.hub-resumo__numeros div {
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
   background-color: var(--color-sand-50);
 }
 
-.hub-detalhe__peca > * {
-  width: 100%;
-  height: 100%;
+.hub-resumo__numeros dt {
+  color: var(--color-ink-soft);
+  font-size: var(--font-2xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.hub-detalhe__descricao,
+.hub-resumo__numeros dd {
+  margin: 0;
+  color: var(--color-wine-900);
+  font-family: var(--font-display);
+  font-size: var(--font-4xl);
+  font-weight: 600;
+}
+
+.hub-feed {
+  display: grid;
+  align-content: start;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* ---------- Post ---------- */
+
+.hub-post {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  scroll-margin-top: 6rem;
+}
+
+.hub-post__midia {
+  align-self: start;
+  background-color: var(--color-sand-100);
+}
+
+.hub-post__midia > a {
+  display: block;
+  overflow: hidden;
+}
+
+.hub-post__midia > a .peca {
+  transition: transform var(--transition-slow);
+}
+
+.hub-post__midia > a:hover .peca {
+  transform: scale(1.03);
+}
+
+.hub-post__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-5);
+}
+
+/* Área que pode rolar quando o conteúdo do post supera a altura da foto; a barra de ações fica fora dela. */
+.hub-post__rolagem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+}
+
+.hub-post__autoria {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hub-post__quem {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.hub-post__quem time {
+  color: var(--color-ink-soft);
+  font-size: var(--font-md);
+}
+
+.hub-post__selos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.hub-post__tipo {
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-rose-100);
+  color: var(--color-wine-700);
+  font-size: var(--font-2xs);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hub-post__texto {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.hub-post__titulo {
+  margin: 0;
+  color: var(--color-wine-900);
+  font-family: var(--font-display);
+  font-size: var(--font-5xl);
+  line-height: 1.15;
+}
+
+.hub-post--detalhe .hub-post__titulo {
+  font-size: var(--font-page-title);
+}
+
+.hub-post__titulo a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.hub-post__titulo a:hover {
+  color: var(--color-wine-700);
+}
+
+.hub-post__descricao,
 .hub-comentario__texto {
+  margin: 0;
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
 
-.hub-detalhe dl {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: var(--space-2) var(--space-4);
+.hub-post__descricao {
+  color: var(--color-ink-soft);
+  line-height: 1.6;
 }
 
-.hub-detalhe dd {
-  margin: 0;
+/* No feed a descrição mostra até 3 linhas; inteira na página do bordado. */
+.hub-post__descricao--curta {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
-.hub-detalhe__paleta {
+/* Ficha da matriz. */
+.hub-ficha {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
   margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-50);
+}
+
+.hub-ficha__item {
+  display: grid;
+  gap: 2px;
+}
+
+.hub-ficha dt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-ink-soft);
+  font-size: var(--font-2xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hub-ficha dt .hub-icone {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.hub-ficha__item--paleta {
+  flex: 1 1 100%;
+}
+
+.hub-ficha dd {
+  margin: 0;
+  font-size: var(--font-lg);
+  font-weight: 500;
+}
+
+.hub-paleta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 2px 0 0;
   padding: 0;
   list-style: none;
 }
 
-.hub-detalhe__paleta li {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.hub-detalhe__amostra {
-  display: inline-block;
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 1px solid var(--color-ink-soft);
+.hub-paleta li {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 1px solid rgba(46, 35, 33, 0.18);
   border-radius: 50%;
   background-color: var(--hub-cor-linha);
 }
 
-.hub-comentarios {
-  margin-top: var(--space-6);
+/* Barra de ações: interações à esquerda, gestão à direita; encostada na base do card. */
+.hub-post__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-block: var(--space-2);
+  border-block: 1px solid var(--color-sand-200);
 }
 
-.hub-comentarios__form,
-.hub-comentarios__lista {
+.hub-post__interacoes,
+.hub-post__gestao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.hub-post__gestao form {
+  margin: 0;
+}
+
+.hub-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0 0.8rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-md);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    color var(--transition),
+    border-color var(--transition);
+}
+
+.hub-botao:hover {
+  background-color: var(--color-sand-100);
+  color: var(--color-wine-700);
+}
+
+.hub-botao:focus-visible,
+.hub-post__titulo a:focus-visible,
+.hub-post__midia > a:focus-visible {
+  outline: 3px solid var(--color-wine-500);
+  outline-offset: 2px;
+}
+
+.hub-botao[aria-expanded="true"] {
+  border-color: var(--color-sand-200);
+  background-color: var(--color-sand-50);
+  color: var(--color-wine-700);
+}
+
+.hub-botao--discreto {
+  color: var(--color-ink-soft);
+  font-size: var(--font-sm);
+}
+
+.hub-botao--perigo {
+  color: var(--color-alerta-ink);
+  font-size: var(--font-sm);
+}
+
+/* Botão só com ícone, quadrado, alvo mínimo de 44px. */
+.hub-botao--icone {
+  justify-content: center;
+  width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+}
+
+.hub-botao--perigo:hover {
+  background-color: var(--color-alerta-bg);
+  color: var(--color-alerta-ink);
+}
+
+.js-curtir[aria-pressed="true"] {
+  color: var(--color-wine-accent);
+}
+
+.js-curtir[aria-pressed="true"] .hub-icone {
+  fill: currentColor;
+}
+
+.js-curtir:disabled {
+  opacity: 0.6;
+}
+
+/* Card do tutorial, separado abaixo do post, com o mesmo estilo de cartão do site. */
+.hub-tutorial-card {
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-sand-200);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.hub-tutorial-card .tutorial {
+  margin-top: 0;
+}
+
+.hub-page--detalhe .hub-tutorial-card {
+  margin-top: var(--space-5);
+}
+
+.hub-feed .hub-tutorial-card {
+  margin-top: 0;
+}
+
+/* ---------- Popup (modal) do tutorial no Hub ---------- */
+
+.hub-modal[hidden] {
+  display: none;
+}
+
+.hub-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  padding: var(--space-4);
+}
+
+.hub-modal__fundo {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(46, 35, 33, 0.55);
+}
+
+.hub-modal__caixa {
+  position: relative;
+  margin: auto;
+  width: min(44rem, 100%);
+  max-height: min(90vh, 46rem);
+  overflow-y: auto;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-lg);
+}
+
+.hub-modal__fechar {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sand-100);
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    color var(--transition);
+}
+
+.hub-modal__fechar:hover {
+  background-color: var(--color-sand-200);
+  color: var(--color-wine-700);
+}
+
+.hub-modal__fechar:focus-visible {
+  outline: 3px solid var(--color-wine-500);
+  outline-offset: 2px;
+}
+
+/* O bloco do tutorial ocupa o popup por inteiro, sem a moldura dupla. */
+.hub-modal__caixa .tutorial {
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+}
+
+body.hub-modal-aberto {
+  overflow: hidden;
+}
+
+.hub-post__aviso {
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: var(--font-md);
+}
+
+/* ---------- Comentários ---------- */
+
+/* Coluna de comentários do post; nas telas de duas colunas fica abaixo do detalhe, na mesma coluna. */
+.hub-post__comentarios {
   display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-5);
+}
+
+.hub-comentarios__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
 }
 
-.hub-comentarios__form {
-  margin-block: var(--space-4);
+.hub-comentarios__titulo {
+  margin: 0;
+  color: var(--color-wine-500);
+  font-family: var(--font-body);
+  font-size: var(--font-xs);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
-.hub-comentarios__form textarea {
-  min-height: 7rem;
+.hub-comentarios__total {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sand-100);
+  color: var(--color-ink-soft);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  vertical-align: 1px;
+}
+
+.hub-post__ver-todos {
+  color: var(--color-ink-soft);
+  font-size: var(--font-md);
+  text-decoration: none;
+}
+
+.hub-post__ver-todos:hover {
+  color: var(--color-wine-700);
+  text-decoration: underline;
+}
+
+.hub-comentarios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  scroll-margin-top: 6rem;
+}
+
+/* Quando a seção estica, os comentários se acumulam na base e a barra de escrever fica encostada no rodapé dela. */
+.hub-comentarios > :first-child,
+.hub-post__comentarios > :last-child {
+  margin-top: auto;
 }
 
 .hub-comentario {
-  padding-block: var(--space-3);
-  border-bottom: 1px solid var(--color-sand-200);
-}
-
-.hub-comentario__cabecalho {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: var(--space-2);
 }
 
-.hub-comentario__cabecalho time {
-  color: var(--color-ink-soft);
+.hub-comentario__corpo {
+  min-width: 0;
 }
 
-.hub-comentario__acoes form {
+.hub-comentario__texto {
+  font-size: var(--font-lg);
+  line-height: 1.35;
+}
+
+.hub-comentario__texto strong {
+  margin-right: var(--space-1);
+}
+
+.hub-comentario--oculto {
+  opacity: 0.6;
+}
+
+.hub-comentario__rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: 0;
+  color: var(--color-ink-soft);
+  font-size: var(--font-sm);
+  line-height: 1.2;
+}
+
+.hub-comentario__rodape form {
   margin: 0;
+}
+
+/* Barra de escrever: campo e botão colados, como o grupo de e-mail do cadastro. */
+.hub-comentar {
+  display: flex;
+  margin: 0;
+}
+
+.hub-comentar__campo {
+  flex: 1;
+  min-width: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  font-size: var(--font-md);
+}
+
+.hub-comentar .btn {
+  flex: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+  box-shadow: none;
+  padding-inline: var(--space-4);
+}
+
+/* O botão de comentar não sobe no hover, ao contrário do botão primário padrão. */
+.hub-comentar .btn:hover {
+  transform: none;
+}
+
+.hub-comentar .btn {
+  flex: none;
+}
+
+/* ---------- Vazio, paginação e página do bordado ---------- */
+
+.hub-vazio {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-7) var(--space-5);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.hub-vazio h2 {
+  margin: 0;
+  color: var(--color-wine-900);
+  font-size: var(--font-h3);
+}
+
+.hub-vazio p {
+  margin: 0 0 var(--space-3);
+  color: var(--color-ink-soft);
 }
 
 .hub-paginacao {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: var(--space-3);
-  margin-top: var(--space-5);
+}
+
+.hub-voltar {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+}
+
+/* Card clicável no feed: o link do título abre o post por cima de tudo,
+   mas os botões internos continuam clicáveis (ficam acima na ordem de pintura). */
+.hub-post--feed {
+  position: relative;
+  cursor: pointer;
+  transition:
+    box-shadow var(--transition),
+    border-color var(--transition);
+}
+
+/* O link do título cresce por cima do card inteiro; os demais interativos ficam acima dele. */
+.hub-post--feed .hub-post__titulo a {
+  position: static;
+}
+
+.hub-post--feed .hub-post__titulo a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.hub-post--feed a:not(.hub-post__titulo a),
+.hub-post--feed button,
+.hub-post--feed input,
+.hub-post--feed textarea,
+.hub-post--feed select {
+  position: relative;
+  z-index: 1;
+}
+
+.hub-post--feed:hover {
+  border-color: var(--color-wine-700);
+  box-shadow: var(--shadow-md);
+}
+
+.hub-post--feed:focus-within {
+  outline: 3px solid var(--color-wine-500);
+  outline-offset: 3px;
+}
+
+/* Post lado a lado: a peça mantém a proporção 4:5 da home (a caixa da mídia é exatamente a do bordado). */
+@media (min-width: 720px) {
+  .hub-post {
+    grid-template-columns: clamp(17rem, 32%, 24rem) minmax(0, 1fr);
+  }
+
+  .hub-post--detalhe {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .hub-post__comentarios {
+    grid-column: 2;
+  }
+}
+
+/* Duas colunas (720px a 1399px): a lista de comentários tem altura máxima e rola por dentro. */
+@media (min-width: 720px) and (max-width: 1399px) {
+  .hub-comentarios {
+    max-height: 24rem;
+    overflow-y: auto;
+    padding-right: var(--space-2);
+  }
+}
+
+/* Três colunas no computador largo (≥1400px): foto na proporção 4:5 da home,
+   detalhes ao meio e comentários à direita, com divisória ao lado dos comentários.
+   No feed, a altura do card é a da foto; o que não couber rola dentro da própria coluna.
+   Na página do bordado a altura é livre (o tutorial pode ser longo). */
+@media (min-width: 1400px) {
+  .hub-post {
+    grid-template-columns: 22rem minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+
+  .hub-post--feed {
+    grid-template-rows: minmax(0, 1fr);
+    height: 27.5rem; /* 22rem × 1.25 (proporção 4:5 da foto) */
+    overflow: hidden;
+  }
+
+  .hub-post--feed .hub-post__midia,
+  .hub-post--feed .hub-post__midia .peca {
+    height: 100%;
+  }
+
+  .hub-post--feed .hub-post__corpo {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .hub-post--feed .hub-post__rolagem {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .hub-post__comentarios {
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding-inline-start: var(--space-4);
+    border-inline-start: 1px solid var(--color-sand-200);
+  }
+
+  /* A lista preenche a área entre o cabeçalho e a barra; comentários se acumulam na base, o mais recente embaixo. */
+  .hub-comentarios {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: var(--space-2);
+  }
+
+}
+
+@media (min-width: 1080px) {
+  .hub-layout {
+    grid-template-columns: 17rem minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .hub-lateral {
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+
+/* Telas médias: filtros ficam em uma faixa acima do feed. */
+@media (min-width: 720px) and (max-width: 1079px) {
+  .hub-lateral {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
-  .hub-detalhe dl {
-    grid-template-columns: 1fr;
-    gap: var(--space-1);
-  }
-
-  .hub-detalhe dd {
-    margin-bottom: var(--space-2);
-  }
-
-  .hub-detalhe__acoes > *,
-  .hub-detalhe__acoes .btn {
+  .hub-cabecalho .btn {
     width: 100%;
   }
 
-  .hub-comentario__cabecalho {
-    flex-direction: column;
+  .hub-lateral__convite {
+    display: none;
+  }
+
+  .hub-post__corpo {
+    padding: var(--space-4);
+  }
+
+  .hub-post__comentarios {
+    padding: var(--space-4);
+  }
+
+  .hub-post__barra {
+    justify-content: flex-start;
+  }
+
+  .hub-comentar {
+    gap: 0;
   }
 }

@@ -8,7 +8,7 @@
 
 $titulo = 'Acesso negado | Desenrola';
 ?>
-<section class="section">
+<section class="section erros">
   <div class="container section__head">
     <p class="eyebrow">Erro 403</p>
     <h1>Você não tem permissão</h1>

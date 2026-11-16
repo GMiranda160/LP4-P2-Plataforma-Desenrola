@@ -12,13 +12,14 @@ class TutorialControlador
     public function __construct(private TutorialServico $servico = new TutorialServico()) {}
 
     /**
-     * POST /bordado/tutorial com bordado_id.
+     * POST /bordado/tutorial com bordado_id. forcar=1 regenera mesmo havendo texto salvo.
      * Responde { texto, origem }, com origem ia, cache ou reserva.
      * Limite: 5 tutoriais novos por usuário a cada 10 minutos (contados em Sessao).
      */
     public function gerar(): void
     {
         $bordadoId = (int) ($_POST['bordado_id'] ?? 0);
+        $forcar = (string) ($_POST['forcar'] ?? '0') === '1';
 
         if ($bordadoId <= 0) {
             Resposta::json(['erro' => 'bordado_invalido'], 400);
@@ -30,10 +31,10 @@ class TutorialControlador
             Resposta::json(['erro' => 'bordado_nao_encontrado'], 404);
         }
 
-        // Cache no banco não chama o Gemini e não conta no limite.
+        // Cache no banco não chama o Gemini e não conta no limite; com forcar=1, regenera mesmo assim.
         $salvo = $bordado['tutorial_ia'] ?? null;
 
-        if (is_string($salvo) && trim($salvo) !== '') {
+        if (!$forcar && is_string($salvo) && trim($salvo) !== '') {
             Resposta::json(['texto' => $salvo, 'origem' => 'cache']);
         }
 
@@ -44,8 +45,11 @@ class TutorialControlador
             ], 429);
         }
 
+        // Principal e fallback somados podem passar dos 30 s padrão do PHP.
+        set_time_limit(70);
+
         try {
-            $resultado = $this->servico->obter($bordadoId);
+            $resultado = $this->servico->obter($bordadoId, $forcar);
         } catch (RuntimeException $erro) {
             error_log('TutorialControlador: ' . $erro->getMessage());
             Resposta::json(['erro' => 'tutorial_indisponivel'], 500);

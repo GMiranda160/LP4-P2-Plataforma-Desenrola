@@ -8,7 +8,7 @@
 
 $titulo = 'Página não encontrada | Desenrola';
 ?>
-<section class="section">
+<section class="section erros">
   <div class="container section__head">
     <p class="eyebrow">Erro 404</p>
     <h1>Página não encontrada</h1>

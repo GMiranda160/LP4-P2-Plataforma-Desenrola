@@ -20,3 +20,7 @@ chave-supabase.local.txt
 public/assets/img/mockups/toalha-rosto.png
 public/assets/img/mockups/toalha-banho.png
 public/assets/img/mockups/avental.png
+
+# Claude
+.claude/
+

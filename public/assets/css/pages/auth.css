@@ -9,7 +9,7 @@
 .auth-container {
   width: 100%;
   max-width: 560px;
-  padding-top: 5vh;
+  padding: 5vh var(--container-pad) var(--space-7);
   margin-inline: auto;
 }
 
