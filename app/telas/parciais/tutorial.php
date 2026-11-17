@@ -21,13 +21,13 @@ $temTutorial = is_string($tutorialSalvo) && trim($tutorialSalvo) !== '';
         <button type="button" class="link-button" data-tutorial-regenerar>Regenerar</button>
       <?php endif; ?>
     </p>
-    <div class="tutorial__texto" data-tutorial-texto><?= e($tutorialSalvo) ?></div>
+    <div class="tutorial__texto" data-tutorial-texto aria-live="polite"><?= e($tutorialSalvo) ?></div>
     <p class="tutorial__erro form__error" data-tutorial-erro role="alert" hidden></p>
   <?php else: ?>
     <p class="field-hint">A IA monta um passo a passo simples, a partir deste bordado.</p>
     <button type="button" class="btn btn--ghost" data-tutorial-gerar>Gerar tutorial com IA</button>
     <p class="field-hint" data-tutorial-nota hidden>Texto gerado por IA, revise antes de bordar.</p>
-    <div class="tutorial__texto" data-tutorial-texto hidden></div>
+    <div class="tutorial__texto" data-tutorial-texto aria-live="polite" hidden></div>
     <p class="tutorial__erro form__error" data-tutorial-erro role="alert" hidden></p>
   <?php endif; ?>
 </section>

@@ -430,6 +430,10 @@ Para aguentar a turma toda:
 - O texto é salvo em `bordados.tutorial_ia`, e a IA é chamada uma só vez por bordado.
 - O modelo fica em `GEMINI_MODEL`, para ser trocado sem mexer no código.
 - Se a IA falhar ou responder 429, o PHP monta um tutorial simples com os dados do bordado.
+- O texto novo chega **em fluxo**: o PHP chama o `streamGenerateContent` do Gemini e repassa cada
+  pedaço ao navegador na hora, um JSON por linha (NDJSON). A tela mostra três pontinhos enquanto a
+  IA pensa e depois escreve letra a letra, com cursor. Se a IA cair no meio, o texto reserva
+  substitui o que já apareceu.
 - Os limites reais devem ser conferidos no [Google AI Studio](https://aistudio.google.com/).
 
 ## 11. Guia de CSS

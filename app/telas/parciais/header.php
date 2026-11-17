@@ -69,7 +69,10 @@ $ativo = static function (string ...$rotas) use ($caminho): string {
 
     <div class="header-actions">
       <?php if ($usuario === null): ?>
-        <a class="btn btn--primary btn--sm" href="/login">Entrar</a>
+        <a class="btn btn--primary btn--sm header-actions__entrar" href="/login" aria-label="Entrar">
+          <svg class="header-actions__entrar-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+          <span class="header-actions__entrar-texto">Entrar</span>
+        </a>
       <?php else: ?>
         <?php Visao::parcial('menu_usuario', ['naGerencia' => false]); ?>
       <?php endif; ?>

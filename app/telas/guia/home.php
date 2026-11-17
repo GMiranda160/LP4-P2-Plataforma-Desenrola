@@ -460,10 +460,10 @@
       <section class="guia__slide" role="group" aria-roledescription="slide" aria-label="7 de 10: arquivos por onde o pedido passa">
         <p class="guia__eyebrow">Anexo de referência</p>
         <h3 class="guia__h">A árvore dos arquivos</h3>
-        <p class="guia__lede">Vinte e um arquivos, sete pastas. Se algo aqui mudar de nome, o pedido muda de caminho.</p>
+        <p class="guia__lede">Vinte e um arquivos, nove pastas. Se algo aqui mudar de nome, o pedido muda de caminho.</p>
 
         <div class="ref__papel arvore guia__anim" style="--d:60ms">
-          <div class="ref__barra"><span class="ref__cmd">$ tree public app</span><span class="ref__tag">REF 07 · 21 arquivos · 7 pastas</span></div>
+          <div class="ref__barra"><span class="ref__cmd">$ tree public app</span><span class="ref__tag">REF 07 · 21 arquivos · 9 pastas</span></div>
           <div class="arvore__cols">
 
             <div class="arvore__col">
@@ -607,7 +607,7 @@
                   <span>banco gerenciado</span>
                   <span>porta 6543</span>
                   <span>conexão cifrada (SSL)</span>
-                  <span>1 conexão por thread</span>
+                  <span>1 conexão por requisição</span>
                 </div>
                 <small class="alfande__onde">app/core/Conexao.php</small>
               </div>

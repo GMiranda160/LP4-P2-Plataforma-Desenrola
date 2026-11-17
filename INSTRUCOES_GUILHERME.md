@@ -292,11 +292,13 @@ Visao::render(string $tela, array $dados = [], string $layout = 'publico'): void
 Visao::parcial(string $nome, array $dados = []): void
 Resposta::redirecionar(string $caminho): never
 Resposta::json(array $dados, int $status = 200): never
+Resposta::fluxo(callable $produzir): never  // NDJSON, uma linha por vez (tutorial da IA)
 
 Sessao::iniciar(): void
 Sessao::definir(string $chave, mixed $valor): void
 Sessao::obter(string $chave, mixed $padrao = null): mixed
 Sessao::remover(string $chave): void
+Sessao::liberar(): void                     // grava e fecha a sessão antes de respostas longas
 Sessao::flash(string $tipo, string $mensagem): void
 Sessao::guardarVelhos(array $dados): void   // remove campos de senha
 Sessao::tirarVelhos(): array
@@ -707,6 +709,23 @@ texto com `textContent` e `white-space: pre-line`. Desative o botão enquanto ca
 Mostre **Texto gerado por IA, revise antes de bordar.**
 
 Limite: 5 tutoriais novos por usuário a cada 10 minutos, contados em `Sessao`.
+
+**IA digitando (streaming).** Quando o `fetch` manda `Accept: application/x-ndjson`, o texto novo
+não chega de uma vez:
+
+1. `TutorialControlador` conta o pedido no limite, chama `Sessao::liberar()` (a sessão fica livre
+   durante o fluxo) e abre `Resposta::fluxo()`, que desliga os buffers e envia uma linha JSON por vez.
+2. `TutorialServico::obterEmFluxo()` chama `GeminiServico::gerarEmFluxo()`, que usa
+   `:streamGenerateContent?alt=sse`. O cURL entrega os bytes aos poucos (`CURLOPT_WRITEFUNCTION`) e
+   cada linha `data: {...}` vira um pedaço repassado na hora.
+3. Linhas enviadas, na ordem: `{"tipo":"inicio"}`, vários `{"tipo":"texto","texto":"..."}` e
+   `{"tipo":"fim","origem":"ia"}`. Se o Gemini cair depois do primeiro pedaço, vem
+   `{"tipo":"recomecar"}` e o texto reserva inteiro.
+4. O `tutorial.js` lê com `response.body.getReader()` e escreve letra a letra (cerca de 90 por
+   segundo, mais rápido quando a fila cresce). Com `prefers-reduced-motion`, cada pedaço entra inteiro.
+5. `ignore_user_abort(true)`: se a pessoa fechar a aba, o PHP termina e salva o texto mesmo assim.
+
+Texto já salvo e erros (400, 404, 429) continuam em JSON comum.
 
 ## 9. CSS e padronização
 

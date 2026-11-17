@@ -1,7 +1,8 @@
 /*
  * Arquivo: tutorial.css
  * Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: estilos do bloco “Tutorial para bordar” (IA), usado na página do bordado.
+ * Responsabilidade: estilos do bloco “Tutorial para bordar” (IA), usado na página do bordado,
+ * com o cursor e os três pontinhos da IA digitando.
  * Veja INSTRUCOES_GUILHERME.md, seção 8.
  */
 
@@ -37,4 +38,53 @@
 
 .tutorial__erro {
   margin: 0;
+}
+
+/* IA digitando: cursor piscando no fim do texto, enquanto o fluxo chega. */
+.tutorial__texto.is-digitando::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: -0.18em;
+  background-color: var(--color-wine-700);
+  animation: tutorial-cursor 1s steps(1) infinite;
+}
+
+/* Antes do primeiro pedaço: três pontinhos no lugar do cursor. */
+.tutorial__texto.is-pensando {
+  min-height: calc(1.6em + var(--space-3) * 2);
+}
+
+.tutorial__texto.is-pensando::after {
+  width: 2.2em;
+  height: 0.5em;
+  margin-left: 0;
+  vertical-align: middle;
+  background: radial-gradient(circle closest-side, var(--color-wine-700) 90%, transparent) 0 50% / 0.733em 0.5em repeat-x;
+  animation: tutorial-pensando 1.2s ease-in-out infinite;
+}
+
+@keyframes tutorial-cursor {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes tutorial-pensando {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial__texto.is-digitando::after {
+    animation: none;
+  }
 }

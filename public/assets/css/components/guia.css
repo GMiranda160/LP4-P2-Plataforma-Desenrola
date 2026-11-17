@@ -2613,8 +2613,9 @@
   .trab5__seta { display: none; }
   .trab5__faixa--ctl { padding: 0.65rem 0.75rem; gap: 0.5rem; grid-template-columns: auto auto minmax(0, 1fr); }
   .trab5__faixa--ctl .trab5__chips { display: none; }
-  .trab5__faixa--pdo { padding: 0.65rem 0.75rem; gap: 0.5rem; grid-template-columns: auto auto minmax(0, 1fr); }
-  .trab5__chips--pdo { max-width: none; justify-content: flex-start; }
+  .trab5__faixa--pdo { padding: 0.65rem 0.75rem; gap: 0.5rem; grid-template-columns: auto minmax(0, 1fr); }
+  /* As quatro etiquetas do PDO descem para uma linha própria, em vez de espremer ao lado do título. */
+  .trab5__chips--pdo { max-width: none; justify-content: flex-start; grid-column: 1 / -1; }
   .trab5__knot { width: 2.3rem; height: 2.3rem; font-size: var(--font-lg); box-shadow: none; }
   .trab5__knot--md { width: 2rem; height: 2rem; font-size: var(--font-md); box-shadow: none; }
   .trab5__icone { width: 1.9rem; height: 1.9rem; }
@@ -2622,7 +2623,10 @@
   .trab5__texto h4 { font-size: var(--font-lg); }
   .trab5__texto code, .trab5__texto p { font-size: var(--font-2xs); }
   .trab5__consultas { grid-template-columns: 1fr; gap: 0.5rem; }
-  .trab5__consulta { flex-direction: row; text-align: left; flex-wrap: wrap; justify-content: flex-start; gap: 0.3rem 0.6rem; padding: 0.55rem 0.65rem; }
+  /* Consulta no celular: número, ícone e título na mesma linha; o código quebra em vez de vazar. */
+  .trab5__consulta { grid-template-columns: auto auto minmax(0, 1fr); justify-content: stretch; justify-items: start; text-align: left; gap: 0.3rem 0.6rem; padding: 0.55rem 0.65rem; }
+  .trab5__consulta > h4:not(.trab5__knot):not(.trab5__icone) { grid-column: 3; grid-row: 1; }
+  .trab5__consulta code, .trab5__chain { white-space: normal; overflow-wrap: anywhere; }
   .trab5__consulta small { display: none; }
   .trab5__chain { font-size: var(--font-2xs); }
   .pipeline { grid-template-columns: repeat(2, 1fr); gap: 0.7cqh; }
@@ -2877,8 +2881,8 @@
 }
 
 @media (max-width: 1100px) {
-  /* Abaixo de 1100px o botão Entrar some e o padding lateral é curto demais
-     para o botão absoluto: volta para o fluxo, depois do menu do usuário. */
+  /* Abaixo de 1100px o botão Entrar vira só o ícone e o padding lateral é
+     curto demais para o botão absoluto: volta para o fluxo, depois do menu do usuário. */
   .guia-btn--auth {
     position: static;
     margin-top: 0;

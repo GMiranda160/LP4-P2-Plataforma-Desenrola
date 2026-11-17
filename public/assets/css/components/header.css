@@ -168,6 +168,11 @@
   display: inline-flex;
 }
 
+/* Ícone de entrar: no mobile o botão Entrar vira só o ícone; no desktop o texto continua como antes. */
+.header-actions__entrar-icone {
+  display: none;
+}
+
 /* Menu do usuário: botão com a inicial, o primeiro nome e a seta de abrir. */
 .user-menu {
   position: relative;

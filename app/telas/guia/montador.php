@@ -489,7 +489,7 @@
 
               <section class="arvore__patch">
                 <div class="arvore__patch-head"><code>app/dados/</code><small>o SQL</small></div>
-                <p class="arvore__file"><code>MatrizDados.php</code><span class="arvore__lider"></span><span class="arvore__role">listaTodas · inserir</span></p>
+                <p class="arvore__file"><code>MatrizDados.php</code><span class="arvore__lider"></span><span class="arvore__role">listarTodas · inserir</span></p>
                 <p class="arvore__file"><code>BordadoDados.php</code><span class="arvore__lider"></span><span class="arvore__role">inserir · contarRecentes</span></p>
               </section>
             </div>

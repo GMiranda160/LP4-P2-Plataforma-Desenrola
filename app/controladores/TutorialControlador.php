@@ -1,7 +1,7 @@
 <?php
 /**
  * Camada: Controlador. Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: responder o tutorial de IA em JSON para o detalhe do bordado.
+ * Responsabilidade: responder o tutorial de IA do bordado, em JSON ou em fluxo NDJSON (a IA digitando).
  * Veja INSTRUCOES_GUILHERME.md, seção 8.
  */
 class TutorialControlador
@@ -13,7 +13,8 @@ class TutorialControlador
 
     /**
      * POST /bordado/tutorial com bordado_id. forcar=1 regenera mesmo havendo texto salvo.
-     * Responde { texto, origem }, com origem ia, cache ou reserva.
+     * Responde { texto, origem }, com origem ia, cache ou reserva. Com Accept: application/x-ndjson,
+     * o texto novo chega em fluxo, pedaço por pedaço (veja gerarEmFluxo). Cache e erros são sempre JSON.
      * Limite: 5 tutoriais novos por usuário a cada 10 minutos (contados em Sessao).
      */
     public function gerar(): void
@@ -45,6 +46,10 @@ class TutorialControlador
             ], 429);
         }
 
+        if ($this->querFluxo()) {
+            $this->gerarEmFluxo($bordadoId, $forcar);
+        }
+
         // Principal e fallback somados podem passar dos 30 s padrão do PHP.
         set_time_limit(70);
 
@@ -60,6 +65,40 @@ class TutorialControlador
         }
 
         Resposta::json($resultado);
+    }
+
+    /**
+     * Responde em fluxo NDJSON, para a tela mostrar a IA digitando. Linhas, na ordem:
+     * {tipo: inicio}, várias {tipo: texto, texto}, talvez {tipo: recomecar}, e {tipo: fim, origem}.
+     * O pedido conta no limite antes de começar, porque a sessão é liberada durante o fluxo.
+     */
+    private function gerarEmFluxo(int $bordadoId, bool $forcar): never
+    {
+        $this->registrarPedido();
+        Sessao::liberar();
+
+        // Dois modelos em fluxo podem somar até 2 minutos. Se a pessoa fechar a aba,
+        // o PHP segue até o fim para salvar o texto em bordados.tutorial_ia.
+        set_time_limit(150);
+        ignore_user_abort(true);
+
+        Resposta::fluxo(function (callable $enviar) use ($bordadoId, $forcar): void {
+            $enviar(['tipo' => 'inicio']);
+
+            $resultado = $this->servico->obterEmFluxo(
+                $bordadoId,
+                $forcar,
+                fn (string $evento, array $dados) => $enviar(['tipo' => $evento] + $dados)
+            );
+
+            $enviar(['tipo' => 'fim', 'origem' => $resultado['origem']]);
+        });
+    }
+
+    /** O tutorial.js pede fluxo com Accept: application/x-ndjson; sem isso, a resposta é JSON inteiro. */
+    private function querFluxo(): bool
+    {
+        return str_contains((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/x-ndjson');
     }
 
     private function limiteExcedido(): bool

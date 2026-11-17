@@ -307,8 +307,8 @@
       <!-- 7 O TUTORIAL -------------------------------------------------- -->
       <section class="guia__slide" role="group" aria-roledescription="slide" aria-label="7 de 8: o tutorial com IA">
         <p class="guia__eyebrow">Tutorial · Texto sob demanda</p>
-        <h3 class="guia__h">O tutorial com IA, sob demanda</h3>
-        <p class="guia__lede">Ninguém borda por sorte: a IA monta o passo a passo, o banco guarda o texto e a tela pede só quando alguém quiser.</p>
+        <h3 class="guia__h">O tutorial com IA, digitado ao vivo</h3>
+        <p class="guia__lede">Ninguém borda por sorte: a IA monta o passo a passo, a tela mostra a IA <b>digitando</b> enquanto o texto chega e o banco guarda tudo no fim.</p>
 
         <ol class="pipeline pipeline--auth">
           <li class="pipeline__passo guia__anim" style="--d:40ms">
@@ -321,10 +321,10 @@
 
           <li class="pipeline__passo guia__anim" style="--d:150ms">
             <span class="pipeline__tag">A ROTA</span>
-            <span class="pipeline__icone"><svg viewBox="0 0 24 24"><circle class="est2-desenha" pathLength="100" cx="12" cy="12" r="8.5"/><path class="est2-desenha est2-d2" pathLength="100" d="M12 7.5V12l3 2"/></svg></span>
+            <span class="pipeline__icone"><svg viewBox="0 0 24 24"><path class="est2-desenha" pathLength="100" d="M3 9c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/><path class="est2-desenha est2-d2" pathLength="100" d="M3 15c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/></svg></span>
             <code>POST /bordado/tutorial</code>
-            <p>A requisição é um <b>fetch</b> JSON com o CSRF no cabeçalho. O controlador confere: bordado existe (<b>404</b>), monta o texto (cache ou Gemini) e responde <code>{ texto, origem }</code>.</p>
-            <span class="pipeline__chips"><code>JSON</code><code>fetch + CSRF</code></span>
+            <p>Um <b>fetch</b> com o CSRF no cabeçalho pede <code>application/x-ndjson</code>. O PHP chama o Gemini em <b>streamGenerateContent</b> e repassa cada pedaço na hora, um JSON por linha, até a linha <code>{ tipo: fim, origem }</code>.</p>
+            <span class="pipeline__chips"><code>NDJSON</code><code>SSE do Gemini</code></span>
           </li>
 
           <li class="pipeline__passo guia__anim" style="--d:260ms">
@@ -338,23 +338,23 @@
           <li class="pipeline__passo pipeline__passo--final guia__anim" style="--d:370ms">
             <span class="pipeline__tag">A TELA</span>
             <span class="pipeline__icone"><svg viewBox="0 0 24 24"><path class="est2-desenha" pathLength="100" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/></svg></span>
-            <code>texto.textContent</code>
-            <p>O texto entra com <code>textContent</code>: nada de HTML do servidor vira marcação na tela. A nota "Revise antes de bordar" lembra que a IA é uma dica, não uma garantia.</p>
-            <span class="pipeline__chips"><code>textContent</code><code>sem HTML</code></span>
+            <code>getReader() · digitador</code>
+            <p>O <b>tutorial.js</b> lê o fluxo aos poucos: três pontinhos enquanto a IA pensa, depois letra a letra com cursor piscando. Tudo entra com <code>textContent</code>, nunca como HTML.</p>
+            <span class="pipeline__chips"><code>ReadableStream</code><code>textContent</code></span>
           </li>
         </ol>
 
-        <p class="guia__nota"><span><b>Geração é sob demanda.</b> O post carrega instantâneo com o que o banco tem; o tutorial só nasce quando alguém pede: nunca no carregamento da página.</span></p>
+        <p class="guia__nota"><span><b>Se a IA cair no meio,</b> o servidor manda <code>recomecar</code> e o texto reserva substitui o que já apareceu. Fechar a aba não perde nada: o PHP termina e salva.</span></p>
       </section>
 
       <!-- 8 ANEXO -------------------------------------------------------- -->
       <section class="guia__slide" role="group" aria-roledescription="slide" aria-label="8 de 8: a árvore do Hub">
         <p class="guia__eyebrow">Anexo de referência</p>
         <h3 class="guia__h">A árvore do Hub</h3>
-        <p class="guia__lede">Treze arquivos no caminho: da rota ao coração que infla na tela.</p>
+        <p class="guia__lede">Catorze arquivos no caminho: da rota ao coração que infla na tela.</p>
 
         <div class="ref__papel arvore guia__anim" style="--d:60ms">
-          <div class="ref__barra"><span class="ref__cmd">$ tree app | grep -E "Hub|Comentario|Tutorial"</span><span class="ref__tag">REF 08 · 13 arquivos · 3 camadas</span></div>
+          <div class="ref__barra"><span class="ref__cmd">$ tree app | grep -E "Hub|Comentario|Tutorial"</span><span class="ref__tag">REF 08 · 14 arquivos · 4 camadas</span></div>
           <div class="arvore__cols">
 
             <div class="arvore__col">
@@ -367,7 +367,7 @@
                 <div class="arvore__patch-head"><code>app/controladores/</code><small>a porta</small></div>
                 <p class="arvore__file"><code>HubControlador.php</code><span class="arvore__lider"></span><span class="arvore__role">feed · detalhe · meus · curtir · ocultar (Eduardo)</span></p>
                 <p class="arvore__file"><code>ComentarioControlador.php</code><span class="arvore__lider"></span><span class="arvore__role">comentar · excluir · ocultar (Eduardo)</span></p>
-                <p class="arvore__file"><code>TutorialControlador.php</code><span class="arvore__lider"></span><span class="arvore__role">gerar: JSON, limite 5/10min</span></p>
+                <p class="arvore__file"><code>TutorialControlador.php</code><span class="arvore__lider"></span><span class="arvore__role">gerar: fluxo NDJSON, limite 5/10min</span></p>
               </section>
             </div>
 
@@ -376,7 +376,7 @@
                 <div class="arvore__patch-head"><code>app/processamento/</code><small>as regras</small></div>
                 <p class="arvore__file"><code>HubServico.php</code><span class="arvore__lider"></span><span class="arvore__role">feed sem SQL · curtir: insert/delete</span></p>
                 <p class="arvore__file"><code>ComentarioServico.php</code><span class="arvore__lider"></span><span class="arvore__role">1 a 280 · 5 por minuto</span></p>
-                <p class="arvore__file"><code>TutorialServico.php</code><span class="arvore__lider"></span><span class="arvore__role">texto do Gemini, em cache</span></p>
+                <p class="arvore__file"><code>TutorialServico.php</code><span class="arvore__lider"></span><span class="arvore__role">Gemini em fluxo, salvo em cache</span></p>
               </section>
 
               <section class="arvore__patch">

@@ -213,7 +213,7 @@
                 <code class="sqlp2__sql">SELECT count(*) FROM insumos</code>
               </div>
               <span class="sqlp2__seta" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span>
-              <p class="sqlp2__card">Todo o estoque de insumos, inclusive os que não estão com o fornecedor.</p>
+              <p class="sqlp2__card">Todos os insumos cadastrados, com ou sem estoque abaixo do mínimo.</p>
             </div>
 
             <div class="sqlp2__row" role="row">
@@ -222,7 +222,7 @@
                 <code class="sqlp2__sql">SELECT count(*) FROM clientes</code>
               </div>
               <span class="sqlp2__seta" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span>
-              <p class="sqlp2__card">A clientela ativa e arquivada; o cadastro é a tela inicial dos clientes.</p>
+              <p class="sqlp2__card">Todos os clientes do ateliê. Cliente é registro comercial: não tem login.</p>
             </div>
 
             <div class="sqlp2__row" role="row">
@@ -249,7 +249,7 @@
                 <code class="sqlp2__sql">SELECT COUNT(*) FROM usuarios</code>
               </div>
               <span class="sqlp2__seta" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span>
-              <p class="sqlp2__card">Contas com acesso (clientes com cadastro e a gerência).</p>
+              <p class="sqlp2__card">Contas com login: a comunidade do Hub e a gerência. Não confundir com clientes.</p>
             </div>
 
             <div class="sqlp2__row" role="row">

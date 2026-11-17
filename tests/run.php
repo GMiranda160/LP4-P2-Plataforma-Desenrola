@@ -6,7 +6,8 @@ declare(strict_types=1);
  * Arquivo: tests/run.php
  * Dono: Guilherme.
  * Responsabilidade: testes de camada sem framework. Cobre a lógica de processamento
- * (GradeServico) e os helpers puros de app/core/ajudantes.php. Não usa o banco,
+ * (GradeServico e o TutorialServico em fluxo, com banco e Gemini falsos) e os helpers puros
+ * de app/core/ajudantes.php. Não usa o banco nem a rede,
  * então roda em qualquer máquina, inclusive antes de configurar o .env.
  *
  * Uso: php tests/run.php
@@ -199,6 +200,97 @@ teste('svg_data_uri: usa base64', function () {
 
 teste('link_whatsapp: monta a URL wa.me', function () {
     verdadeiro(str_contains(link_whatsapp(), 'https://wa.me/'), 'faltou o wa.me');
+});
+
+// ------------------------------------------------------------------
+// TutorialServico em fluxo, com banco e Gemini falsos (nada sai da máquina).
+// ------------------------------------------------------------------
+
+/** Bordado falso: devolve um bordado fixo e guarda o que seria salvo, sem tocar no banco. */
+function bordadosFalsos(?string $tutorialSalvo): BordadoDados
+{
+    return new class ($tutorialSalvo) extends BordadoDados {
+        public ?string $salvo = null;
+
+        public function __construct(private ?string $tutorial)
+        {
+        }
+
+        public function buscarParaTutorial(int $id): ?array
+        {
+            return ['id' => $id, 'titulo' => 'Rosa', 'categoria' => 'Toalha', 'cor_peca' => '#ffffff',
+                'largura' => 40, 'altura' => 30, 'total_pontos' => 900, 'paleta' => ['#691818'],
+                'tutorial_ia' => $this->tutorial];
+        }
+
+        public function salvarTutorial(int $id, string $texto): void
+        {
+            $this->salvo = $texto;
+        }
+    };
+}
+
+/** Gemini falso: manda os pedaços pedidos e, se $falhaNoFim, cai depois deles. */
+function geminiFalso(array $pedacos, bool $falhaNoFim = false): GeminiServico
+{
+    return new class ($pedacos, $falhaNoFim) extends GeminiServico {
+        public function __construct(private array $pedacos, private bool $falhaNoFim)
+        {
+        }
+
+        public function gerarEmFluxo(string $prompt, callable $aoReceber): string
+        {
+            foreach ($this->pedacos as $pedaco) {
+                $aoReceber($pedaco);
+            }
+
+            if ($this->falhaNoFim) {
+                throw $this->pedacos === [] ? new RuntimeException('caiu') : new FluxoInterrompido('caiu no meio');
+            }
+
+            return implode('', $this->pedacos);
+        }
+    };
+}
+
+teste('tutorial em fluxo: repassa cada pedaço e salva o texto inteiro', function () {
+    $dados = bordadosFalsos(null);
+    $eventos = [];
+    $r = (new TutorialServico($dados, geminiFalso(['MATERIAIS', ': linha'])))
+        ->obterEmFluxo(1, false, function (string $tipo, array $d) use (&$eventos) { $eventos[] = [$tipo, $d['texto'] ?? null]; });
+
+    igual('ia', $r['origem']);
+    igual([['texto', 'MATERIAIS'], ['texto', ': linha']], $eventos);
+    igual('MATERIAIS: linha', $dados->salvo);
+});
+
+teste('tutorial em fluxo: texto salvo sai inteiro, sem chamar a IA', function () {
+    $eventos = [];
+    $r = (new TutorialServico(bordadosFalsos('já existe'), geminiFalso([], true)))
+        ->obterEmFluxo(1, false, function (string $tipo, array $d) use (&$eventos) { $eventos[] = $tipo; });
+
+    igual('cache', $r['origem']);
+    igual(['texto'], $eventos);
+});
+
+teste('tutorial em fluxo: queda no meio manda recomecar e o texto reserva', function () {
+    $dados = bordadosFalsos(null);
+    $eventos = [];
+    $r = (new TutorialServico($dados, geminiFalso(['MATER'], true)))
+        ->obterEmFluxo(1, false, function (string $tipo, array $d) use (&$eventos) { $eventos[] = $tipo; });
+
+    igual('reserva', $r['origem']);
+    igual(['texto', 'recomecar', 'texto'], $eventos);
+    igual(null, $dados->salvo, 'texto reserva não pode ser salvo');
+});
+
+teste('tutorial em fluxo: falha antes de qualquer pedaço não manda recomecar', function () {
+    $eventos = [];
+    $r = (new TutorialServico(bordadosFalsos(null), geminiFalso([], true)))
+        ->obterEmFluxo(1, false, function (string $tipo, array $d) use (&$eventos) { $eventos[] = $tipo; });
+
+    igual('reserva', $r['origem']);
+    igual(['texto'], $eventos);
 });
 
 echo "\n{$total} testes, {$falhas} falhas\n";

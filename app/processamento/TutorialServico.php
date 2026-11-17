@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 /**
  * Camada: Processamento. Dono: Guilherme. Só Guilherme altera este arquivo.
- * Responsabilidade: obter o tutorial de IA de um bordado, com cache no banco e texto reserva.
+ * Responsabilidade: obter o tutorial de IA de um bordado, com cache no banco e texto reserva,
+ * de uma vez (obter) ou em fluxo, pedaço por pedaço (obterEmFluxo).
  * Veja INSTRUCOES_GUILHERME.md, seção 8.
  */
 class TutorialServico
@@ -47,6 +48,57 @@ class TutorialServico
             }
 
             return ['texto' => $this->textoReserva($bordado), 'origem' => 'reserva'];
+        }
+
+        $this->bordados->salvarTutorial($bordadoId, $texto);
+
+        return ['texto' => $texto, 'origem' => 'ia'];
+    }
+
+    /**
+     * Mesma regra de obter(), mas em fluxo: $emitir(evento, dados) recebe cada pedaço
+     * na hora em que o Gemini manda, para a tela mostrar a IA digitando.
+     * Eventos: 'texto' (['texto' => pedaço]) e 'recomecar' (o fluxo caiu no meio e o
+     * texto a seguir substitui o que já apareceu). Devolve ['texto', 'origem'] como obter().
+     * Lança RuntimeException se o bordado não existir.
+     */
+    public function obterEmFluxo(int $bordadoId, bool $forcar, callable $emitir): array
+    {
+        $bordado = $this->bordados->buscarParaTutorial($bordadoId);
+
+        if ($bordado === null) {
+            throw new RuntimeException('Bordado não encontrado: ' . $bordadoId);
+        }
+
+        $salvo = $bordado['tutorial_ia'] ?? null;
+        $temSalvo = is_string($salvo) && trim($salvo) !== '';
+
+        if (!$forcar && $temSalvo) {
+            $emitir('texto', ['texto' => $salvo]);
+
+            return ['texto' => $salvo, 'origem' => 'cache'];
+        }
+
+        try {
+            $texto = $this->gemini->gerarEmFluxo(
+                $this->montarPrompt($bordado),
+                fn (string $pedaco) => $emitir('texto', ['texto' => $pedaco])
+            );
+        } catch (RuntimeException $erro) {
+            error_log('TutorialServico: Gemini (fluxo) falhou para o bordado ' . $bordadoId . ': ' . $erro->getMessage());
+
+            // Parte do texto já apareceu: a tela apaga e recebe o substituto inteiro.
+            if ($erro instanceof FluxoInterrompido) {
+                $emitir('recomecar', []);
+            }
+
+            $resultado = $forcar && $temSalvo
+                ? ['texto' => $salvo, 'origem' => 'cache']
+                : ['texto' => $this->textoReserva($bordado), 'origem' => 'reserva'];
+
+            $emitir('texto', ['texto' => $resultado['texto']]);
+
+            return $resultado;
         }
 
         $this->bordados->salvarTutorial($bordadoId, $texto);

@@ -98,6 +98,18 @@ class Sessao
         }
     }
 
+    /**
+     * Grava a sessão no banco agora e a fecha para esta requisição. Usado antes de respostas
+     * longas (o tutorial em fluxo), para não segurar a sessão nem sobrescrever o que outra aba
+     * gravar enquanto isso. Depois de liberar, definir() não é mais salvo.
+     */
+    public static function liberar(): void
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+    }
+
     /** Grava um valor na sessão. */
     public static function definir(string $chave, mixed $valor): void
     {

@@ -88,7 +88,20 @@
     display: none;
   }
 
-  .header-actions .btn {
+  /* No celular vira só o ícone: o bloco de ações fica curto de espaço e o
+     botão de texto não cabia. O ícone usa o mesmo alvo quadrado do menu do usuário. */
+  .header-actions__entrar {
+    width: 2.35rem;
+    min-width: 0;
+    height: 2.35rem;
+    padding: 0;
+  }
+
+  .header-actions__entrar-icone {
+    display: inline-flex;
+  }
+
+  .header-actions__entrar-texto {
     display: none;
   }
 
