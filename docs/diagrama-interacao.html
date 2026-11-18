@@ -1,0 +1,1505 @@
+<!doctype html>
+<!--
+  Arquivo: diagrama-interacao.html
+  Dono: Guilherme. Só Guilherme altera este arquivo.
+  Responsabilidade: diagrama interativo de interação entre os objetos do Desenrola.
+  Cada caixa é um arquivo (classe, tela ou módulo JS), com as variáveis que ele usa.
+  Cada seta é uma chamada de método, colorida pelo processo a que pertence.
+  A legenda liga e desliga processos; o grafo esconde o que não participa e se reorganiza.
+  Os dados do diagrama ficam no objeto PROCESSOS e na lista NOS, no fim do arquivo.
+  Abre direto no navegador, sem servidor e sem internet.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Desenrola: interação entre objetos</title>
+<style>
+  :root {
+    --bg: #f6f3ee;
+    --painel: #fffdf9;
+    --caixa: #ffffff;
+    --cabeca: #f1ebe2;
+    --tinta: #2b2622;
+    --suave: #786e65;
+    --linha: #ddd3c6;
+    --aresta-neutra: #b9aea1;
+    --sombra: 0 1px 2px rgba(60, 40, 20, .08), 0 4px 14px rgba(60, 40, 20, .06);
+    --p-pub: #0f8b8d;
+    --p-ger: #6a4bc4;
+    --p-db: #8a6d00;
+    --p-mont: #c8324a;
+    --p-tut: #1f6fd1;
+    --p-hub: #d2691e;
+    --p-cat: #2e8b3a;
+    --p-auth: #b0368f;
+    --selo: #ffffff;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171513;
+      --painel: #1f1c19;
+      --caixa: #24211e;
+      --cabeca: #2e2a26;
+      --tinta: #ece6de;
+      --suave: #a69c91;
+      --linha: #3d3832;
+      --aresta-neutra: #5b544c;
+      --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 14px rgba(0, 0, 0, .3);
+      --p-pub: #3cc4c6;
+      --p-ger: #a48cf0;
+      --p-db: #d9b43a;
+      --p-mont: #f07085;
+      --p-tut: #6aa8f5;
+      --p-hub: #f39a52;
+      --p-cat: #6cc977;
+      --p-auth: #e27bc7;
+      --selo: #171513;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171513;
+    --painel: #1f1c19;
+    --caixa: #24211e;
+    --cabeca: #2e2a26;
+    --tinta: #ece6de;
+    --suave: #a69c91;
+    --linha: #3d3832;
+    --aresta-neutra: #5b544c;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 14px rgba(0, 0, 0, .3);
+    --p-pub: #3cc4c6;
+    --p-ger: #a48cf0;
+    --p-db: #d9b43a;
+    --p-mont: #f07085;
+    --p-tut: #6aa8f5;
+    --p-hub: #f39a52;
+    --p-cat: #6cc977;
+    --p-auth: #e27bc7;
+    --selo: #171513;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--tinta);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: grid;
+    grid-template-columns: 330px 1fr;
+    overflow: hidden;
+    transition: grid-template-columns .25s ease;
+  }
+  /* Painel recolhido: a coluna da esquerda some e o grafo ocupa a tela toda. */
+  body.recolhido { grid-template-columns: 0 1fr; }
+  body.recolhido aside { visibility: hidden; padding: 0; border: 0; }
+  @media (prefers-reduced-motion: reduce) { body { transition: none; } }
+
+  .topo { display: flex; align-items: flex-start; gap: 10px; }
+  .topo > div { flex: 1; min-width: 0; }
+  .icone { width: 30px; height: 30px; padding: 0; display: grid; place-items: center; flex: none; font-size: 15px; line-height: 1; }
+
+  /* Barra compacta que aparece no lugar do painel quando ele está recolhido. */
+  .compacta {
+    position: absolute; top: 12px; left: 12px; z-index: 2; display: none; align-items: center; gap: 4px;
+    background: var(--painel); border: 1px solid var(--linha); border-radius: 8px; padding: 4px; box-shadow: var(--sombra);
+  }
+  body.recolhido .compacta { display: flex; }
+  .compacta .icone { border: 0; background: transparent; }
+  .compacta .icone:hover { background: var(--cabeca); }
+  .compacta .sep { width: 1px; align-self: stretch; background: var(--linha); margin: 2px 4px; }
+  .mini {
+    width: 22px; height: 22px; padding: 0; border-radius: 6px; border: 2px solid var(--c); background: transparent;
+  }
+  .mini[aria-pressed="true"] { background: var(--c); }
+
+  /* Painel lateral: legenda, opções, passo a passo e detalhes da caixa clicada. */
+  aside {
+    min-width: 0;
+    background: var(--painel);
+    border-right: 1px solid var(--linha);
+    overflow-y: auto;
+    padding: 18px 18px 28px;
+  }
+  h1 { font-size: 17px; margin: 0 0 2px; letter-spacing: -.01em; }
+  .sub { color: var(--suave); font-size: 12.5px; margin: 0 0 16px; }
+  h2 {
+    font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--suave); margin: 20px 0 8px; display: flex; align-items: center; gap: 8px;
+  }
+  h2 .acoes { margin-left: auto; display: flex; gap: 4px; }
+  button {
+    font: inherit; font-size: 12px; color: var(--tinta); background: var(--caixa);
+    border: 1px solid var(--linha); border-radius: 6px; padding: 3px 9px; cursor: pointer;
+  }
+  button:hover { border-color: var(--suave); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--p-tut); outline-offset: 2px; }
+
+  .proc {
+    display: grid; grid-template-columns: 18px 1fr auto; gap: 2px 10px; align-items: start;
+    padding: 8px 8px; border-radius: 8px; cursor: pointer; border: 1px solid transparent;
+    position: relative;
+  }
+  .proc:hover { background: var(--cabeca); }
+  .proc input { position: absolute; opacity: 0; pointer-events: none; }
+  .proc .cor {
+    width: 16px; height: 16px; border-radius: 4px; margin-top: 2px;
+    border: 2px solid var(--c); background: transparent; transition: background .15s;
+  }
+  .proc input:checked + .cor { background: var(--c); }
+  .proc input:focus-visible + .cor { outline: 2px solid var(--c); outline-offset: 2px; }
+  .proc .nome { font-weight: 600; font-size: 13.5px; }
+  .proc .desc { grid-column: 2 / 4; color: var(--suave); font-size: 12px; }
+  .proc:not(:has(input:checked)) .nome { color: var(--suave); }
+  .proc .so { font-size: 11px; padding: 1px 7px; }
+
+  .opcao { display: flex; gap: 8px; align-items: center; font-size: 13px; margin-top: 10px; cursor: pointer; }
+
+  ol.passos { margin: 0; padding: 0; list-style: none; counter-reset: p; }
+  ol.passos li {
+    display: grid; grid-template-columns: 26px 1fr; gap: 8px; padding: 6px 6px; border-radius: 6px;
+    cursor: pointer; font-size: 12.5px;
+  }
+  ol.passos li:hover { background: var(--cabeca); }
+  ol.passos .n {
+    background: var(--c); color: var(--selo); border-radius: 5px; text-align: center;
+    font-weight: 700; font-size: 11px; height: 19px; line-height: 19px;
+  }
+  ol.passos .de { color: var(--suave); }
+  ol.passos code, .detalhe code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 11.5px; }
+  .vazio { color: var(--suave); font-size: 12.5px; }
+
+  .detalhe h3 { margin: 0; font-size: 14px; }
+  .detalhe .caminho { color: var(--suave); font-size: 12px; margin-bottom: 8px; word-break: break-all; }
+  .detalhe ul { margin: 4px 0 10px; padding-left: 16px; font-size: 12.5px; }
+  .detalhe li { margin: 2px 0; }
+  .pontinho { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 2px; vertical-align: 1px; }
+  .dica { color: var(--suave); font-size: 12px; margin-top: 22px; border-top: 1px solid var(--linha); padding-top: 12px; }
+
+  /* Área do grafo. */
+  main { position: relative; overflow: hidden; min-width: 0; }
+  svg#grafo { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; user-select: none; }
+  svg#grafo.arrastando { cursor: grabbing; }
+  .ferramentas { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 2; }
+  .ferramentas button { padding: 5px 11px; font-size: 13px; box-shadow: var(--sombra); }
+
+  .col-titulo { font-size: 13px; font-weight: 700; fill: var(--suave); letter-spacing: .06em; text-transform: uppercase; }
+  .no { cursor: pointer; transition: opacity .15s; }
+  .no .caixa { fill: var(--caixa); stroke: var(--linha); stroke-width: 1; }
+  .no .cabeca { fill: var(--cabeca); }
+  .no .titulo { font-size: 14px; font-weight: 700; fill: var(--tinta); }
+  .no .arq { font-size: 10.5px; fill: var(--suave); }
+  .no .tipo { font-size: 9.5px; font-weight: 700; fill: var(--suave); letter-spacing: .08em; text-transform: uppercase; }
+  .no .attr { font: 11.5px ui-monospace, "Cascadia Code", Consolas, monospace; fill: var(--tinta); }
+  .no .attr-off { opacity: .32; }
+  .no.apagado { opacity: .28; }
+  .no.selecionado .caixa { stroke: var(--tinta); stroke-width: 2; }
+  .no:focus { outline: none; }
+  .no:focus-visible .caixa { stroke: var(--p-tut); stroke-width: 2.5; }
+  .no .divisa { stroke: var(--linha); }
+
+  .aresta { fill: none; stroke-width: 1.9; transition: opacity .15s; }
+  .aresta.neutra { stroke: var(--aresta-neutra); stroke-width: 1.2; }
+  .aresta.fraca { stroke: var(--aresta-neutra); stroke-width: 1; opacity: .35; }
+  .alvo { fill: none; stroke: transparent; stroke-width: 12; cursor: help; }
+  .rotulo { transition: opacity .15s; pointer-events: none; }
+  .rotulo text {
+    font: 10.5px ui-monospace, "Cascadia Code", Consolas, monospace; fill: var(--tinta);
+    paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round;
+  }
+  .rotulo .selo { font: 700 9.5px system-ui, sans-serif; fill: var(--selo); stroke: none; }
+
+  svg.focando .aresta:not(.foco), svg.focando .rotulo:not(.foco) { opacity: .06; }
+  svg.focando .no:not(.foco) { opacity: .22; }
+  svg.focando .aresta.foco { stroke-width: 2.8; }
+
+  .dica-flutuante {
+    position: absolute; pointer-events: none; z-index: 3; max-width: 380px;
+    background: var(--painel); color: var(--tinta); border: 1px solid var(--linha);
+    border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: var(--sombra); display: none;
+  }
+  .dica-flutuante b { display: block; margin-bottom: 4px; }
+  .dica-flutuante .linha-p { margin: 3px 0; }
+  .dica-flutuante code { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; }
+
+  @media (max-width: 760px) {
+    body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; overflow: auto; }
+    aside { max-height: 46vh; border-right: 0; border-bottom: 1px solid var(--linha); padding: 14px 16px; }
+    main { min-height: 60vh; }
+    body.recolhido { grid-template-columns: minmax(0, 1fr); grid-template-rows: 0 1fr; }
+    body.recolhido aside { display: none; }
+    body.recolhido main { min-height: 100vh; }
+    .ferramentas { top: auto; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+<aside id="painel">
+  <div class="topo">
+    <div>
+      <h1>Desenrola: interação entre objetos</h1>
+      <p class="sub">Caixas são arquivos, com as variáveis que usam. Setas são métodos chamados, na cor do processo.</p>
+    </div>
+    <button type="button" class="icone" id="recolher" aria-controls="painel" aria-expanded="true" title="Recolher painel (tecla [)">«</button>
+  </div>
+
+  <h2>Processos <span class="acoes"><button type="button" id="todos">Todos</button><button type="button" id="nenhum">Nenhum</button></span></h2>
+  <div id="legenda"></div>
+  <label class="opcao"><input type="checkbox" id="ocultar" checked> Esconder o que não participa</label>
+
+  <h2>Passo a passo</h2>
+  <div id="passos"><p class="vazio">Deixe um único processo ligado (botão "só") para ver a ordem das chamadas.</p></div>
+
+  <h2>Caixa selecionada</h2>
+  <div id="detalhe" class="detalhe"><p class="vazio">Clique em uma caixa para ver o arquivo, as variáveis e quem ela chama.</p></div>
+
+  <p class="dica">Arraste o fundo para mover. Use a roda do mouse para o zoom. Passe o mouse em uma caixa para ver só as ligações dela, ou em uma seta para ler os métodos completos. A tecla [ recolhe e mostra este painel.</p>
+</aside>
+
+<main>
+  <div class="compacta" role="toolbar" aria-label="Painel recolhido">
+    <button type="button" class="icone" id="expandir" aria-controls="painel" aria-expanded="false" title="Mostrar painel (tecla [)">»</button>
+    <span class="sep"></span>
+    <span id="mini-legenda" style="display:flex;gap:4px"></span>
+  </div>
+  <div class="ferramentas">
+    <button type="button" id="menos" aria-label="Diminuir zoom">−</button>
+    <button type="button" id="mais" aria-label="Aumentar zoom">+</button>
+    <button type="button" id="ajustar">Ajustar</button>
+    <button type="button" id="tema">Tema</button>
+  </div>
+  <svg id="grafo" role="img" aria-label="Grafo de interação entre os objetos do Desenrola">
+    <defs id="defs"></defs>
+    <g id="vista"></g>
+  </svg>
+  <div class="dica-flutuante" id="flutuante"></div>
+</main>
+
+<script>
+/*
+ * Dados do diagrama.
+ * PROCESSOS: cada processo tem cor, descrição e a lista ordenada de passos [de, para, método].
+ * NOS: cada caixa tem coluna, título, caminho do arquivo e as variáveis usadas,
+ * cada variável marcada com os processos de que participa ("todos" vale para todos).
+ */
+const PROCESSOS = [
+  {
+    id: 'pub', nome: 'Páginas públicas',
+    desc: 'Como uma página pública nasce: index.php, roteador, controlador, Visao, tela, layout e parciais.',
+    passos: [
+      ['nav', 'index', 'GET /'],
+      ['index', 'sessao', 'iniciar()'],
+      ['sessao', 'sessaoBanco', 'restante(id) / session_start() → read(id)'],
+      ['index', 'roteador', 'new Roteador(rotas)->despachar()'],
+      ['roteador', 'cHome', 'index()'],
+      ['cHome', 'auth', 'id()'],
+      ['cHome', 'sProd', 'destaques(6) / categorias()'],
+      ['sProd', 'dProd', 'destaques(limite) / categorias()'],
+      ['dProd', 'conexao', 'pdo()'],
+      ['cHome', 'sHub', 'maisCurtidos(6, usuario)'],
+      ['sHub', 'dHub', 'maisCurtidos(limite, usuario)'],
+      ['dHub', 'conexao', 'pdo()'],
+      ['conexao', 'pg', 'SELECT produtos, bordados, curtidas'],
+      ['cHome', 'visao', "render('home/index', dados)"],
+      ['visao', 'tHome', 'require tela + extract($dados)'],
+      ['tHome', 'visao', "parcial('peca_bordada', item)"],
+      ['visao', 'pecaBord', 'require parcial'],
+      ['pecaBord', 'ajud', 'svg_data_uri(svg)'],
+      ['ajud', 'sStor', 'urlPublica(caminho)'],
+      ['pecaBord', 'sStor', 'urlPublica(fotoPeca | fotoProduto)'],
+      ['visao', 'layPub', 'require layout ($conteudo, $titulo)'],
+      ['layPub', 'csrf', 'token() (meta csrf)'],
+      ['layPub', 'visao', "parcial('header' | 'mensagens' | 'footer')"],
+      ['visao', 'parciais', 'require parcial'],
+      ['parciais', 'auth', 'usuario()'],
+      ['parciais', 'sessao', 'tirarFlash()'],
+      ['parciais', 'ajud', 'link_whatsapp()'],
+      ['layPub', 'nav', 'HTML final (echo)'],
+      ['nav', 'storage', 'GET da imagem pública (img src)'],
+    ],
+  },
+  {
+    id: 'ger', nome: 'Páginas do gerente',
+    desc: 'O mesmo caminho, com a checagem de gerente, os totais do painel e o layout administrativo.',
+    passos: [
+      ['nav', 'index', 'GET /gerente'],
+      ['index', 'sessao', 'iniciar()'],
+      ['index', 'roteador', 'new Roteador(rotas)->despachar()'],
+      ['roteador', 'auth', 'eGerente()'],
+      ['auth', 'sessao', "obter('usuario')"],
+      ['roteador', 'cPainel', 'index()'],
+      ['cPainel', 'dIns', 'contar()'],
+      ['cPainel', 'dCli', 'contar()'],
+      ['cPainel', 'dProd', 'contar()'],
+      ['cPainel', 'dMat', 'contar()'],
+      ['cPainel', 'dUsu', 'contar()'],
+      ['cPainel', 'dHub', 'contarPublicados() / contarCurtidas()'],
+      ['cPainel', 'dCom', 'contar()'],
+      ['dIns', 'conexao', 'pdo()->query(COUNT)'],
+      ['dCli', 'conexao', 'pdo()->query(COUNT)'],
+      ['dProd', 'conexao', 'pdo()->query(COUNT)'],
+      ['dMat', 'conexao', 'pdo()->query(COUNT)'],
+      ['dUsu', 'conexao', 'pdo()->query(COUNT)'],
+      ['dHub', 'conexao', 'pdo()->query(COUNT)'],
+      ['dCom', 'conexao', 'pdo()->query(COUNT)'],
+      ['conexao', 'pg', 'SELECT count(*)'],
+      ['cPainel', 'visao', "render('painel/index', totais, 'gerente')"],
+      ['visao', 'tPainel', 'require tela + extract($totais)'],
+      ['visao', 'layGer', 'require layout gerente'],
+      ['layGer', 'visao', "parcial('menu_usuario' | 'mensagens') / guia('painel')"],
+      ['visao', 'parciais', 'require parcial'],
+      ['parciais', 'auth', 'usuario() / eGerente()'],
+      ['parciais', 'sessao', 'tirarFlash()'],
+      ['layGer', 'nav', 'HTML final (echo)'],
+    ],
+  },
+  {
+    id: 'db', nome: 'Banco de dados',
+    desc: 'Sessão guardada no banco, conexão PDO única e acesso ao Supabase (PostgreSQL e Storage).',
+    passos: [
+      ['nav', 'index', 'requisição com cookie de sessão'],
+      ['index', 'sessao', 'iniciar()'],
+      ['sessao', 'sessaoBanco', 'session_set_save_handler() / restante(id) / gc()'],
+      ['sessao', 'sessaoBanco', 'session_start() → read(id) / fim da requisição → write(id, dados)'],
+      ['sessaoBanco', 'conexao', 'pdo()'],
+      ['conexao', 'pg', 'new PDO(pgsql, sslmode=require) / prepare()->execute()'],
+      ['dUsu', 'conexao', 'pdo()'],
+      ['dProd', 'conexao', 'pdo()'],
+      ['dHub', 'conexao', 'pdo()'],
+      ['dCom', 'conexao', 'pdo()'],
+      ['dBord', 'conexao', 'pdo()'],
+      ['dMat', 'conexao', 'pdo()'],
+      ['dPeca', 'conexao', 'pdo()'],
+      ['dIns', 'conexao', 'pdo()'],
+      ['dCli', 'conexao', 'pdo()'],
+      ['sMont', 'conexao', 'pdo()->beginTransaction() / commit() / rollBack()'],
+      ['sStor', 'storage', 'POST / DELETE /storage/v1/object (cURL)'],
+    ],
+  },
+  {
+    id: 'mont', nome: 'Montador de matrizes',
+    desc: 'A imagem vira grade no navegador, é validada no servidor, vira SVG no Storage e bordado no banco.',
+    passos: [
+      ['nav', 'index', 'GET /montador'],
+      ['index', 'roteador', 'new Roteador(rotas)->despachar()'],
+      ['roteador', 'auth', 'usuario()'],
+      ['roteador', 'cMont', 'index()'],
+      ['cMont', 'dMat', 'listarTodas()'],
+      ['cMont', 'sProd', 'categorias()'],
+      ['sProd', 'dProd', 'categorias()'],
+      ['cMont', 'sPeca', 'ativas()'],
+      ['sPeca', 'dPeca', 'listar(true)'],
+      ['cMont', 'visao', "render('montador/index', dados)"],
+      ['visao', 'tMont', 'require tela + extract($dados)'],
+      ['tMont', 'csrf', 'campo() (_csrf no form)'],
+      ['visao', 'layPub', 'require layout'],
+      ['layPub', 'nav', 'HTML final (echo)'],
+      ['nav', 'mainjs', 'carrega main.js (ES Module)'],
+      ['mainjs', 'montjs', 'initMontador(root)'],
+      ['tMont', 'montjs', '#dados-montador (JSON)'],
+      ['montjs', 'convjs', 'converterImagem(arquivo, {largura, cores})'],
+      ['montjs', 'convjs', 'desenharGrade(canvas, grade)'],
+      ['montjs', 'enqjs', 'criarEnquadrador(dialogo, {aoConfirmar})'],
+      ['enqjs', 'index', 'fetch GET /montador/imagem?url'],
+      ['roteador', 'cMont', 'imagem()'],
+      ['cMont', 'sImg', 'baixar(url)'],
+      ['sImg', 'web', 'GET da imagem (cURL, IP validado)'],
+      ['montjs', 'index', 'form.submit(): POST /montador/salvar (grade_json, pos_x, pos_y, escala, rotacao, cor_peca)'],
+      ['roteador', 'csrf', 'valido(token)'],
+      ['roteador', 'cMont', 'salvar()'],
+      ['cMont', 'sMont', 'salvar($_POST, usuario)'],
+      ['sMont', 'dProd', 'existe(categoriaId)'],
+      ['sMont', 'dPeca', 'buscar(pecaId)'],
+      ['sMont', 'sGrade', 'validar(gradeJson)'],
+      ['sMont', 'dBord', 'contarRecentes(usuarioId)'],
+      ['sMont', 'sGrade', 'gerarSvg(grade)'],
+      ['sMont', 'sStor', 'novoCaminho() / enviar(caminho, conteudo, tipo)'],
+      ['sStor', 'storage', 'POST matrizes/*.svg, *.json, fotos/'],
+      ['sMont', 'conexao', 'pdo()->beginTransaction()'],
+      ['sMont', 'dMat', 'inserir(d)'],
+      ['sMont', 'dBord', 'inserir(d)'],
+      ['sMont', 'sStor', 'remover(caminho) se o INSERT falhar'],
+      ['dMat', 'conexao', 'pdo()'],
+      ['dBord', 'conexao', 'pdo()'],
+      ['conexao', 'pg', 'INSERT matrizes / INSERT bordados'],
+      ['cMont', 'sessao', 'flash() / guardarVelhos()'],
+      ['cMont', 'resposta', 'redirecionar(destino)'],
+    ],
+  },
+  {
+    id: 'tut', nome: 'Tutorial com IA',
+    desc: 'O botão pede o tutorial, o servidor monta o prompt, chama o Gemini e devolve o texto em fluxo.',
+    passos: [
+      ['tHub', 'visao', "parcial('tutorial', bordado)"],
+      ['visao', 'tTut', 'require parcial'],
+      ['layPub', 'csrf', 'token() (meta csrf)'],
+      ['nav', 'mainjs', 'carrega main.js (ES Module)'],
+      ['mainjs', 'tutjs', 'initTutorial(root)'],
+      ['tTut', 'tutjs', '[data-tutorial] + bordado_id'],
+      ['tutjs', 'index', 'fetch POST /bordado/tutorial (Accept: x-ndjson, X-CSRF-Token)'],
+      ['index', 'roteador', 'new Roteador(rotas)->despachar()'],
+      ['roteador', 'csrf', 'valido(X-CSRF-Token)'],
+      ['roteador', 'auth', 'usuario()'],
+      ['roteador', 'cTut', 'gerar()'],
+      ['cTut', 'dBord', 'buscarParaTutorial(id)'],
+      ['cTut', 'sessao', "obter('tutoriais_novos') / definir() / liberar()"],
+      ['cTut', 'resposta', 'fluxo(produzir) / json(texto | erro)'],
+      ['cTut', 'sTut', 'obterEmFluxo(id, forcar, emitir) / obter(id, forcar)'],
+      ['sTut', 'dBord', 'buscarParaTutorial(id)'],
+      ['sTut', 'sTut', 'montarPrompt(bordado)'],
+      ['sTut', 'sGem', 'gerarEmFluxo(prompt, aoReceber) / gerar(prompt)'],
+      ['sGem', 'gemini', 'POST :streamGenerateContent (SSE)'],
+      ['sTut', 'sTut', 'textoReserva(bordado) se o Gemini falhar'],
+      ['sTut', 'dBord', 'salvarTutorial(id, texto)'],
+      ['dBord', 'conexao', 'pdo()'],
+      ['conexao', 'pg', 'UPDATE bordados SET tutorial_ia'],
+      ['resposta', 'tutjs', 'NDJSON {tipo: inicio | texto | fim}'],
+    ],
+  },
+  {
+    id: 'hub', nome: 'Hub',
+    desc: 'Feed, detalhe e meus bordados, curtidas por fetch, comentários com limite por minuto.',
+    passos: [
+      ['nav', 'index', 'GET /hub | /hub/bordado | /meus-bordados'],
+      ['index', 'roteador', 'new Roteador(rotas)->despachar()'],
+      ['roteador', 'cHub', 'feed() / detalhe() / meus()'],
+      ['cHub', 'auth', 'id() / eGerente()'],
+      ['cHub', 'sHub', 'categoria() / ordem() / feed(usuario, categoria, ordem, pagina) / detalhe() / doAutor() / podeExcluir()'],
+      ['sHub', 'dHub', 'feed(usuario, categoria, ordemSql, limite, inicio) / detalhe() / doAutor()'],
+      ['dHub', 'conexao', 'pdo()'],
+      ['cHub', 'sCom', 'ultimosPorBordados(ids, 2) / listar(id)'],
+      ['sCom', 'dCom', 'ultimosPorBordados() / listar()'],
+      ['dCom', 'conexao', 'pdo()'],
+      ['conexao', 'pg', 'SELECT bordados, curtidas, comentarios'],
+      ['cHub', 'sProd', 'categorias()'],
+      ['cHub', 'visao', "render('hub/feed' | 'hub/detalhe' | 'hub/meus')"],
+      ['visao', 'tHub', 'require tela + _card.php'],
+      ['tHub', 'csrf', 'campo()'],
+      ['visao', 'layPub', 'require layout'],
+      ['layPub', 'csrf', 'token() (meta csrf)'],
+      ['layPub', 'nav', 'HTML final (echo)'],
+      ['nav', 'mainjs', 'carrega main.js (ES Module)'],
+      ['mainjs', 'hubjs', "import './pages/hub.js'"],
+      ['hubjs', 'index', 'fetch POST /hub/curtir (X-CSRF-Token)'],
+      ['roteador', 'csrf', 'valido(X-CSRF-Token | _csrf)'],
+      ['roteador', 'auth', 'usuario()'],
+      ['roteador', 'cHub', 'curtir()'],
+      ['cHub', 'sHub', 'curtir(usuarioId, bordadoId)'],
+      ['sHub', 'dHub', 'buscarDono() / inserirCurtida() / removerCurtida() / curtidasDo()'],
+      ['cHub', 'resposta', 'json({curtiu, curtidas})'],
+      ['resposta', 'hubjs', 'JSON'],
+      ['nav', 'index', 'POST /hub/comentar | /hub/comentario/excluir'],
+      ['roteador', 'cCom', 'comentar() / excluir() / ocultar()'],
+      ['cCom', 'auth', 'id() / eGerente()'],
+      ['cCom', 'sessao', "obter('comentarios_minuto') / definir() / flash()"],
+      ['cCom', 'sCom', 'comentar(bordadoId, usuarioId, texto) / buscar(id) / excluir() / alternarOculto()'],
+      ['sCom', 'dCom', 'bordadoVisivel() / inserir() / buscar() / excluir() / alternarOculto()'],
+      ['cCom', 'resposta', 'redirecionar(destino)'],
+      ['cHub', 'sHub', 'excluir(id, usuario, eGerente) / alternarOculto(id)'],
+      ['sHub', 'dHub', 'excluir(id) / alternarOculto(id)'],
+      ['sHub', 'sStor', 'remover(foto)'],
+      ['sStor', 'storage', 'DELETE fotos/'],
+    ],
+  },
+  {
+    id: 'cat', nome: 'Catálogo',
+    desc: 'Vitrine de produtos, página do produto, peça bordada e orçamento pelo WhatsApp.',
+    passos: [
+      ['nav', 'index', 'GET /catalogo?categoria | /produto?id'],
+      ['index', 'roteador', 'new Roteador(rotas)->despachar()'],
+      ['roteador', 'cCat', 'listar() / produto()'],
+      ['cCat', 'sProd', 'catalogo(categoria) / categorias() / mostrar(id)'],
+      ['sProd', 'dProd', 'listar(categoria) / categorias() / buscarAtivo(id)'],
+      ['dProd', 'conexao', 'pdo()'],
+      ['conexao', 'pg', 'SELECT produtos JOIN bordados, matrizes, categorias'],
+      ['cCat', 'visao', "render('catalogo/lista' | 'catalogo/produto')"],
+      ['visao', 'tCat', 'require tela + extract($produtos)'],
+      ['tCat', 'visao', "parcial('peca_bordada', item)"],
+      ['visao', 'pecaBord', 'require parcial'],
+      ['pecaBord', 'ajud', 'svg_data_uri(svg)'],
+      ['ajud', 'sStor', 'urlPublica(caminho)'],
+      ['pecaBord', 'sStor', 'urlPublica(fotoPeca | fotoProduto)'],
+      ['tCat', 'ajud', 'link_whatsapp(mensagem)'],
+      ['visao', 'layPub', 'require layout'],
+      ['layPub', 'nav', 'HTML final (echo)'],
+      ['nav', 'storage', 'GET da imagem pública (img src)'],
+      ['nav', 'whats', 'abre wa.me (orçamento)'],
+    ],
+  },
+  {
+    id: 'auth', nome: 'Autenticação',
+    desc: 'Login, cadastro, recuperação de senha, CSRF e o usuário guardado na sessão.',
+    passos: [
+      ['nav', 'index', 'POST /login | /cadastro | /recuperar-senha | /recuperar-senha/redefinir'],
+      ['index', 'sessao', 'iniciar()'],
+      ['index', 'roteador', 'new Roteador(rotas)->despachar()'],
+      ['roteador', 'csrf', 'valido(token)'],
+      ['csrf', 'sessao', "obter('csrf_token')"],
+      ['roteador', 'auth', 'usuario() / eGerente()'],
+      ['roteador', 'resposta', "requerLogin(): redirecionar('/login')"],
+      ['roteador', 'cAuth', 'login() / cadastrar() / recuperar() / redefinir() / sair()'],
+      ['cAuth', 'sAuth', 'autenticar(email, senha) / cadastrar($_POST) / perguntaDe(email) / redefinirSenha(id, $_POST)'],
+      ['sAuth', 'dUsu', 'buscarPorEmail(email) / buscarPorId(id) / inserir(d) / atualizarSenha(id, hash)'],
+      ['dUsu', 'conexao', 'pdo()->prepare()->execute()'],
+      ['conexao', 'pg', 'SELECT / INSERT / UPDATE usuarios'],
+      ['cAuth', 'auth', 'entrar(usuario) / sair()'],
+      ['auth', 'sessao', "definir('usuario') / obter('usuario')"],
+      ['auth', 'sessaoBanco', 'sair(): session_destroy() → destroy(id)'],
+      ['cAuth', 'sessao', "flash() / guardarVelhos() / tirarVelhos() / definir('recuperar_id') / obter('recuperar_tentativas')"],
+      ['sessao', 'sessaoBanco', 'fim da requisição → write(id, dados), vida por perfil'],
+      ['cAuth', 'resposta', "redirecionar('/hub' | '/gerente' | '/login')"],
+      ['cAuth', 'visao', "render('auth/login' | 'auth/cadastro' | 'auth/redefinir')"],
+      ['visao', 'tAuth', 'require tela + extract($dados)'],
+      ['tAuth', 'csrf', 'campo()'],
+      ['csrf', 'sessao', "definir('csrf_token')"],
+      ['visao', 'layPub', 'require layout'],
+      ['layPub', 'nav', 'HTML final (echo)'],
+    ],
+  },
+];
+
+const COLUNAS = ['Navegador e JS', 'Telas (app/telas)', 'Core (app/core)', 'Controladores', 'Processamento', 'Dados e conexão', 'Serviços externos'];
+
+// [id, coluna, título, caminho, tipo, variáveis]
+const NOS_BRUTOS = [
+  // Coluna 0: navegador e JavaScript
+  ['nav', 0, 'Navegador', 'formulários, links e cookies', 'cliente', [
+    ['cookie PHPSESSID', 'todos'],
+    ['_csrf (campo oculto)', 'auth hub mont tut'],
+    ['usuario, senha', 'auth'],
+    ['confirmar_senha, pergunta_seguranca, resposta', 'auth'],
+    ['?categoria, ?ordem, ?pagina', 'hub cat'],
+    ['?id', 'cat hub'],
+    ['bordado_id, texto, voltar', 'hub'],
+  ]],
+  ['mainjs', 0, 'main.js', 'public/assets/js/main.js', 'js', [
+    ["queryAll('[data-montador]')", 'mont'],
+    ["queryAll('[data-tutorial]')", 'tut'],
+    ['root', 'mont tut'],
+    ["import './pages/hub.js'", 'hub'],
+  ]],
+  ['hubjs', 0, 'hub.js', 'public/assets/js/pages/hub.js', 'js', [
+    ['botao.dataset.id', 'hub'],
+    ['resposta', 'hub'],
+    ['dados {curtiu, curtidas}', 'hub'],
+  ]],
+  ['tutjs', 0, 'tutorial.js', 'public/assets/js/pages/tutorial.js', 'js', [
+    ['ROTULOS', 'tut'],
+    ['texto, nota, erro', 'tut'],
+    ['corpo (FormData)', 'tut'],
+    ['forcar', 'tut'],
+    ['digitador', 'tut'],
+    ['recebeuTexto, terminou', 'tut'],
+  ]],
+  ['montjs', 0, 'montador.js', 'public/assets/js/pages/montador.js', 'js', [
+    ['dados (#dados-montador)', 'mont'],
+    ['form', 'mont'],
+    ['modoMontagem', 'mont'],
+    ['passoAtual', 'mont'],
+    ['gradeConvertida', 'mont'],
+    ['gradeJson', 'mont'],
+    ['posX, posY, escala, rotacao', 'mont'],
+    ['corPeca, categoriaId', 'mont'],
+    ['fotoDoUsuario', 'mont'],
+    ['gesto', 'mont'],
+  ]],
+  ['enqjs', 0, 'enquadrador.js', 'public/assets/js/components/enquadrador.js', 'js', [
+    ['TIPOS', 'mont'],
+    ['MODOS', 'mont'],
+    ['dialogo', 'mont'],
+    ['url', 'mont'],
+    ['aoConfirmar', 'mont'],
+  ]],
+  ['convjs', 0, 'conversor.js', 'public/assets/js/pages/conversor.js', 'js', [
+    ['VAZIO, TIPOS_ACEITOS, TAMANHO_MAXIMO', 'mont'],
+    ['LARGURA_PADRAO, CORES_PADRAO', 'mont'],
+    ['bitmap, canvas', 'mont'],
+    ['pixels', 'mont'],
+    ['paleta', 'mont'],
+    ['indices, pontos, total', 'mont'],
+  ]],
+
+  // Coluna 1: telas
+  ['tAuth', 1, 'auth/*.php', 'app/telas/auth/login, cadastro, recuperar, redefinir', 'tela', [
+    ['$titulo', 'auth'],
+    ['$velhos', 'auth'],
+    ['$perguntas', 'auth'],
+    ['$pergunta', 'auth'],
+  ]],
+  ['tHome', 1, 'home/index.php', 'app/telas/home/index.php', 'tela', [
+    ['$titulo', 'pub'],
+    ['$destaques', 'pub'],
+    ['$maisCurtidos', 'pub'],
+    ['$categorias', 'pub'],
+  ]],
+  ['tCat', 1, 'catalogo/*.php', 'app/telas/catalogo/lista.php, produto.php', 'tela', [
+    ['$produtos', 'cat'],
+    ['$categorias, $categoriaAtual', 'cat'],
+    ['$produto', 'cat'],
+    ['$pagina', 'cat'],
+  ]],
+  ['pecaBord', 1, 'peca_bordada.php', 'app/telas/parciais/peca_bordada.php', 'parcial', [
+    ['$item[mockup], $item[cor_peca]', 'pub cat'],
+    ['$item[svg]', 'pub cat'],
+    ['$item[pos_x], [pos_y], [escala], [rotacao]', 'pub cat'],
+    ['$item[foto_peca], [foto_tingir]', 'pub cat'],
+    ['$fotoPeca, $fotoProduto, $fotoUrl', 'pub cat'],
+  ]],
+  ['tHub', 1, 'hub/*.php', 'app/telas/hub/feed, detalhe, meus, _card', 'tela', [
+    ['$bordados', 'hub'],
+    ['$bordado', 'hub tut'],
+    ['$b, $modoPost (_card)', 'hub tut'],
+    ['$comentarios', 'hub'],
+    ['$podeExcluir', 'hub'],
+    ['$categorias, $categoriaAtual', 'hub'],
+    ['$ordem, $pagina, $temMais', 'hub'],
+  ]],
+  ['tTut', 1, 'tutorial.php', 'app/telas/parciais/tutorial.php', 'parcial', [
+    ['$bordado', 'tut'],
+    ['$tutorialSalvo, $temTutorial', 'tut'],
+  ]],
+  ['tMont', 1, 'montador/index.php', 'app/telas/montador/index.php', 'tela', [
+    ['$titulo, $modo', 'mont'],
+    ['$matrizes', 'mont'],
+    ['$categorias', 'mont'],
+    ['$pecas', 'mont'],
+    ['$matrizInicial', 'mont'],
+  ]],
+  ['tPainel', 1, 'painel/index.php', 'app/telas/painel/index.php', 'tela', [
+    ['$titulo', 'ger'],
+    ['$totais (rotulo, total, link)', 'ger'],
+  ]],
+  ['layPub', 1, 'layouts/publico.php', 'app/telas/layouts/publico.php', 'layout', [
+    ['<meta name="csrf">', 'pub hub tut'],
+    ['$conteudo', 'pub cat hub auth mont'],
+    ['$titulo', 'pub cat hub auth mont'],
+  ]],
+  ['layGer', 1, 'layouts/gerente.php', 'app/telas/layouts/gerente.php', 'layout', [
+    ['$conteudo', 'ger'],
+    ['$titulo', 'ger'],
+  ]],
+  ['parciais', 1, 'parciais/*.php', 'app/telas/parciais/header, mensagens, footer, menu_usuario', 'parcial', [
+    ['$mensagens, $tipo, $mensagem', 'pub ger'],
+    ['$usuario (header)', 'pub'],
+    ['$usuarioAtual, $primeiroNome (menu)', 'pub ger'],
+    ['$rotas, $rota, $ativo', 'pub'],
+    ['$naGerencia', 'ger'],
+  ]],
+
+  // Coluna 2: core
+  ['index', 2, 'index.php', 'public/index.php', 'entrada', [
+    ['$caminho', 'todos'],
+    ['rotas.php', 'todos'],
+  ]],
+  ['sessao', 2, 'Sessao', 'app/core/Sessao.php', 'core', [
+    ["$_SESSION['usuario']", 'auth pub ger hub mont'],
+    ["$_SESSION['csrf_token']", 'auth hub mont tut pub'],
+    ["$_SESSION['flash']", 'auth pub ger hub mont'],
+    ["$_SESSION['velhos']", 'auth mont'],
+    ['recuperar_id, recuperar_pergunta, recuperar_tentativas', 'auth'],
+    ['comentarios_minuto', 'hub'],
+    ['tutoriais_novos', 'tut'],
+    ['$manejador', 'db'],
+    ['$vidaCookie, $idObsoleto', 'db'],
+  ]],
+  ['roteador', 2, 'Roteador', 'app/core/Roteador.php', 'core', [
+    ['$rotas', 'pub ger mont tut hub cat auth'],
+    ['$metodo, $caminho', 'pub ger mont tut hub cat auth'],
+    ['$rota', 'pub ger mont tut hub cat auth'],
+    ['$acesso', 'auth ger mont tut hub'],
+    ['$token', 'auth hub mont tut'],
+    ['$classe, $acao', 'pub ger mont tut hub cat auth'],
+  ]],
+  ['csrf', 2, 'Csrf', 'app/core/Csrf.php', 'core', [
+    ['CHAVE', 'auth hub mont tut pub'],
+    ['$token', 'auth hub mont tut pub'],
+    ['$esperado', 'auth hub mont tut'],
+  ]],
+  ['auth', 2, 'Auth', 'app/core/Auth.php', 'core', [
+    ['$usuario (id, nome, email, perfil)', 'auth pub ger hub mont tut'],
+    ['$parametros (cookie)', 'auth'],
+  ]],
+  ['visao', 2, 'Visao', 'app/core/Visao.php', 'core', [
+    ['$tela', 'pub ger auth hub mont cat'],
+    ['$dados', 'pub ger auth hub mont cat tut'],
+    ['$layout', 'pub ger auth hub mont cat'],
+    ['$arquivo', 'pub ger auth hub mont cat tut'],
+    ['$conteudo, $titulo', 'pub ger auth hub mont cat'],
+  ]],
+  ['ajud', 2, 'ajudantes.php', 'app/core/ajudantes.php', 'core', [
+    ['$svg', 'pub cat'],
+    ['$mensagem, $texto', 'cat'],
+    ['ATELIE_WHATSAPP, WHATSAPP_MENSAGEM', 'cat'],
+  ]],
+  ['resposta', 2, 'Resposta', 'app/core/Resposta.php', 'core', [
+    ['$caminho', 'auth hub mont'],
+    ['$dados, $status', 'hub tut'],
+    ['$produzir, $enviar', 'tut'],
+  ]],
+
+  // Coluna 3: controladores
+  ['cAuth', 3, 'AuthControlador', 'app/controladores/AuthControlador.php', 'controlador', [
+    ['$usuario', 'auth'],
+    ['$email, $senha', 'auth'],
+    ['$erros', 'auth'],
+    ['$dados (id, pergunta)', 'auth'],
+    ['$id', 'auth'],
+    ['$tentativas', 'auth'],
+  ]],
+  ['cHome', 3, 'HomeControlador', 'app/controladores/HomeControlador.php', 'controlador', [
+    ['$destaques', 'pub'],
+    ['$maisCurtidos', 'pub'],
+    ['$categorias', 'pub'],
+  ]],
+  ['cCat', 3, 'CatalogoControlador', 'app/controladores/CatalogoControlador.php', 'controlador', [
+    ['$categoria', 'cat'],
+    ['$produtos, $categorias', 'cat'],
+    ['$id', 'cat'],
+    ['$produto', 'cat'],
+  ]],
+  ['cHub', 3, 'HubControlador', 'app/controladores/HubControlador.php', 'controlador', [
+    ['$servico', 'hub'],
+    ['$categoria, $ordem, $pagina', 'hub'],
+    ['$resultado', 'hub'],
+    ['$bordado', 'hub'],
+    ['$eGerente', 'hub'],
+    ['$id', 'hub'],
+    ['$erro', 'hub'],
+  ]],
+  ['cCom', 3, 'ComentarioControlador', 'app/controladores/ComentarioControlador.php', 'controlador', [
+    ['$usuarioId, $bordadoId', 'hub'],
+    ['$instantes, $agora', 'hub'],
+    ['$texto', 'hub'],
+    ['$erros', 'hub'],
+    ['$comentario', 'hub'],
+    ['$destino', 'hub'],
+  ]],
+  ['cMont', 3, 'MontadorControlador', 'app/controladores/MontadorControlador.php', 'controlador', [
+    ['$servico', 'mont'],
+    ['MODOS', 'mont'],
+    ['$modo', 'mont'],
+    ['$matrizes', 'mont'],
+    ['$imagem', 'mont'],
+    ['$usuario', 'mont'],
+    ['$resultado', 'mont'],
+  ]],
+  ['cTut', 3, 'TutorialControlador', 'app/controladores/TutorialControlador.php', 'controlador', [
+    ['LIMITE_NOVOS, JANELA_SEGUNDOS', 'tut'],
+    ['$servico', 'tut'],
+    ['$bordadoId, $forcar', 'tut'],
+    ['$bordado, $salvo', 'tut'],
+    ['$resultado', 'tut'],
+    ['$pedidos', 'tut'],
+  ]],
+  ['cPainel', 3, 'PainelControlador', 'app/controladores/PainelControlador.php', 'controlador', [
+    ['$hub', 'ger'],
+    ['$totais', 'ger'],
+  ]],
+
+  // Coluna 4: processamento
+  ['sAuth', 4, 'AuthServico', 'app/processamento/AuthServico.php', 'serviço', [
+    ['$campos', 'auth'],
+    ['$erros', 'auth'],
+    ['$nome, $usuario, $email', 'auth'],
+    ['$senha, $confirmarSenha', 'auth'],
+    ['$pergunta, $resposta', 'auth'],
+    ['$perguntas', 'auth'],
+    ['$hash', 'auth'],
+  ]],
+  ['sProd', 4, 'ProdutoServico', 'app/processamento/ProdutoServico.php', 'serviço', [
+    ['new ProdutoDados() em cada método', 'cat pub mont hub'],
+    ['$categoria', 'cat'],
+    ['$limite', 'pub'],
+    ['$id', 'cat'],
+  ]],
+  ['sHub', 4, 'HubServico', 'app/processamento/HubServico.php', 'serviço', [
+    ['POR_PAGINA', 'hub'],
+    ['ORDENS', 'hub'],
+    ['$dados', 'hub pub'],
+    ['$linhas', 'hub'],
+    ['$bordado', 'hub'],
+    ['$curtiu', 'hub'],
+    ['$paleta', 'hub'],
+    ['$foto', 'hub'],
+  ]],
+  ['sCom', 4, 'ComentarioServico', 'app/processamento/ComentarioServico.php', 'serviço', [
+    ['$dados', 'hub'],
+    ['$texto, $tamanho', 'hub'],
+    ['$comentario', 'hub'],
+    ['$ehAutor', 'hub'],
+  ]],
+  ['sMont', 4, 'MontadorServico', 'app/processamento/MontadorServico.php', 'serviço', [
+    ['MODOS, LIMITE_POR_HORA', 'mont'],
+    ['FOTO_MAX, FOTO_TIPOS', 'mont'],
+    ['$bordados, $matrizes, $produtos', 'mont'],
+    ['$grade, $storage', 'mont'],
+    ['$campos, $usuarioId, $eGerente', 'mont'],
+    ['$modo, $titulo, $descricao', 'mont'],
+    ['$corPeca, $categoriaId', 'mont'],
+    ['$posX, $posY, $escala, $rotacao', 'mont'],
+    ['$gradeJson, $fotoDataUrl', 'mont'],
+    ['$arquivos', 'mont'],
+    ['$erros', 'mont'],
+    ['$pdo', 'mont db'],
+    ['$matrizId, $bordadoId', 'mont'],
+  ]],
+  ['sGrade', 4, 'GradeServico', 'app/processamento/GradeServico.php', 'serviço', [
+    ['MIN, MAX, MAX_CORES, MAX_BYTES', 'mont'],
+    ['$grade', 'mont'],
+    ['$largura, $altura', 'mont'],
+    ['$paleta, $pontos', 'mont'],
+    ['$total', 'mont'],
+    ['$caminhos, $svg', 'mont'],
+  ]],
+  ['sPeca', 4, 'PecaServico', 'app/processamento/PecaServico.php', 'serviço', [
+    ['$dados', 'mont'],
+  ]],
+  ['sImg', 4, 'ImagemRemotaServico', 'app/processamento/ImagemRemotaServico.php', 'serviço', [
+    ['TAMANHO_MAXIMO, TIPOS', 'mont'],
+    ['TIMEOUT, REDIRECIONAMENTOS', 'mont'],
+    ['$url, $host, $porta, $ip', 'mont'],
+    ['$curl, $resposta', 'mont'],
+  ]],
+  ['sStor', 4, 'StorageServico', 'app/processamento/StorageServico.php', 'serviço', [
+    ['BUCKET', 'mont hub cat pub db'],
+    ['URL_PADRAO', 'mont hub cat pub db'],
+    ['TIMEOUT', 'mont hub db'],
+    ['$chave', 'mont hub db'],
+    ['$caminho', 'mont hub cat pub db'],
+    ['$url, $curl', 'mont hub db'],
+  ]],
+  ['sTut', 4, 'TutorialServico', 'app/processamento/TutorialServico.php', 'serviço', [
+    ['$bordados, $gemini', 'tut'],
+    ['$bordado', 'tut'],
+    ['$salvo, $temSalvo', 'tut'],
+    ['$texto', 'tut'],
+    ['$resultado', 'tut'],
+    ['$cores, $dados (prompt)', 'tut'],
+  ]],
+  ['sGem', 4, 'GeminiServico', 'app/processamento/GeminiServico.php', 'serviço', [
+    ['URL_BASE', 'tut'],
+    ['MODELO_PADRAO, MODELO_FALLBACK', 'tut'],
+    ['TIMEOUT_FLUXO, TIMEOUT_CONEXAO', 'tut'],
+    ['$chave', 'tut'],
+    ['$principal, $fallback', 'tut'],
+    ['$curl', 'tut'],
+    ['$pendente, $completo', 'tut'],
+    ['$motivo', 'tut'],
+  ]],
+
+  // Coluna 5: dados e conexão
+  ['dUsu', 5, 'UsuarioDados', 'app/dados/UsuarioDados.php', 'dados', [
+    ['$pdo, $consulta', 'auth ger db'],
+    ['$usuario', 'auth'],
+    ['$d', 'auth'],
+  ]],
+  ['dProd', 5, 'ProdutoDados', 'app/dados/ProdutoDados.php', 'dados', [
+    ['$sql', 'cat pub mont db'],
+    ['$consulta', 'cat pub ger mont db'],
+    ['$categoria', 'cat'],
+    ['$limite', 'pub'],
+  ]],
+  ['dHub', 5, 'HubDados', 'app/dados/HubDados.php', 'dados', [
+    ['CAMPOS_CARD, JUNCOES', 'hub pub'],
+    ['$ordemSql, $limite, $inicio', 'hub'],
+    ['$consulta', 'hub pub ger db'],
+  ]],
+  ['dCom', 5, 'ComentarioDados', 'app/dados/ComentarioDados.php', 'dados', [
+    ['$bordadoIds, $limite', 'hub'],
+    ['$consulta', 'hub ger db'],
+  ]],
+  ['conexao', 5, 'Conexao', 'app/core/Conexao.php', 'core', [
+    ['$pdo (static)', 'todos'],
+    ['$host, $user, $pass', 'db'],
+    ['$dsn', 'db'],
+    ['$opcoes', 'db'],
+  ]],
+  ['sessaoBanco', 5, 'SessaoBanco', 'app/core/SessaoBanco.php', 'core', [
+    ['VIDA_PUBLICO', 'db pub'],
+    ['VIDA_USUARIO, VIDA_GERENTE', 'db auth'],
+    ['$id, $dados', 'db auth pub'],
+    ['$intervalo, $perfil', 'db auth'],
+  ]],
+  ['dBord', 5, 'BordadoDados', 'app/dados/BordadoDados.php', 'dados', [
+    ['$sql', 'mont tut db'],
+    ['$d', 'mont'],
+    ['$consulta', 'mont tut db'],
+  ]],
+  ['dMat', 5, 'MatrizDados', 'app/dados/MatrizDados.php', 'dados', [
+    ['COLUNAS_LISTA', 'mont'],
+    ['$d', 'mont'],
+    ['$consulta', 'mont ger db'],
+  ]],
+  ['dPeca', 5, 'PecaDados', 'app/dados/PecaDados.php', 'dados', [
+    ['COLUNAS', 'mont'],
+    ['$consulta', 'mont db'],
+  ]],
+  ['dIns', 5, 'InsumoDados', 'app/dados/InsumoDados.php', 'dados', [
+    ['$consulta', 'ger db'],
+  ]],
+  ['dCli', 5, 'ClienteDados', 'app/dados/ClienteDados.php', 'dados', [
+    ['$consulta', 'ger db'],
+  ]],
+
+  // Coluna 6: serviços externos
+  ['whats', 6, 'WhatsApp', 'wa.me', 'externo', [
+    ['?text= mensagem do orçamento', 'cat'],
+  ]],
+  ['web', 6, 'Site da imagem', 'URL informada no montador', 'externo', [
+    ['imagem PNG, JPEG ou WebP', 'mont'],
+  ]],
+  ['pg', 6, 'PostgreSQL', 'Supabase', 'externo', [
+    ['usuarios', 'auth ger db'],
+    ['sessoes', 'db auth pub'],
+    ['produtos, categorias', 'cat pub ger mont'],
+    ['bordados', 'hub pub mont tut'],
+    ['matrizes', 'mont tut ger'],
+    ['pecas', 'mont'],
+    ['curtidas, comentarios', 'hub ger'],
+    ['insumos, clientes', 'ger'],
+  ]],
+  ['storage', 6, 'Supabase Storage', 'bucket mostruario', 'externo', [
+    ['matrizes/ (svg, json)', 'mont db'],
+    ['fotos/', 'mont hub db'],
+    ['produtos/, pecas/, base/', 'cat pub db'],
+  ]],
+  ['gemini', 6, 'API Gemini', 'generativelanguage.googleapis.com', 'externo', [
+    ['gemini-flash-latest', 'tut'],
+    ['gemini-flash-lite-latest (reserva)', 'tut'],
+  ]],
+];
+
+/* ---------- Montagem das estruturas a partir dos dados ---------- */
+
+const IDS_PROC = PROCESSOS.map(p => p.id);
+const PROC = Object.fromEntries(PROCESSOS.map(p => [p.id, p]));
+const lista = s => (s === 'todos' ? IDS_PROC : s.split(' '));
+
+const NOS = NOS_BRUTOS.map(([id, col, titulo, arq, tipo, attrs]) => ({
+  id, col, titulo, arq, tipo,
+  attrs: attrs.map(([nome, ps]) => ({ nome, procs: new Set(lista(ps)) })),
+  procs: new Set(),
+}));
+const NO = Object.fromEntries(NOS.map(n => [n.id, n]));
+NOS.forEach(n => n.attrs.forEach(a => a.procs.forEach(p => n.procs.add(p))));
+
+const ARESTAS = [];
+const ARESTA = {};
+for (const p of PROCESSOS) {
+  p.passos.forEach(([de, para, metodo], i) => {
+    if (!NO[de] || !NO[para]) { console.warn('Caixa inexistente no passo', p.id, de, para); return; }
+    const chave = de + '>' + para;
+    let e = ARESTA[chave];
+    if (!e) { e = ARESTA[chave] = { chave, de, para, m: {}, passos: {} }; ARESTAS.push(e); }
+    (e.m[p.id] ||= []).includes(metodo) || e.m[p.id].push(metodo);
+    (e.passos[p.id] ||= []).push(i + 1);
+    NO[de].procs.add(p.id);
+    NO[para].procs.add(p.id);
+  });
+}
+ARESTAS.forEach(e => { e.procs = IDS_PROC.filter(p => e.m[p]); });
+
+/* ---------- Estado ---------- */
+
+const estado = { ativos: new Set(IDS_PROC), ocultar: true, selecionado: null };
+try {
+  const salvo = JSON.parse(localStorage.getItem('desenrola-diagrama') || 'null');
+  if (salvo && Array.isArray(salvo.ativos)) {
+    estado.ativos = new Set(salvo.ativos.filter(p => PROC[p]));
+    estado.ocultar = salvo.ocultar !== false;
+  }
+} catch (_) { /* sem armazenamento: segue com o padrão */ }
+function guardar() {
+  try { localStorage.setItem('desenrola-diagrama', JSON.stringify({ ativos: [...estado.ativos], ocultar: estado.ocultar })); } catch (_) {}
+}
+
+/* ---------- Medidas ---------- */
+
+const L = 270;          // largura da caixa
+const VAO = 250;        // espaço entre colunas (onde ficam os nomes dos métodos)
+const CAB = 46;         // altura do cabeçalho da caixa
+const LIN = 18;         // altura de cada variável
+const ESP = 26;         // espaço vertical entre caixas
+const TOPO = 70;        // espaço para o título das colunas
+
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('grafo');
+const vista = document.getElementById('vista');
+const defs = document.getElementById('defs');
+const flutuante = document.getElementById('flutuante');
+
+function el(tag, attrs, pai) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (pai) pai.appendChild(e);
+  return e;
+}
+const cruza = (a, b) => { for (const x of a) if (b.has(x)) return true; return false; };
+const cor = p => `var(--p-${p})`;
+const corta = (t, n) => (t.length > n ? t.slice(0, n - 1) + '…' : t);
+
+// Pontas de seta, uma por processo e uma neutra.
+for (const id of [...IDS_PROC, 'neutro']) {
+  const m = el('marker', { id: 'm-' + id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 6, markerHeight: 6, orient: 'auto-start-reverse' }, defs);
+  el('path', { d: 'M0,0 L10,5 L0,10 z', style: `fill:${id === 'neutro' ? 'var(--aresta-neutra)' : cor(id)}` }, m);
+}
+
+/* ---------- Layout ---------- */
+
+function calcularLayout() {
+  const at = estado.ativos;
+  const filtra = estado.ocultar && at.size > 0;
+  const visiveis = NOS.filter(n => !filtra || cruza(n.procs, at));
+  visiveis.forEach(n => {
+    n._attrs = n.attrs.filter(a => !filtra || cruza(a.procs, at));
+    n._h = CAB + (n._attrs.length ? n._attrs.length * LIN + 12 : 4);
+  });
+  const cols = [...new Set(visiveis.map(n => n.col))].sort((a, b) => a - b);
+  const alturas = {};
+  cols.forEach(c => {
+    const ns = visiveis.filter(n => n.col === c);
+    alturas[c] = ns.reduce((s, n) => s + n._h, 0) + ESP * (ns.length - 1);
+  });
+  const maxH = Math.max(0, ...Object.values(alturas));
+  cols.forEach((c, k) => {
+    let y = TOPO + (maxH - alturas[c]) / 2;
+    visiveis.filter(n => n.col === c).forEach(n => { n._x = k * (L + VAO); n._y = y; n._k = k; y += n._h + ESP; });
+  });
+  return { visiveis, cols, maxH };
+}
+
+function arestasVisiveis(conj) {
+  const at = estado.ativos;
+  return ARESTAS.filter(e => conj.has(e.de) && conj.has(e.para)).map(e => {
+    const linhas = at.size === 0 ? [] : e.procs.filter(p => at.has(p));
+    return { e, linhas, fraca: at.size > 0 && linhas.length === 0 };
+  }).filter(v => !(v.fraca && estado.ocultar));
+}
+
+// Distribui os pontos de saída e chegada ao longo da lateral de cada caixa.
+function ancorar(vis) {
+  const vagas = {};
+  const pôr = (no, lado, item) => ((vagas[no.id + lado] ||= { no, lado, itens: [] }).itens.push(item));
+  for (const v of vis) {
+    const a = NO[v.e.de], b = NO[v.e.para];
+    let la, lb;
+    if (a === b) { la = lb = 'R'; }
+    else if (b._k > a._k) { la = 'R'; lb = 'L'; }
+    else if (b._k < a._k) { la = 'L'; lb = 'R'; }
+    else { la = lb = 'R'; }
+    v.la = la; v.lb = lb;
+    pôr(a, la, { v, ponta: 'de', oy: a === b ? a._y : b._y + b._h / 2 });
+    pôr(b, lb, { v, ponta: 'para', oy: a === b ? a._y + 1 : a._y + a._h / 2 });
+  }
+  for (const { no, lado, itens } of Object.values(vagas)) {
+    itens.sort((x, y) => x.oy - y.oy);
+    const ini = no._y + 16, fim = no._y + no._h - 10;
+    const n = itens.length;
+    itens.forEach((it, i) => {
+      const y = n === 1 ? no._y + Math.min(no._h / 2, 60) : ini + (i + 0.5) * ((fim - ini) / n);
+      const x = lado === 'R' ? no._x + L : no._x;
+      it.v[it.ponta === 'de' ? 'p1' : 'p2'] = { x, y };
+    });
+  }
+}
+
+function caminho(v, desloc) {
+  const { x: x1 } = v.p1, { x: x2 } = v.p2;
+  const y1 = v.p1.y + desloc, y2 = v.p2.y + desloc;
+  if (v.e.de === v.e.para) {
+    const yb = Math.max(y2, y1 + 24);
+    return { d: `M${x1},${y1} C${x1 + 95},${y1 - 14} ${x2 + 95},${yb + 14} ${x2},${yb}`, c: [x1 + 74, (y1 + yb) / 2] };
+  }
+  let c1x, c2x;
+  if (v.la === 'R' && v.lb === 'L') {
+    const dx = Math.max(70, (x2 - x1) * 0.42);
+    c1x = x1 + dx; c2x = x2 - dx;
+  } else if (v.la === 'L' && v.lb === 'R') {
+    const dx = Math.max(70, (x1 - x2) * 0.42);
+    c1x = x1 - dx; c2x = x2 + dx;
+  } else {
+    const dx = 80 + Math.abs(y2 - y1) * 0.12;
+    c1x = x1 + dx; c2x = x2 + dx;
+  }
+  const mx = (x1 + 3 * c1x + 3 * c2x + x2) / 8;
+  const my = (y1 + 3 * y1 + 3 * y2 + y2) / 8;
+  return { d: `M${x1},${y1} C${c1x},${y1} ${c2x},${y2} ${x2},${y2}`, c: [mx, my] };
+}
+
+/* ---------- Desenho ---------- */
+
+let ultimoTamanho = null;
+
+function desenhar(reajustar) {
+  vista.textContent = '';
+  const { visiveis, cols, maxH } = calcularLayout();
+  const conj = new Set(visiveis.map(n => n.id));
+  const vis = arestasVisiveis(conj);
+  ancorar(vis);
+  const at = estado.ativos;
+
+  // Títulos das colunas
+  const gTit = el('g', {}, vista);
+  cols.forEach((c, k) => {
+    const t = el('text', { x: k * (L + VAO) + L / 2, y: TOPO - 30, 'text-anchor': 'middle', class: 'col-titulo' }, gTit);
+    t.textContent = COLUNAS[c];
+  });
+
+  const gArestas = el('g', {}, vista);
+  const gNos = el('g', {}, vista);
+  const gRotulos = el('g', {}, vista);
+
+  // Arestas: uma linha por processo ativo, lado a lado.
+  for (const v of vis) {
+    const procs = v.linhas.length ? v.linhas : [null];
+    procs.forEach((p, i) => {
+      const desloc = (i - (procs.length - 1) / 2) * 3.4;
+      const { d } = caminho(v, desloc);
+      const classe = p ? 'aresta' : (v.fraca ? 'aresta fraca' : 'aresta neutra');
+      const attrs = { d, class: classe, 'data-chave': v.e.chave, 'marker-end': `url(#m-${p || 'neutro'})` };
+      if (p) attrs.style = `stroke:${cor(p)}`;
+      el('path', attrs, gArestas);
+    });
+    const alvo = el('path', { d: caminho(v, 0).d, class: 'alvo', 'data-chave': v.e.chave }, gArestas);
+    alvo.addEventListener('mousemove', ev => mostrarDicaAresta(ev, v.e));
+    alvo.addEventListener('mouseleave', esconderDica);
+    alvo.addEventListener('mouseenter', () => focarAresta(v.e.chave));
+    alvo.addEventListener('mouseleave', desfocar);
+
+    // Rótulo com os métodos e os números dos passos.
+    if (v.linhas.length) {
+      const [cx, cy] = caminho(v, 0).c;
+      const metodos = [...new Set(v.linhas.flatMap(p => v.e.m[p]))];
+      const mostrar = metodos.slice(0, 3).map(m => corta(m, 46));
+      if (metodos.length > 3) mostrar.push(`+${metodos.length - 3} (passe o mouse)`);
+      const g = el('g', { class: 'rotulo', 'data-chave': v.e.chave, transform: `translate(${cx},${cy})` }, gRotulos);
+      const comSelos = at.size <= 3;
+      const alturaTexto = mostrar.length * 13;
+      let y0 = -alturaTexto / 2 + 10;
+      if (comSelos) {
+        const selos = v.linhas.map(p => ({ p, t: v.e.passos[p].join(' · ') }));
+        const largs = selos.map(s => s.t.length * 6 + 10);
+        const total = largs.reduce((a, b) => a + b, 0) + (selos.length - 1) * 4;
+        let x = -total / 2;
+        const ys = y0 - 22;
+        selos.forEach((s, i) => {
+          el('rect', { x, y: ys, width: largs[i], height: 15, rx: 4, style: `fill:${cor(s.p)}` }, g);
+          const t = el('text', { x: x + largs[i] / 2, y: ys + 11, 'text-anchor': 'middle', class: 'selo' }, g);
+          t.textContent = s.t;
+          x += largs[i] + 4;
+        });
+      }
+      mostrar.forEach((m, i) => {
+        const t = el('text', { x: 0, y: y0 + i * 13, 'text-anchor': 'middle' }, g);
+        t.textContent = m;
+      });
+    }
+  }
+
+  // Caixas
+  for (const n of visiveis) {
+    const ativo = at.size === 0 || cruza(n.procs, at);
+    const g = el('g', {
+      class: 'no' + (ativo ? '' : ' apagado') + (estado.selecionado === n.id ? ' selecionado' : ''),
+      transform: `translate(${n._x},${n._y})`, 'data-id': n.id, tabindex: 0,
+    }, gNos);
+    const titulo = el('title', {}, g); titulo.textContent = `${n.titulo}\n${n.arq}`;
+    el('rect', { class: 'caixa', width: L, height: n._h, rx: 10, filter: 'url(#sombra)' }, g);
+    el('path', { class: 'cabeca', d: `M0,10 Q0,0 10,0 H${L - 10} Q${L},0 ${L},10 V${CAB} H0 Z` }, g);
+    el('line', { class: 'divisa', x1: 0, x2: L, y1: CAB, y2: CAB }, g);
+    const tt = el('text', { x: 12, y: 20, class: 'titulo' }, g); tt.textContent = corta(n.titulo, 26);
+    const ta = el('text', { x: 12, y: 36, class: 'arq' }, g); ta.textContent = corta(n.arq, 42);
+    const tp = el('text', { x: L - 10, y: 18, 'text-anchor': 'end', class: 'tipo' }, g); tp.textContent = n.tipo;
+    // Pontinhos dos processos de que a caixa participa
+    const dotsCaixa = IDS_PROC.filter(p => n.procs.has(p) && (at.size === 0 || at.has(p)));
+    dotsCaixa.forEach((p, i) => el('circle', { cx: L - 12 - i * 10, cy: 33, r: 3.6, style: `fill:${cor(p)}` }, g));
+
+    n._attrs.forEach((a, i) => {
+      const y = CAB + 8 + i * LIN + 12;
+      const usa = IDS_PROC.filter(p => a.procs.has(p) && (at.size === 0 || at.has(p)));
+      const on = at.size === 0 || usa.length > 0;
+      const espaco = L - 26 - usa.length * 9;
+      const t = el('text', { x: 14, y, class: 'attr' + (on ? '' : ' attr-off') }, g);
+      t.textContent = corta(a.nome, Math.floor(espaco / 6.9));
+      usa.forEach((p, j) => el('circle', { cx: L - 12 - j * 9, cy: y - 4, r: 3, style: `fill:${cor(p)}` }, g));
+    });
+
+    g.addEventListener('mouseenter', () => focarNo(n.id));
+    g.addEventListener('mouseleave', desfocar);
+    g.addEventListener('click', ev => { ev.stopPropagation(); selecionar(n.id); });
+    g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); selecionar(n.id); } });
+  }
+
+  separarRotulos(gRotulos);
+
+  const largura = Math.max(1, cols.length) * (L + VAO) - VAO + 120;
+  ultimoTamanho = { x: -40, y: 0, w: largura + 40, h: maxH + TOPO + 40 };
+  if (reajustar) ajustar();
+}
+
+// Afasta na vertical os rótulos que ficaram um em cima do outro.
+function separarRotulos(grupo) {
+  const rs = [...grupo.children].map(g => {
+    const b = g.getBBox();
+    const m = g.getAttribute('transform').match(/translate\(([-\d.]+),([-\d.]+)\)/);
+    return { g, cx: +m[1], cy: +m[2], x: b.x, y: b.y, w: b.width, h: b.height };
+  });
+  for (let volta = 0; volta < 150; volta++) {
+    let mexeu = false;
+    rs.sort((a, b) => (a.cy + a.y) - (b.cy + b.y));
+    for (let i = 0; i < rs.length; i++) {
+      for (let j = i + 1; j < rs.length; j++) {
+        const a = rs[i], b = rs[j];
+        const ax = a.cx + a.x, bx = b.cx + b.x, ay = a.cy + a.y, by = b.cy + b.y;
+        if (ax < bx + b.w && bx < ax + a.w && ay < by + b.h && by < ay + a.h) {
+          const falta = (ay + a.h) - by + 3;
+          a.cy -= falta / 2; b.cy += falta / 2; mexeu = true;
+        }
+      }
+    }
+    if (!mexeu) break;
+  }
+  rs.forEach(r => r.g.setAttribute('transform', `translate(${r.cx},${r.cy})`));
+}
+
+// Sombra suave das caixas
+(() => {
+  const f = el('filter', { id: 'sombra', x: '-10%', y: '-10%', width: '120%', height: '130%' }, defs);
+  el('feDropShadow', { dx: 0, dy: 1.5, stdDeviation: 2.5, 'flood-opacity': 0.12 }, f);
+})();
+
+/* ---------- Foco e dicas ---------- */
+
+function focarNo(id) {
+  svg.classList.add('focando');
+  const viz = new Set([id]);
+  vista.querySelectorAll('[data-chave]').forEach(x => {
+    const [de, para] = x.dataset.chave.split('>');
+    const liga = de === id || para === id;
+    x.classList.toggle('foco', liga);
+    if (liga) { viz.add(de); viz.add(para); }
+  });
+  vista.querySelectorAll('.no').forEach(x => x.classList.toggle('foco', viz.has(x.dataset.id)));
+}
+function focarAresta(chave) {
+  svg.classList.add('focando');
+  const [de, para] = chave.split('>');
+  vista.querySelectorAll('[data-chave]').forEach(x => x.classList.toggle('foco', x.dataset.chave === chave));
+  vista.querySelectorAll('.no').forEach(x => x.classList.toggle('foco', x.dataset.id === de || x.dataset.id === para));
+}
+function desfocar() {
+  svg.classList.remove('focando');
+  vista.querySelectorAll('.foco').forEach(x => x.classList.remove('foco'));
+}
+
+function mostrarDicaAresta(ev, e) {
+  const at = estado.ativos;
+  const procs = e.procs.filter(p => at.size === 0 || at.has(p));
+  const html = [`<b>${NO[e.de].titulo} → ${NO[e.para].titulo}</b>`];
+  for (const p of procs) {
+    html.push(`<div class="linha-p"><span class="pontinho" style="background:${cor(p)}"></span>${PROC[p].nome}, passo ${e.passos[p].join(', ')}<br>` +
+      e.m[p].map(m => `<code>${esc(m)}</code>`).join('<br>') + '</div>');
+  }
+  flutuante.innerHTML = html.join('');
+  flutuante.style.display = 'block';
+  const r = svg.getBoundingClientRect();
+  let x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
+  const w = flutuante.offsetWidth, h = flutuante.offsetHeight;
+  if (x + w > r.width - 8) x = ev.clientX - r.left - w - 14;
+  if (y + h > r.height - 8) y = ev.clientY - r.top - h - 14;
+  flutuante.style.left = Math.max(8, x) + 'px';
+  flutuante.style.top = Math.max(8, y) + 'px';
+}
+function esconderDica() { flutuante.style.display = 'none'; }
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ---------- Zoom e arraste ---------- */
+
+const cam = { x: 0, y: 0, k: 1 };
+function aplicar() { vista.setAttribute('transform', `translate(${cam.x},${cam.y}) scale(${cam.k})`); }
+function ajustar() {
+  const r = svg.getBoundingClientRect();
+  const t = ultimoTamanho; if (!t || !r.width) return;
+  const k = Math.min(r.width / t.w, r.height / t.h) * 0.96;
+  cam.k = Math.max(0.12, Math.min(1.4, k));
+  cam.x = (r.width - t.w * cam.k) / 2 - t.x * cam.k;
+  cam.y = Math.max(8, (r.height - t.h * cam.k) / 2) - t.y * cam.k;
+  aplicar();
+}
+function zoom(fator, cx, cy) {
+  const r = svg.getBoundingClientRect();
+  if (cx === undefined) { cx = r.width / 2; cy = r.height / 2; }
+  const k = Math.max(0.12, Math.min(3, cam.k * fator));
+  cam.x = cx - (cx - cam.x) * (k / cam.k);
+  cam.y = cy - (cy - cam.y) * (k / cam.k);
+  cam.k = k; aplicar();
+}
+function centrar(px, py) {
+  const r = svg.getBoundingClientRect();
+  if (cam.k < 0.7) cam.k = 0.9;
+  cam.x = r.width / 2 - px * cam.k; cam.y = r.height / 2 - py * cam.k; aplicar();
+}
+svg.addEventListener('wheel', ev => {
+  ev.preventDefault();
+  const r = svg.getBoundingClientRect();
+  zoom(Math.exp(-ev.deltaY * 0.0015), ev.clientX - r.left, ev.clientY - r.top);
+}, { passive: false });
+let arraste = null;
+svg.addEventListener('pointerdown', ev => {
+  if (ev.target.closest('.no')) return;
+  arraste = { x: ev.clientX, y: ev.clientY, cx: cam.x, cy: cam.y, moveu: false };
+  svg.setPointerCapture(ev.pointerId); svg.classList.add('arrastando');
+});
+svg.addEventListener('pointermove', ev => {
+  if (!arraste) return;
+  const dx = ev.clientX - arraste.x, dy = ev.clientY - arraste.y;
+  if (Math.abs(dx) + Math.abs(dy) > 3) arraste.moveu = true;
+  cam.x = arraste.cx + dx; cam.y = arraste.cy + dy; aplicar();
+});
+svg.addEventListener('pointerup', ev => {
+  if (arraste && !arraste.moveu && !ev.target.closest('.no')) selecionar(null);
+  arraste = null; svg.classList.remove('arrastando');
+});
+document.getElementById('mais').onclick = () => zoom(1.25);
+document.getElementById('menos').onclick = () => zoom(0.8);
+document.getElementById('ajustar').onclick = ajustar;
+document.getElementById('tema').onclick = () => {
+  const raiz = document.documentElement;
+  const escuro = raiz.dataset.theme ? raiz.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  raiz.dataset.theme = escuro ? 'light' : 'dark';
+};
+addEventListener('resize', () => ajustar());
+
+/* ---------- Recolher e expandir o painel ---------- */
+
+const botaoRecolher = document.getElementById('recolher');
+const botaoExpandir = document.getElementById('expandir');
+const miniLegenda = document.getElementById('mini-legenda');
+
+// Legenda compacta: um quadradinho por processo, que liga e desliga como na legenda completa.
+for (const p of PROCESSOS) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'mini';
+  b.dataset.p = p.id;
+  b.title = p.nome;
+  b.setAttribute('aria-label', p.nome);
+  b.style.setProperty('--c', cor(p.id));
+  b.onclick = () => {
+    estado.ativos.has(p.id) ? estado.ativos.delete(p.id) : estado.ativos.add(p.id);
+    atualizar();
+  };
+  miniLegenda.appendChild(b);
+}
+
+function recolherPainel(recolher, salvar = true) {
+  document.body.classList.toggle('recolhido', recolher);
+  botaoRecolher.setAttribute('aria-expanded', String(!recolher));
+  botaoExpandir.setAttribute('aria-expanded', String(!recolher));
+  (recolher ? botaoExpandir : botaoRecolher).focus({ preventScroll: true });
+  if (salvar) { try { localStorage.setItem('desenrola-painel', recolher ? 'recolhido' : 'aberto'); } catch (_) {} }
+  // Reajusta o grafo depois que a coluna termina de mudar de largura.
+  setTimeout(ajustar, 280);
+}
+botaoRecolher.onclick = () => recolherPainel(true);
+botaoExpandir.onclick = () => recolherPainel(false);
+addEventListener('keydown', ev => {
+  if (ev.key !== '[' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  if (ev.target instanceof Element && ev.target.closest('input, textarea, select')) return;
+  recolherPainel(!document.body.classList.contains('recolhido'));
+});
+try {
+  if (localStorage.getItem('desenrola-painel') === 'recolhido') {
+    document.body.classList.add('recolhido');
+    botaoRecolher.setAttribute('aria-expanded', 'false');
+    botaoExpandir.setAttribute('aria-expanded', 'false');
+  }
+} catch (_) {}
+
+/* ---------- Painel lateral ---------- */
+
+const legenda = document.getElementById('legenda');
+for (const p of PROCESSOS) {
+  const rot = document.createElement('label');
+  rot.className = 'proc';
+  rot.style.setProperty('--c', cor(p.id));
+  rot.innerHTML = `<input type="checkbox" data-p="${p.id}"><span class="cor"></span>
+    <span class="nome">${p.nome}</span><button type="button" class="so" data-so="${p.id}" title="Mostrar só este processo">só</button>
+    <span class="desc">${p.desc}</span>`;
+  legenda.appendChild(rot);
+}
+legenda.addEventListener('change', ev => {
+  const p = ev.target.dataset.p; if (!p) return;
+  ev.target.checked ? estado.ativos.add(p) : estado.ativos.delete(p);
+  atualizar();
+});
+legenda.addEventListener('click', ev => {
+  const p = ev.target.dataset.so; if (!p) return;
+  ev.preventDefault();
+  estado.ativos = new Set([p]); atualizar();
+});
+document.getElementById('todos').onclick = () => { estado.ativos = new Set(IDS_PROC); atualizar(); };
+document.getElementById('nenhum').onclick = () => { estado.ativos = new Set(); atualizar(); };
+const caixaOcultar = document.getElementById('ocultar');
+caixaOcultar.onchange = () => { estado.ocultar = caixaOcultar.checked; atualizar(); };
+
+function desenharPassos() {
+  const alvo = document.getElementById('passos');
+  if (estado.ativos.size !== 1) {
+    alvo.innerHTML = '<p class="vazio">Deixe um único processo ligado (botão "só") para ver a ordem das chamadas.</p>';
+    return;
+  }
+  const p = PROC[[...estado.ativos][0]];
+  const ol = document.createElement('ol');
+  ol.className = 'passos';
+  ol.style.setProperty('--c', cor(p.id));
+  p.passos.forEach(([de, para, metodo], i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="n">${i + 1}</span><span><span class="de">${esc(NO[de].titulo)} → ${esc(NO[para].titulo)}</span><br><code>${esc(metodo)}</code></span>`;
+    const chave = de + '>' + para;
+    li.onmouseenter = () => focarAresta(chave);
+    li.onmouseleave = desfocar;
+    li.onclick = () => {
+      const r = vista.querySelector(`.rotulo[data-chave="${CSS.escape(chave)}"]`);
+      if (r) { const m = r.getAttribute('transform').match(/translate\(([-\d.]+),([-\d.]+)\)/); if (m) centrar(+m[1], +m[2]); }
+    };
+    ol.appendChild(li);
+  });
+  alvo.innerHTML = '';
+  alvo.appendChild(ol);
+}
+
+function selecionar(id) {
+  estado.selecionado = id;
+  vista.querySelectorAll('.no').forEach(x => x.classList.toggle('selecionado', x.dataset.id === id));
+  const alvo = document.getElementById('detalhe');
+  if (!id) { alvo.innerHTML = '<p class="vazio">Clique em uma caixa para ver o arquivo, as variáveis e quem ela chama.</p>'; return; }
+  const n = NO[id], at = estado.ativos;
+  const filtro = p => at.size === 0 || at.has(p);
+  const pts = s => [...s].filter(filtro).map(p => `<span class="pontinho" style="background:${cor(p)}" title="${PROC[p].nome}"></span>`).join('');
+  const linhaAresta = (e, outro) => e.procs.filter(filtro).length
+    ? `<li>${pts(new Set(e.procs))} <b>${esc(NO[outro].titulo)}</b>: <code>${esc([...new Set(e.procs.filter(filtro).flatMap(p => e.m[p]))].join(' / '))}</code></li>` : '';
+  const sai = ARESTAS.filter(e => e.de === id).map(e => linhaAresta(e, e.para)).join('');
+  const entra = ARESTAS.filter(e => e.para === id && e.de !== id).map(e => linhaAresta(e, e.de)).join('');
+  alvo.innerHTML = `<h3>${esc(n.titulo)}</h3><div class="caminho">${esc(n.arq)}</div>
+    <b>Variáveis</b><ul>${n.attrs.map(a => `<li>${pts(a.procs)} <code>${esc(a.nome)}</code></li>`).join('')}</ul>
+    <b>Chama</b><ul>${sai || '<li class="vazio">nada nos processos ligados</li>'}</ul>
+    <b>É chamada por</b><ul>${entra || '<li class="vazio">ninguém nos processos ligados</li>'}</ul>`;
+}
+
+function atualizar() {
+  legenda.querySelectorAll('input[data-p]').forEach(i => { i.checked = estado.ativos.has(i.dataset.p); });
+  miniLegenda.querySelectorAll('.mini').forEach(b => b.setAttribute('aria-pressed', String(estado.ativos.has(b.dataset.p))));
+  caixaOcultar.checked = estado.ocultar;
+  guardar();
+  desenhar(true);
+  desenharPassos();
+  selecionar(estado.selecionado && vista.querySelector(`.no[data-id="${estado.selecionado}"]`) ? estado.selecionado : null);
+}
+
+atualizar();
+</script>
+</body>
+</html>
