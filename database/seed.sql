@@ -37,7 +37,6 @@ WHERE NOT EXISTS (SELECT 1 FROM pecas)
 ORDER BY v.ordem;
 
 -- 3. Contas de gerente ---------------------------------------------------
--- Senha provisória: admin123 (troque no primeiro acesso, ou via SQL).
 -- A pergunta de segurança é um placeholder: os gerentes não usam o fluxo
 -- de recuperação pelo site. Resposta é uma string aleatória, sem significado.
 

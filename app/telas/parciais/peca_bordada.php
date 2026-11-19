@@ -41,9 +41,10 @@ if ($fotoProduto !== '') {
 $fotoPeca = (string) ($item['foto_peca'] ?? '');
 $fotoUrl = $fotoPeca !== '' ? StorageServico::urlPublica($fotoPeca) : '';
 $corPeca = (string) ($item['cor_peca'] ?? '#2e2321');
-// Mesma regra do montador: só peça base é tingida, e branco significa "cor original da foto".
-$tingir = $fotoUrl !== '' && filter_var($item['foto_tingir'] ?? true, FILTER_VALIDATE_BOOLEAN)
-    && strtolower($corPeca) !== '#ffffff';
+// Mesma regra do montador: só peça base é tingida. Branco significa "cor original da foto",
+// mas a camada de tinta é desenhada mesmo assim: com multiply, branco não altera a foto,
+// e a camada precisa existir para a prévia de cor da página do produto conseguir pintá-la.
+$tingir = $fotoUrl !== '' && filter_var($item['foto_tingir'] ?? true, FILTER_VALIDATE_BOOLEAN);
 
 $desenho = '';
 if ($fotoUrl === '') {
